@@ -31,7 +31,7 @@ Detalle: `docs/sources/` · `research.md`
 - [x] T1.4 Scaffold `apps/frontend` Angular + PWA schematic  
 - [x] T1.5 `infra/docker/docker-compose.yml` (PostGIS + backend)  
 - [x] T1.6 `.env.example`  
-- [ ] T1.7 CI mínimo (lint/test stub) — opcional si aún no hay remote  
+- [x] T1.7 CI mínimo (lint/test stub) — opcional si aún no hay remote  
 
 ---
 
@@ -43,6 +43,8 @@ Detalle: `docs/sources/` · `research.md`
 - [x] T2.4 `GET /api/v1/health`  
 - [x] T2.5 OpenAPI/Swagger habilitado  
 - [x] T2.6 Framework connector: interface `fetch/validate/normalize/upsert` + logging  
+
+> **Nota producto:** la “Fase 2 de producto” (más fuentes oficiales) continúa **fuera** de este checklist 001 — ver `docs/dev/ESTADO-FASES.md` (SISPRO + Places).  
 
 ---
 

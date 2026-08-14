@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
 import type { SourceDto } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { statusLabel } from '../plain-labels';
@@ -7,7 +7,7 @@ import { statusLabel } from '../plain-labels';
 @Component({
   selector: 'aee-sources-page',
   standalone: true,
-  imports: [NgFor, NgIf],
+  imports: [NgFor, NgIf, DatePipe],
   template: `
     <section class="page-hero">
       <div class="wrap">
@@ -42,6 +42,10 @@ import { statusLabel } from '../plain-labels';
               <span class="badge">{{ statusLabel(s.integrationStatus) }}</span>
             </div>
             <p>{{ friendlyDesc(s) }}</p>
+            <p class="meta" *ngIf="s.lastSuccessfulFetch">
+              Última sync OK: {{ s.lastSuccessfulFetch | date: 'medium' }}
+            </p>
+            <p class="err-soft" *ngIf="s.lastError">Último error: {{ s.lastError }}</p>
             <a *ngIf="s.url" [href]="s.url" target="_blank" rel="noopener">Abrir sitio oficial</a>
           </li>
         </ul>
@@ -156,6 +160,18 @@ import { statusLabel } from '../plain-labels';
         color: var(--teal);
         font-weight: 800;
       }
+      .meta {
+        margin: 0.35rem 0 0;
+        font-size: 0.85rem;
+        color: var(--teal-deep);
+        font-weight: 700;
+      }
+      .err-soft {
+        margin: 0.35rem 0 0;
+        font-size: 0.85rem;
+        color: var(--coral-deep);
+        font-weight: 700;
+      }
       .err {
         color: var(--coral-deep);
         font-weight: 800;
@@ -181,6 +197,8 @@ export class SourcesPageComponent implements OnInit {
   }
 
   friendlyName(s: SourceDto): string {
+    if (s.id === 'sispro') return 'SISPRO / REPS — salud (IPS)';
+    if (s.id === 'community') return 'Comunidad (avisos y lugares)';
     if (s.id === 'ideam') return 'IDEAM — ríos y clima';
     if (s.id === 'sgc') return 'SGC — sismos';
     if (s.id === 'osm') return 'OpenStreetMap — mapa base';
@@ -188,6 +206,12 @@ export class SourcesPageComponent implements OnInit {
   }
 
   friendlyDesc(s: SourceDto): string {
+    if (s.id === 'sispro') {
+      return 'Sedes IPS en el mapa (filtro Salud). Datos MinSalud / SISPRO.';
+    }
+    if (s.id === 'community') {
+      return 'Avisos y puntos publicados por personas (sin verificar).';
+    }
     if (s.id === 'ideam') return 'Alertas oficiales que ves en Comunidad.';
     if (s.id === 'sgc') return 'Todavía no entra automático; usa el enlace oficial.';
     if (s.id === 'osm') return 'Dibuja las calles del mapa. No es una alerta.';

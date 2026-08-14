@@ -89,15 +89,17 @@ Detalle de comportamiento: [`../../specs/002-registro-facil-lugares/spec.md`](..
 
 ## Orden práctico de desarrollo
 
-| Orden | Qué | Efecto cobertura |
-|-------|-----|------------------|
-| 1 | MVP 001 (API + needs + IDEAM + mapa) | Columna vertebral |
-| 2 | DIVIPOLA + “cerca de mí” | Todo municipio direccionable |
-| 3 | Connector **SISPRO/REPS** (IPS puntos) | Salud en casi todo el país |
-| 4 | **Spec 002** registro fácil de Places | Acopios/voluntariado donde no hay API |
-| 5 | Connectors Cali / Medellín / Bogotá | Densificar ciudades grandes |
-| 6 | OSM amenities cacheado por depto | Relleno barato |
-| 7 | Discovery continuo CDGRD | Connectors oportunistas |
+Alineado al roadmap canónico: [`../product/ROADMAP-FASES.md`](../product/ROADMAP-FASES.md)
+
+| Orden | Fase | Qué | Efecto cobertura |
+|-------|------|-----|------------------|
+| 1 | 1 | MVP 001 (API + avisos + IDEAM + mapa) | Columna vertebral |
+| 2 | 2 | Connector **SISPRO/REPS** (IPS) | Salud en casi todo el país |
+| 3 | 3 | DIVIPOLA + **spec 002** Places (acopio/ONG) | Municipio direccionable + vacío sin API |
+| 4 | 4–5 | Quiero ayudar + donación (enlaces) | Acción humana sin intermediarnos |
+| 5 | 6 | Connectors Cali / Medellín / Bogotá + OSM | Densificar |
+| 6 | 7 | Discovery CDGRD + deep-links oficiales | Oportunista / derivación |
+| — | 12 | Offline avanzado | **Último, casi opcional** |
 
 ---
 

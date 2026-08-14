@@ -80,17 +80,29 @@ La lista es para leer; el mapa es para ver **dónde**.
 
 ## Roadmap corto
 
-| Slice | Idea |
-|-------|------|
-| **001** | Alertas + avisos + fuentes + API (este repo) |
-| **002+** | Registro fácil de lugares (acopio, fundaciones, ONG) y enlaces a donar **en sitios de terceros** |
-| Después | Mejor cobertura nacional, moderación, más connectors |
+| Fase | Idea |
+|------|------|
+| **0** | Discovery de fuentes |
+| **1 / 001** | Alertas + avisos + fuentes + API |
+| **2** | SISPRO salud + Places (validación, sync paginado, expiración) |
+| **3 / 002** | Orgs/acopio, filtro ciudad, “quién necesita apoyo” (sin donar nosotros) |
+| **4–5** | Quiero ayudar + donación solo por enlace a terceros |
+| **6–8** | Densidad territorial → deep-links oficiales → moderación |
+| **9** | Producción + API madura |
+| **10–11** | Verticales / multi-país (opcionales) |
+| **12** | Offline / PWA avanzada — **última, casi opcional** |
+
+Detalle completo: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
 
 ---
 
 ## Documentos relacionados
 
+- Roadmap fases: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)  
 - Visión: [`vision.md`](vision.md)  
-- Spec activa: [`../../specs/001-mvp-mapa-ayuda/spec.md`](../../specs/001-mvp-mapa-ayuda/spec.md)  
-- Cómo compilar y correr: [`../dev/COMO-CORRER.md`](../dev/COMO-CORRER.md)  
+- Inspiración refs: [`INSPIRACION-REFERENCIAS.md`](INSPIRACION-REFERENCIAS.md)  
+- Estado fases: [`../dev/ESTADO-FASES.md`](../dev/ESTADO-FASES.md)  
+- Cómo correr: [`../dev/COMO-CORRER.md`](../dev/COMO-CORRER.md)  
+- Spec 001: [`../../specs/001-mvp-mapa-ayuda/spec.md`](../../specs/001-mvp-mapa-ayuda/spec.md)  
+- Spec 002: [`../../specs/002-registro-facil-lugares/spec.md`](../../specs/002-registro-facil-lugares/spec.md)  
 - Constitution: [`../../.specify/memory/constitution.md`](../../.specify/memory/constitution.md)  

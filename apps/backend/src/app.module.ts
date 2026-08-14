@@ -9,6 +9,7 @@ import { SourcesModule } from './sources/sources.module';
 import { EventsModule } from './events/events.module';
 import { NeedsModule } from './needs/needs.module';
 import { ConnectorsModule } from './connectors/connectors.module';
+import { PlacesModule } from './places/places.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ConnectorsModule } from './connectors/connectors.module';
     SourcesModule,
     EventsModule,
     NeedsModule,
+    PlacesModule,
     ConnectorsModule,
   ],
   providers: [

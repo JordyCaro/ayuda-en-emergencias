@@ -18,8 +18,8 @@ async function bootstrap() {
 
   const swagger = new DocumentBuilder()
     .setTitle('Ayuda en Emergencias API')
-    .setDescription('API pública v1 — slice 001 MVP')
-    .setVersion('0.1.0')
+    .setDescription('API pública v1 — MVP 001 + Fase 2 (Places / SISPRO)')
+    .setVersion('0.2.0')
     .build();
   SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, swagger));
 

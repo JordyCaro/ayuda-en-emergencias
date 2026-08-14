@@ -5,6 +5,7 @@ import { SourceEntity } from '../sources/source.entity';
 import { RawRecordEntity } from '../events/raw-record.entity';
 import { EventEntity } from '../events/event.entity';
 import { NeedEntity } from '../needs/need.entity';
+import { PlaceEntity } from '../places/place.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,13 @@ import { NeedEntity } from '../needs/need.entity';
         url:
           config.get<string>('DATABASE_URL') ??
           'postgresql://aee:aee@localhost:5432/ayuda_emergencias',
-        entities: [SourceEntity, RawRecordEntity, EventEntity, NeedEntity],
+        entities: [
+          SourceEntity,
+          RawRecordEntity,
+          EventEntity,
+          NeedEntity,
+          PlaceEntity,
+        ],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging: config.get<string>('TYPEORM_LOGGING') === 'true',
       }),

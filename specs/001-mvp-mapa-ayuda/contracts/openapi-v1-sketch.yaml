@@ -147,6 +147,90 @@ paths:
                 $ref: '#/components/schemas/Need'
         '404':
           description: Not found
+  /places:
+    get:
+      summary: List places (salud, acopio, etc.)
+      operationId: listPlaces
+      parameters:
+        - $ref: '#/components/parameters/lat'
+        - $ref: '#/components/parameters/lng'
+        - $ref: '#/components/parameters/radius'
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [HELP_CENTER, DONATION_POINT, SHELTER, VOLUNTEER_POINT, MEDICAL, MEETING_POINT, OTHER]
+        - name: west
+          in: query
+          schema: { type: number }
+        - name: south
+          in: query
+          schema: { type: number }
+        - name: east
+          in: query
+          schema: { type: number }
+        - name: north
+          in: query
+          schema: { type: number }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 800 }
+        - name: offset
+          in: query
+          schema: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: Places + meta pagination
+        '400':
+          description: Invalid bbox or query
+    post:
+      summary: Create community place (UNVERIFIED)
+      operationId: createPlace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlaceRequest'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Validation error
+        '429':
+          description: Rate limited
+  /places/{id}:
+    get:
+      summary: Get place by id
+      operationId: getPlace
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Place
+        '404':
+          description: Not found
+  /connectors/sispro/run:
+    post:
+      summary: Sync SISPRO/REPS IPS places for a bbox (rate-limited)
+      operationId: runSispro
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                west: { type: number }
+                south: { type: number }
+                east: { type: number }
+                north: { type: number }
+      responses:
+        '200':
+          description: Sync result (placesUpserted, skipped, truncated)
+        '400':
+          description: Invalid bbox
+        '429':
+          description: Rate limited
 components:
   parameters:
     id:
@@ -236,6 +320,9 @@ components:
           type: string
           format: date-time
           nullable: true
+        lastError:
+          type: string
+          nullable: true
         attributionRequired:
           type: boolean
     Event:
@@ -317,3 +404,22 @@ components:
                 type: number
               minItems: 2
               maxItems: 2
+    CreatePlaceRequest:
+      type: object
+      required: [type, title, geometry]
+      properties:
+        type:
+          type: string
+          enum: [HELP_CENTER, DONATION_POINT, SHELTER, VOLUNTEER_POINT, MEDICAL, MEETING_POINT, OTHER]
+        title:
+          type: string
+          maxLength: 512
+        description:
+          type: string
+          maxLength: 2000
+        geometry:
+          type: object
+          description: GeoJSON Point
+        externalUrl:
+          type: string
+          format: uri

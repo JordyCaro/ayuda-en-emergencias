@@ -103,14 +103,17 @@ Si algo falla al implementar: **primero** corregir spec/plan, no solo el código
 
 ```text
 docs/
-  MAPA-DEL-REPO.md     ← este archivo
-  DECISIONS.md         ← resumen de decisiones
+  MAPA-DEL-REPO.md           ← este archivo
+  DECISIONS.md               ← resumen de decisiones
+  product/ROADMAP-FASES.md   ← fases canónicas (master → cumplimiento)
   product/vision.md
-  architecture/        ← overview + ADRs (por qué elegimos X)
-  sources/             ← registry de APIs externas
-  sdd/workflow.md      ← cómo se usa SDD aquí
-  legal/               ← borradores
-  api/                 ← índice hacia OpenAPI
+  product/QUE-ES.md
+  architecture/              ← overview + ADRs
+  sources/                   ← registry de APIs externas
+  sdd/workflow.md
+  legal/
+  api/
+  dev/ESTADO-FASES.md        ← tablero corto de estado
 ```
 
 ### C) Reglas permanentes
@@ -194,6 +197,7 @@ README.md          # puerta de entrada
 
 ## 8. Estado actual
 
-- Documentación y carpetas: **sí**  
-- Código Angular/Nest/Docker ejecutable: **aún no**  
-- Repo remoto: **aún no**
+- Documentación + roadmap de fases (0–12): **sí** — [`product/ROADMAP-FASES.md`](product/ROADMAP-FASES.md)  
+- Código MVP 001 + Places/SISPRO (fases 1–2): **sí** (local)  
+- Siguiente producto: **Fase 3 / spec 002**  
+- Offline avanzado: **fase 12**, última y casi opcional

@@ -9,10 +9,11 @@ Producto: **Ayuda en Emergencias**.
 ## Antes de escribir código de producto
 
 1. Leer `.specify/memory/constitution.md`  
-2. Identificar el slice activo (hoy: `specs/001-mvp-mapa-ayuda/`)  
+2. Identificar el slice activo (hoy: `specs/001-mvp-mapa-ayuda/` hecho; siguiente producto `specs/002-registro-facil-lugares/`)  
 3. Leer `spec.md` → `plan.md` → `tasks.md`  
 4. Si el pedido del usuario contradice el spec OUT o la constitution → **parar y preguntar**; no “ampliar el MVP porque es fácil”  
 5. No implementar features OUT del spec activo  
+6. Roadmap de fases (master): `docs/product/ROADMAP-FASES.md` — **offline = fase 12, última y casi opcional**  
 
 ## Mapa mental del monorepo
 
@@ -52,13 +53,16 @@ Prioridad de lectura:
 
 1. `README.md`  
 2. `docs/product/QUE-ES.md`  
-3. `docs/dev/COMO-CORRER.md`  
-4. `docs/MAPA-DEL-REPO.md`  
-5. Constitution  
-6. Spec/plan/tasks del slice activo  
+3. `docs/product/ROADMAP-FASES.md`  
+4. `docs/dev/COMO-CORRER.md`  
+5. `docs/MAPA-DEL-REPO.md`  
+6. Constitution  
+7. Spec/plan/tasks del slice activo  
 
 ## Estado del proyecto
 
-Documentación + código MVP 001. Producto = **capa que conecta** (no intermedia donaciones).  
-Avisos comunitarios = comentarios geolocalizados, no tickets de atención.  
-Ver `docs/product/QUE-ES.md` y `docs/dev/COMO-CORRER.md`.
+Fases **0–2** hechas (001 + Places/SISPRO **robusta**). Siguiente: **Fase 3 / 002**.  
+Producto = **capa que conecta** (no intermedia donaciones).  
+Avisos = comentarios geolocalizados, no tickets.  
+Cumplimiento master = fases **0–9**; **offline = 12 (casi opcional)**.  
+Ver `docs/product/ROADMAP-FASES.md` y `docs/dev/COMO-CORRER.md`.

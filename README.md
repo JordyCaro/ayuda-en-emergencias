@@ -79,9 +79,12 @@ docs/           → explicación humana
 
 | Tema | Archivo |
 |------|---------|
-| Qué es / para qué | `docs/product/QUE-ES.md` |
+| Confianza | `docs/product/QUE-ES.md` |
 | Visión | `docs/product/vision.md` |
+| **Roadmap completo (master → fases)** | `docs/product/ROADMAP-FASES.md` |
 | Correr / compilar | `docs/dev/COMO-CORRER.md` |
+| Estado de fases | `docs/dev/ESTADO-FASES.md` |
+| Fases + backend (para nuevos devs) | `docs/dev/FASES-Y-BACKEND.md` |
 | Probar por fases | `docs/dev/COMO-PROBAR-FASES.md` |
 | Spec 001 | `specs/001-mvp-mapa-ayuda/` |
 | Fuentes | `docs/sources/` |
@@ -93,6 +96,7 @@ docs/           → explicación humana
 
 - Recaudar o custodiar donaciones  
 - Prometer cumplimiento de avisos  
-- Voluntariado / mascotas / RND como producto propio en 001  
+- Ser base oficial de desaparecidos / app de mascotas  
 
-Esos vínculos a **terceros** se planifican en **002+**.
+Vínculos a **terceros** (acopio, donación, voluntariado, RND): fases **3–7** del roadmap.  
+**Offline avanzado:** fase **12**, última y casi opcional.

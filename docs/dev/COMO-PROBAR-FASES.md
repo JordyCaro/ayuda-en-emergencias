@@ -1,7 +1,8 @@
 # Cómo ver y probar el MVP 001
 
 Producto: ver [`../product/QUE-ES.md`](../product/QUE-ES.md).  
-Arranque: ver [`COMO-CORRER.md`](COMO-CORRER.md).
+Arranque: ver [`COMO-CORRER.md`](COMO-CORRER.md).  
+Fases / roadmap: [`../product/ROADMAP-FASES.md`](../product/ROADMAP-FASES.md) · [`ESTADO-FASES.md`](ESTADO-FASES.md).
 
 ## Idea rápida
 

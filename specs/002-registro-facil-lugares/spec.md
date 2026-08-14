@@ -11,22 +11,25 @@
 ## 1. Outcomes
 
 1. Cualquier persona en Colombia puede **publicar un punto** (acopio, ayuda, voluntariado, albergue, otro) en &lt;30 segundos.  
-2. Una **organización o entidad** puede registrarse con un flujo simple (nombre, tipo, punto, enlace de evidencia).  
-3. Los puntos aparecen en el mapa **cerca del usuario**, con badge de no verificado / verificado.  
-4. Puntos de emergencia pueden **expirar** automáticamente y renovarse.  
-5. El equipo puede marcar VERIFIED sin convertir el registro ciudadano en autoridad.
+2. Una **organización o entidad** puede registrarse con un flujo simple (nombre, tipo, punto, enlace de evidencia / “qué necesitan”).  
+3. Existe un listado tipo **“Organizaciones / puntos que piden apoyo”** con **filtro por ciudad** (DIVIPOLA) y orden por actualización reciente.  
+4. Los puntos aparecen en el mapa **cerca del usuario**, con badge de no verificado / verificado y **fecha de última actualización** (sensación de frescura, sin fingir live falso).  
+5. Puntos de emergencia pueden **expirar** automáticamente y renovarse.  
+6. El equipo puede marcar VERIFIED sin convertir el registro ciudadano en autoridad.  
+7. Nosotros **no** recaudamos donaciones: solo enlazamos al canal de la org/punto.
 
 ## 2. Alcance
 
 ### IN
 
-- CTA home o mapa: **“Publicar punto de ayuda”** (además de Necesito ayuda).  
+- CTA home o mapa: **“Publicar punto de ayuda”** (además de dejar aviso).  
 - Tipos Place: `DONATION_POINT`, `HELP_CENTER`, `SHELTER`, `VOLUNTEER_POINT`, `MEDICAL`, `MEETING_POINT`, `OTHER`.  
-- Formulario mínimo: tipo → pin → título corto → descripción (qué reciben / horarios) → opcional URL evidencia.  
-- `POST /api/v1/places` (o extensión de reports tipados PLACE).  
-- Listado/filtro geo de Places junto a needs/events.  
-- `expiresAt` default configurable (ej. 72h si tipo donación en “modo emergencia”).  
-- Distinción UI: “Publicado por la comunidad” vs “Verificado”.  
+- Formulario mínimo: tipo → pin / ciudad → título → descripción (qué necesitan o reciben / horarios) → opcional URL.  
+- `POST /api/v1/places` + `GET` con geo y **`city` / código DIVIPOLA**.  
+- UI listado orgs + filtros (ciudad, tipo) inspirado en necesidades reales post-emergencia (refs. doc inspiración).  
+- `expiresAt` default configurable.  
+- Distinción UI: “Comunidad” vs “Verificado”.  
+- Copy: no promesa de cumplimiento; no pasarela de dinero.  
 
 ### OUT (002)
 

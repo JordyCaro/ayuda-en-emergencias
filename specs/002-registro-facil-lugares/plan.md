@@ -25,4 +25,5 @@ Connectors SISPRO/REPS y Cali/Medellín siguen en paralelo (capa A/B).
 
 ## Aprobación
 
-Pendiente gate humano tras cerrar 001 o en paralelo explícito.
+Pendiente gate humano formal.  
+**Nota 2026-08-14:** el modelo `Place` + `GET/POST /api/v1/places` y el connector SISPRO (MEDICAL oficial) ya arrancaron en **Fase 2 de producto**. El 002 completa el flujo “Publicar punto de acopio/ONG” en UI y expiración.

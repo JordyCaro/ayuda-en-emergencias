@@ -35,6 +35,35 @@ const DEFAULT_SOURCES: Array<Partial<SourceEntity> & { id: string; name: string 
     notes: 'Query features bloqueado en Fase 0. Deep-link al visor oficial.',
   },
   {
+    id: 'sispro',
+    name: 'SISPRO / REPS — Sedes IPS (salud)',
+    type: 'OFFICIAL',
+    tier: 1,
+    country: 'CO',
+    url: 'https://www.minsalud.gov.co/',
+    apiUrl:
+      'https://sig.sispro.gov.co/arcgis_msp/rest/services/Visor/MPS_Proteccion_Social/FeatureServer/2',
+    license: 'MinSalud / SISPRO — atribución; LEGAL_REVIEW_LIGHT',
+    attributionRequired: true,
+    updateFrequency: 'UNKNOWN',
+    integrationStatus: 'TESTING',
+    notes: 'Fase 2: capa MEDICAL nacional (~20k puntos). Sync por bbox del mapa.',
+  },
+  {
+    id: 'community',
+    name: 'Avisos y lugares de la comunidad',
+    type: 'USER',
+    tier: 3,
+    country: 'CO',
+    url: null,
+    apiUrl: null,
+    license: null,
+    attributionRequired: false,
+    updateFrequency: 'REAL_TIME',
+    integrationStatus: 'INTEGRATED',
+    notes: 'Avisos geolocalizados y places publicados por usuarios (UNVERIFIED).',
+  },
+  {
     id: 'osm',
     name: 'OpenStreetMap (tiles / atribución)',
     type: 'OPEN_DATA',
@@ -98,6 +127,7 @@ export class SourcesService {
       updateFrequency: s.updateFrequency,
       integrationStatus: s.integrationStatus,
       lastSuccessfulFetch: s.lastSuccessfulFetch?.toISOString() ?? null,
+      lastError: s.lastError,
       attributionRequired: s.attributionRequired,
     };
   }

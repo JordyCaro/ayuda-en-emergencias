@@ -53,6 +53,17 @@ export type IntegrationStatus =
 
 export type NeedStatus = 'OPEN' | 'CLOSED' | 'EXPIRED';
 
+export type PlaceType =
+  | 'HELP_CENTER'
+  | 'DONATION_POINT'
+  | 'SHELTER'
+  | 'VOLUNTEER_POINT'
+  | 'MEDICAL'
+  | 'MEETING_POINT'
+  | 'OTHER';
+
+export type PlaceStatus = 'ACTIVE' | 'EXPIRED' | 'HIDDEN';
+
 export interface GeoJsonPoint {
   type: 'Point';
   coordinates: [number, number];
@@ -69,6 +80,7 @@ export interface SourceDto {
   updateFrequency?: UpdateFrequency | null;
   integrationStatus: IntegrationStatus;
   lastSuccessfulFetch?: string | null;
+  lastError?: string | null;
   attributionRequired?: boolean;
 }
 
@@ -102,4 +114,29 @@ export interface CreateNeedRequest {
   category: NeedCategory;
   description: string;
   geometry: GeoJsonPoint;
+}
+
+export interface PlaceDto {
+  id: string;
+  type: PlaceType;
+  title: string;
+  description?: string | null;
+  geometry: GeoJsonPoint;
+  sourceId: string;
+  sourceName?: string;
+  verification: Verification;
+  status: PlaceStatus;
+  address?: string | null;
+  municipality?: string | null;
+  department?: string | null;
+  externalUrl?: string | null;
+  retrievedAt?: string | null;
+}
+
+export interface CreatePlaceRequest {
+  type: PlaceType;
+  title: string;
+  description?: string;
+  geometry: GeoJsonPoint;
+  externalUrl?: string;
 }

@@ -9,13 +9,15 @@ import {
 } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import maplibregl, { Map, Marker } from 'maplibre-gl';
-import type { EventDto, NeedDto } from '@aee/shared-types';
+import type { EventDto, NeedDto, PlaceDto } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { NEED_CATS, eventPlainTitle } from '../plain-labels';
 
+type LayerFilter = 'all' | 'alerta' | 'aviso' | 'salud';
+
 type NearItem = {
   id: string;
-  kind: 'alerta' | 'pedido';
+  kind: 'alerta' | 'aviso' | 'salud';
   title: string;
   detail: string;
   trust: string;
@@ -30,18 +32,18 @@ type NearItem = {
   template: `
     <section class="page-hero">
       <div class="wrap">
-        <p class="kicker">Acompañar</p>
+        <p class="kicker">Acompañar · Fase 2</p>
         <h1>Comunidad</h1>
         <p class="lead">
-          Lista + mapa: alertas oficiales y <strong>avisos</strong> de personas (comentarios en un
-          lugar, sin verificar). No operamos donaciones: solo mostramos señales.
+          Alertas (IDEAM), <strong>avisos</strong> de personas y puntos de
+          <strong>salud</strong> (SISPRO/REPS). Filtra lo que quieres ver. No operamos donaciones.
         </p>
         <div class="toolbar">
           <button type="button" class="ghost" (click)="locateMe()" [disabled]="locating()">
             {{ locating() ? 'Buscando…' : 'Mi ubicación' }}
           </button>
           <button type="button" class="cta" (click)="refreshAll()" [disabled]="loading() || syncing()">
-            {{ loading() || syncing() ? 'Actualizando…' : 'Actualizar datos' }}
+            {{ loading() || syncing() ? 'Actualizando…' : 'Actualizar zona' }}
           </button>
         </div>
       </div>
@@ -50,18 +52,32 @@ type NearItem = {
     <section class="body">
       <div class="wrap layout">
         <div>
+          <div class="filters" role="group" aria-label="Filtros">
+            <button type="button" [class.on]="filter() === 'all'" (click)="setFilter('all')">Todo</button>
+            <button type="button" [class.on]="filter() === 'alerta'" (click)="setFilter('alerta')">
+              Alertas
+            </button>
+            <button type="button" [class.on]="filter() === 'aviso'" (click)="setFilter('aviso')">
+              Avisos
+            </button>
+            <button type="button" [class.on]="filter() === 'salud'" (click)="setFilter('salud')">
+              Salud
+            </button>
+          </div>
+
           <p class="toast" *ngIf="status()">{{ status() }}</p>
           <p class="toast err" *ngIf="error()">{{ error() }}</p>
 
-          <ul class="list" *ngIf="items().length; else empty">
-            <li *ngFor="let item of items()">
+          <ul class="list" *ngIf="visibleItems().length; else empty">
+            <li *ngFor="let item of visibleItems()">
               <button
                 type="button"
                 class="item"
                 [class.alerta]="item.kind === 'alerta'"
+                [class.salud]="item.kind === 'salud'"
                 (click)="focus(item)"
               >
-                <span class="tag">{{ item.kind === 'alerta' ? 'Oficial' : 'Aviso' }}</span>
+                <span class="tag">{{ tagLabel(item.kind) }}</span>
                 <strong>{{ item.title }}</strong>
                 <small>{{ item.detail }}</small>
                 <em>{{ item.trust }}</em>
@@ -69,7 +85,9 @@ type NearItem = {
             </li>
           </ul>
           <ng-template #empty>
-            <p class="empty" *ngIf="!loading()">Aún no hay datos. Pulsa Actualizar.</p>
+            <p class="empty" *ngIf="!loading()">
+              Nada en este filtro. Pulsa <strong>Actualizar zona</strong> (trae IDEAM + salud cerca).
+            </p>
           </ng-template>
         </div>
 
@@ -81,6 +99,7 @@ type NearItem = {
             <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener"
               >OpenStreetMap</a
             >
+            · Salud: SISPRO / MinSalud
           </p>
         </details>
       </div>
@@ -113,7 +132,7 @@ type NearItem = {
       }
       .lead {
         margin: 0.7rem 0 0;
-        max-width: 40rem;
+        max-width: 42rem;
         font-weight: 600;
         opacity: 0.92;
       }
@@ -159,6 +178,26 @@ type NearItem = {
           align-items: start;
         }
       }
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 0.75rem;
+      }
+      .filters button {
+        border: 1px solid var(--line);
+        background: var(--white);
+        border-radius: 999px;
+        padding: 0.5rem 0.85rem;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+      .filters button.on {
+        background: var(--ink);
+        color: #fff;
+        border-color: transparent;
+      }
       .toast {
         margin: 0 0 0.75rem;
         padding: 0.75rem 0.9rem;
@@ -193,6 +232,9 @@ type NearItem = {
       .item.alerta {
         border-color: rgba(15, 110, 106, 0.35);
       }
+      .item.salud {
+        border-color: rgba(28, 100, 160, 0.4);
+      }
       .tag {
         font-size: 0.7rem;
         font-weight: 800;
@@ -200,8 +242,11 @@ type NearItem = {
         text-transform: uppercase;
         color: var(--teal);
       }
-      .item:not(.alerta) .tag {
+      .item:not(.alerta):not(.salud) .tag {
         color: var(--coral);
+      }
+      .item.salud .tag {
+        color: #1c64a0;
       }
       .item strong {
         font-family: var(--font-display);
@@ -256,15 +301,15 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
   private map?: Map;
   private markers: Marker[] = [];
   private userMarker?: Marker;
-  private pendingEvents: EventDto[] = [];
-  private pendingNeeds: NeedDto[] = [];
+  private allItems: NearItem[] = [];
 
   readonly loading = signal(false);
   readonly syncing = signal(false);
   readonly locating = signal(false);
   readonly status = signal<string | null>(null);
   readonly error = signal<string | null>(null);
-  readonly items = signal<NearItem[]>([]);
+  readonly filter = signal<LayerFilter>('all');
+  readonly visibleItems = signal<NearItem[]>([]);
 
   ngAfterViewInit(): void {
     setTimeout(() => this.initMap(), 0);
@@ -274,6 +319,17 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     this.clearMarkers();
     this.userMarker?.remove();
     this.map?.remove();
+  }
+
+  setFilter(f: LayerFilter): void {
+    this.filter.set(f);
+    this.applyFilter();
+  }
+
+  tagLabel(kind: NearItem['kind']): string {
+    if (kind === 'alerta') return 'Alerta';
+    if (kind === 'salud') return 'Salud';
+    return 'Aviso';
   }
 
   private initMap(): void {
@@ -293,14 +349,29 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
       },
       center: [-74.072, 4.711],
-      zoom: 5.4,
+      zoom: 10.2,
     });
     this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-    this.refreshAll();
     this.map.on('load', () => {
       this.map?.resize();
-      this.render(this.pendingEvents, this.pendingNeeds);
+      this.refreshAll();
     });
+    this.map.on('moveend', () => {
+      // no auto-fetch on every pan (costoso); el usuario pulsa Actualizar
+    });
+  }
+
+  private currentBBox(): { west: number; south: number; east: number; north: number } {
+    if (!this.map) {
+      return { west: -74.25, south: 4.45, east: -73.95, north: 4.85 };
+    }
+    const b = this.map.getBounds();
+    return {
+      west: b.getWest(),
+      south: b.getSouth(),
+      east: b.getEast(),
+      north: b.getNorth(),
+    };
   }
 
   locateMe(): void {
@@ -314,7 +385,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         this.locating.set(false);
         const lng = pos.coords.longitude;
         const lat = pos.coords.latitude;
-        this.map?.easeTo({ center: [lng, lat], zoom: 11, duration: 800 });
+        this.map?.easeTo({ center: [lng, lat], zoom: 12, duration: 800 });
         this.userMarker?.remove();
         const el = document.createElement('div');
         el.style.width = '16px';
@@ -327,7 +398,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
             .setLngLat([lng, lat])
             .addTo(this.map);
         }
-        this.status.set('Mapa centrado en tu ubicación.');
+        this.status.set('Centrado. Pulsa Actualizar zona para traer salud e IDEAM.');
       },
       () => {
         this.locating.set(false);
@@ -339,34 +410,65 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
 
   refreshAll(): void {
     this.syncing.set(true);
+    this.error.set(null);
+    const bbox = this.currentBBox();
+    let pending = 2;
+    const errs: string[] = [];
+    const doneSync = () => {
+      pending -= 1;
+      if (pending > 0) return;
+      this.syncing.set(false);
+      if (errs.length) this.error.set(errs.join(' · '));
+      this.loadLists(bbox);
+    };
     this.api.runIdeam().subscribe({
-      next: () => {
-        this.syncing.set(false);
-        this.refresh();
+      next: () => doneSync(),
+      error: (err) => {
+        errs.push(this.httpMsg(err, 'IDEAM no respondió'));
+        doneSync();
       },
-      error: () => {
-        this.syncing.set(false);
-        this.refresh();
-        this.status.set('Mostramos lo ya guardado.');
+    });
+    this.api.runSispro(bbox).subscribe({
+      next: (r) => {
+        if (r.skipped) {
+          this.status.set('SISPRO ya estaba sincronizando; mostrando datos guardados…');
+        } else {
+          const trunc = r.truncated ? ' (zona densa: muestra parcial)' : '';
+          this.status.set(`Salud: ${r.placesUpserted} puntos en la zona${trunc} · trayendo listas…`);
+        }
+        doneSync();
+      },
+      error: (err) => {
+        errs.push(this.httpMsg(err, 'No se pudo sync SISPRO'));
+        this.status.set('Mostrando salud ya guardada en la zona.');
+        doneSync();
       },
     });
   }
 
-  refresh(): void {
+  private loadLists(bbox: {
+    west: number;
+    south: number;
+    east: number;
+    north: number;
+  }): void {
     this.loading.set(true);
     let events: EventDto[] = [];
     let needs: NeedDto[] = [];
-    let pending = 2;
+    let places: PlaceDto[] = [];
+    let pending = 3;
+    const loadErrs: string[] = [];
     const done = () => {
       pending -= 1;
       if (pending > 0) return;
       this.loading.set(false);
-      this.pendingEvents = events;
-      this.pendingNeeds = needs;
-      this.render(events, needs);
+      this.buildItems(events, needs, places);
       this.status.set(
-        `${events.filter((e) => this.point(e.geometry)).length} alertas · ${needs.filter((n) => this.point(n.geometry)).length} avisos`,
+        `${events.length} alertas · ${needs.length} avisos · ${places.length} salud (zona)`,
       );
+      if (loadErrs.length && !this.error()) {
+        this.error.set(loadErrs.join(' · '));
+      }
     };
     this.api.events().subscribe({
       next: (res) => {
@@ -374,7 +476,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         done();
       },
       error: () => {
-        this.error.set('No se pudieron cargar alertas.');
+        loadErrs.push('No cargaron alertas');
         done();
       },
     });
@@ -384,38 +486,44 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         done();
       },
       error: () => {
-        this.error.set('No se pudieron cargar pedidos.');
+        loadErrs.push('No cargaron avisos');
+        done();
+      },
+    });
+    this.api.places({ type: 'MEDICAL', limit: 400, ...bbox }).subscribe({
+      next: (res) => {
+        places = res.data;
+        done();
+      },
+      error: () => {
+        loadErrs.push('No cargaron puntos de salud');
         done();
       },
     });
   }
 
-  focus(item: NearItem): void {
-    this.map?.easeTo({ center: [item.lng, item.lat], zoom: 10, duration: 650 });
+  private httpMsg(err: unknown, fallback: string): string {
+    const e = err as { error?: { message?: string | string[] }; message?: string };
+    const m = e?.error?.message;
+    if (typeof m === 'string') return m;
+    if (Array.isArray(m) && m[0]) return String(m[0]);
+    return fallback;
   }
 
-  private render(events: EventDto[], needs: NeedDto[]): void {
-    this.clearMarkers();
+  private buildItems(events: EventDto[], needs: NeedDto[], places: PlaceDto[]): void {
     const list: NearItem[] = [];
     for (const e of events) {
       const coords = this.point(e.geometry);
       if (!coords) continue;
-      const title = eventPlainTitle(e.type, e.title);
       list.push({
         id: e.id,
         kind: 'alerta',
-        title,
+        title: eventPlainTitle(e.type, e.title),
         detail: e.summary?.trim() || e.sourceName || 'Fuente oficial',
         trust: 'Información oficial',
         lng: coords[0],
         lat: coords[1],
       });
-      if (this.map) {
-        const el = this.dot('#0f6e6a', true);
-        this.markers.push(
-          new maplibregl.Marker({ element: el }).setLngLat(coords).addTo(this.map),
-        );
-      }
     }
     for (const n of needs) {
       const coords = this.point(n.geometry);
@@ -423,29 +531,62 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
       const title = NEED_CATS[n.category]?.title ?? n.category;
       list.push({
         id: n.id,
-        kind: 'pedido',
+        kind: 'aviso',
         title: `Aviso: ${title}`,
         detail: n.description,
         trust: 'Comentario de persona · sin verificar',
         lng: coords[0],
         lat: coords[1],
       });
-      if (this.map) {
-        const el = this.dot('#e4574c', false);
-        this.markers.push(
-          new maplibregl.Marker({ element: el }).setLngLat(coords).addTo(this.map),
-        );
-      }
     }
-    this.items.set(list.slice(0, 80));
-    if (this.map && list.length > 1) {
-      const bounds = new maplibregl.LngLatBounds(
-        [list[0].lng, list[0].lat],
-        [list[0].lng, list[0].lat],
+    for (const p of places) {
+      const coords = this.point(p.geometry);
+      if (!coords) continue;
+      list.push({
+        id: p.id,
+        kind: 'salud',
+        title: p.title,
+        detail: [p.address, p.municipality].filter(Boolean).join(' · ') || 'Sede IPS',
+        trust: `${p.sourceName ?? 'SISPRO'} · oficial`,
+        lng: coords[0],
+        lat: coords[1],
+      });
+    }
+    this.allItems = list;
+    this.applyFilter();
+  }
+
+  private applyFilter(): void {
+    const f = this.filter();
+    const filtered =
+      f === 'all' ? this.allItems : this.allItems.filter((i) => i.kind === f);
+    this.visibleItems.set(filtered.slice(0, 120));
+    this.renderMarkers(filtered);
+  }
+
+  private renderMarkers(items: NearItem[]): void {
+    this.clearMarkers();
+    if (!this.map) return;
+    for (const item of items.slice(0, 200)) {
+      const color =
+        item.kind === 'alerta' ? '#0f6e6a' : item.kind === 'salud' ? '#1c64a0' : '#e4574c';
+      const round = item.kind !== 'aviso';
+      const el = this.dot(color, round);
+      this.markers.push(
+        new maplibregl.Marker({ element: el })
+          .setLngLat([item.lng, item.lat])
+          .setPopup(
+            new maplibregl.Popup({ offset: 12 }).setHTML(
+              `<strong>${this.esc(item.title)}</strong><br/>${this.esc(item.detail)}`,
+            ),
+          )
+          .addTo(this.map),
       );
-      for (const it of list) bounds.extend([it.lng, it.lat]);
-      this.map.fitBounds(bounds, { padding: 40, maxZoom: 9, duration: 500 });
     }
+  }
+
+  focus(item: NearItem): void {
+    this.map?.easeTo({ center: [item.lng, item.lat], zoom: 13, duration: 650 });
   }
 
   private dot(color: string, round: boolean): HTMLDivElement {
@@ -477,5 +618,13 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
   private clearMarkers(): void {
     for (const m of this.markers) m.remove();
     this.markers = [];
+  }
+
+  private esc(v: string): string {
+    return v
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
   }
 }
