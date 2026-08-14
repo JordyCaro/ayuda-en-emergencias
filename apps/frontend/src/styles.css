@@ -1,0 +1,87 @@
+:root {
+  /* Bandas sólidas — editorial, no “manchas” */
+  --ink: #10233f;
+  --ink-soft: #1c3558;
+  --cream: #f6f1e9;
+  --cream-2: #ebe4d8;
+  --white: #fffcf7;
+  --teal: #0f6e6a;
+  --teal-deep: #0a524f;
+  --coral: #e4574c;
+  --coral-deep: #c9443b;
+  --sky-band: #dceaf5;
+  --muted: #5c6b7a;
+  --line: rgba(16, 35, 63, 0.12);
+  --shadow: 0 18px 50px rgba(16, 35, 63, 0.12);
+  --radius: 18px;
+  --tap: 52px;
+  --nav-h: 68px;
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--cream);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(8px, -10px, 0) rotate(2deg);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.7s var(--ease) both;
+}

@@ -1,0 +1,16 @@
+{
+  "name": "ayuda-en-emergencias",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev:backend": "pnpm --filter @aee/backend start:dev",
+    "dev:frontend": "pnpm --filter @aee/frontend start",
+    "build": "pnpm -r run build",
+    "docker:up": "docker compose -f infra/docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "docker:logs": "docker compose -f infra/docker/docker-compose.yml logs -f"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

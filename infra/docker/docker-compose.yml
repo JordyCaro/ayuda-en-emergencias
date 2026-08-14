@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: aee-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aee}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aee}
+      POSTGRES_DB: ${POSTGRES_DB:-ayuda_emergencias}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - aee_pgdata:/var/lib/postgresql/data
+      - ./init-postgis.sql:/docker-entrypoint-initdb.d/01-postgis.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aee} -d ${POSTGRES_DB:-ayuda_emergencias}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  aee_pgdata:

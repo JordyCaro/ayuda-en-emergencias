@@ -1,0 +1,319 @@
+openapi: 3.0.3
+info:
+  title: Ayuda en Emergencias API
+  version: 0.1.0
+  description: |
+    Sketch del contrato público v1 para el slice 001.
+    No es implementación. GeoJSON se usará en responses geográficas cuando aplique.
+  license:
+    name: TBD
+    url: https://example.invalid
+servers:
+  - url: /api/v1
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /sources:
+    get:
+      summary: List registered sources
+      operationId: listSources
+      responses:
+        '200':
+          description: Source registry projection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Source'
+  /events:
+    get:
+      summary: List normalized events/alerts
+      operationId: listEvents
+      parameters:
+        - $ref: '#/components/parameters/country'
+        - $ref: '#/components/parameters/lat'
+        - $ref: '#/components/parameters/lng'
+        - $ref: '#/components/parameters/radius'
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/EventType'
+        - name: updatedSince
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Event list (GeoJSON FeatureCollection optional in impl)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+  /events/{id}:
+    get:
+      summary: Get event by id
+      operationId: getEvent
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Not found
+  /needs:
+    get:
+      summary: List needs
+      operationId: listNeeds
+      parameters:
+        - $ref: '#/components/parameters/country'
+        - $ref: '#/components/parameters/lat'
+        - $ref: '#/components/parameters/lng'
+        - $ref: '#/components/parameters/radius'
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/NeedCategory'
+      responses:
+        '200':
+          description: Needs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Need'
+    post:
+      summary: Create citizen map aviso / notice (UNVERIFIED; not a guaranteed request)
+      operationId: createNeed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNeedRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Need'
+        '400':
+          description: Validation error
+        '429':
+          description: Rate limited
+  /needs/{id}:
+    get:
+      summary: Get need by id
+      operationId: getNeed
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Need
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Need'
+        '404':
+          description: Not found
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    country:
+      name: country
+      in: query
+      schema:
+        type: string
+        example: CO
+    lat:
+      name: lat
+      in: query
+      schema:
+        type: number
+    lng:
+      name: lng
+      in: query
+      schema:
+        type: number
+    radius:
+      name: radius
+      in: query
+      description: Meters
+      schema:
+        type: number
+  schemas:
+    Verification:
+      type: string
+      enum:
+        - OFFICIAL
+        - VERIFIED
+        - COMMUNITY_CONFIRMED
+        - UNVERIFIED
+        - OUTDATED
+        - EXPIRED
+        - REJECTED
+    EventType:
+      type: string
+      enum:
+        - HYDRO_ALERT
+        - EARTHQUAKE
+        - FLOOD
+        - FIRE
+        - LANDSLIDE
+        - OTHER
+    NeedCategory:
+      type: string
+      enum:
+        - HELP
+        - WATER
+        - FOOD
+        - SHELTER
+        - MEDICAL
+        - TRANSPORT
+        - COMMUNICATION
+        - VOLUNTEER
+        - OTHER
+    Source:
+      type: object
+      required: [id, name, type, tier, country, integrationStatus]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        tier:
+          type: integer
+        country:
+          type: string
+        url:
+          type: string
+        license:
+          type: string
+        updateFrequency:
+          type: string
+        integrationStatus:
+          type: string
+        lastSuccessfulFetch:
+          type: string
+          format: date-time
+          nullable: true
+        attributionRequired:
+          type: boolean
+    Event:
+      type: object
+      required: [id, type, sourceId, verification, retrievedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/EventType'
+        originalType:
+          type: string
+        sourceId:
+          type: string
+        sourceName:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        geometry:
+          type: object
+          description: GeoJSON geometry
+        observedAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+        retrievedAt:
+          type: string
+          format: date-time
+        verification:
+          $ref: '#/components/schemas/Verification'
+    Need:
+      type: object
+      required: [id, category, description, geometry, verification, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        category:
+          $ref: '#/components/schemas/NeedCategory'
+        description:
+          type: string
+        geometry:
+          type: object
+        verification:
+          $ref: '#/components/schemas/Verification'
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        source:
+          type: string
+          example: USER
+    CreateNeedRequest:
+      type: object
+      required: [category, description, geometry]
+      properties:
+        category:
+          $ref: '#/components/schemas/NeedCategory'
+        description:
+          type: string
+          maxLength: 2000
+        geometry:
+          type: object
+          description: GeoJSON Point
+          required: [type, coordinates]
+          properties:
+            type:
+              type: string
+              enum: [Point]
+            coordinates:
+              type: array
+              items:
+                type: number
+              minItems: 2
+              maxItems: 2
