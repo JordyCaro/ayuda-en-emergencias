@@ -314,6 +314,7 @@ export class NeedHelpPageComponent implements OnInit {
     this.okId.set(null);
     this.api
       .createNeed({
+        intent: 'NEED',
         category: this.category,
         description: this.description.trim(),
         geometry: { type: 'Point', coordinates: [this.lng()!, this.lat()!] },

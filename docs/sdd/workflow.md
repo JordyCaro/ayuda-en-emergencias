@@ -10,7 +10,7 @@ Constitution → Specify → Clarify → Plan → Checklist → Tasks → Analyz
 
 ## Onboarding rápido
 
-- Humanos: [`COMO-EMPEZAR.md`](COMO-EMPEZAR.md) + [`../MAPA-DEL-REPO.md`](../MAPA-DEL-REPO.md)  
+- Humanos: [`../../README.md`](../../README.md) + [`../MAPA-DEL-REPO.md`](../MAPA-DEL-REPO.md)  
 - Agentes: [`../../AGENTS.md`](../../AGENTS.md)
 
 ## Dónde vive cada artifact

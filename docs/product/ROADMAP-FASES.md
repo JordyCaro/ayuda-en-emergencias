@@ -3,8 +3,10 @@
 **Canónico.** Las demás tablas de fases del repo deben apuntar aquí.  
 **Última actualización:** 2026-08-14  
 
-Fuente de intención: master de emergencias + decisiones de producto del repo (constitution, visión, registries).  
+Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
+
+**Estado:** fases **0–3 hechas**. Siguiente: **Fase 4** (`003+`).
 
 ---
 
@@ -71,7 +73,7 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 - Source registry + extended + catálogo OSS.  
 - Pruebas reales (IDEAM, SISPRO, UNGRD SODA, IDIGER, etc.).  
 - Contexto sismo / entidades nacionales-territoriales.  
-Docs: `docs/sources/`, `docs/product/contexto-sismo-2026.md`.
+Docs: `docs/sources/`.
 
 ### Fase 1 — Foundation + núcleo *(hecha, slice 001)*
 
@@ -89,18 +91,20 @@ Spec: `specs/001-mvp-mapa-ayuda/`.
 - Expiración de places comunitarios; errores de fuente visibles en Confianza.  
 - Tests de helpers geo + contrato OpenAPI actualizado.
 
-### Fase 3 — Lugares / orgs *(siguiente — 002)*
+### Fase 3 — Lugares / orgs *(hecha — 002)*
 
-- Publicar puntos de acopio / ONG / ayuda con procedencia `USER` u `ORGANIZATION`.  
+- Publicar puntos de acopio / ONG / ayuda (`/publicar-punto`) con procedencia comunitaria.  
 - Filtro por ciudad (DIVIPOLA).  
-- Listado “organizaciones / puntos que piden apoyo”.  
-- `expiresAt` y copy “no donamos nosotros”.  
-Spec: `specs/002-registro-facil-lugares/` (DRAFT).
+- Listado / directorio “quién necesita apoyo” (`/ayudar`; mapa como complemento).  
+- `expiresAt` y copy: no donamos nosotros.  
+Spec: `specs/002-registro-facil-lugares/` (**APROBADA**).
 
-### Fase 4 — Quiero ayudar / voluntariado (enlace)
+**UX post-002 (sin cambiar el outcome):** nav centrada en **¿Qué necesitas?** (foro de avisos) + **Ayudar** (directorio) + **Fuentes**; home con utilidad temprana y stats/API reales. El mapa ya no es la puerta principal.
 
-- CTA claro desde home/comunidad.  
-- Ver necesidades/puntos cercanos + instrucciones de contacto **de la org**.  
+### Fase 4 — Quiero ayudar / voluntariado (enlace) *(siguiente)*
+
+- Formalizar en slice `003+` el flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs.  
+- Hoy hay **CTAs y directorio** que anticipan parte del outcome; falta contrato SDD y cierre explícito (sin matching laboral).  
 - No: bolsa de empleo, nómina, ni “asignamos voluntarios”.
 
 ### Fase 5 — Donación solo como descubrimiento
@@ -113,8 +117,7 @@ Spec: `specs/002-registro-facil-lugares/` (DRAFT).
 
 - Connectors ciudad / CDGRD oportunistas (registry).  
 - OSM Overpass cacheado por depto (amenities útiles).  
-- Mejor “cerca de mí” a escala nacional.  
-Ver: `docs/sources/cobertura-nacional-estrategia.md`.
+- Mejor “cerca de mí” a escala nacional.
 
 ### Fase 7 — Deep-links oficiales extra
 
@@ -194,13 +197,10 @@ Si una idea está en este roadmap pero **OUT** del slice activo → no implement
 
 ---
 
-## Documentos satélite
+## Docs relacionados (mínimo)
 
 | Doc | Rol |
 |-----|-----|
-| [`../dev/ESTADO-FASES.md`](../dev/ESTADO-FASES.md) | Estado corto + alineación con tasks 001 |
-| [`../dev/FASES-Y-BACKEND.md`](../dev/FASES-Y-BACKEND.md) | Guía para backend / APIs vs vacío |
-| [`vision.md`](vision.md) | Visión condensada (apunta aquí) |
-| [`INSPIRACION-REFERENCIAS.md`](INSPIRACION-REFERENCIAS.md) | Features de webs de referencia → fase |
-| [`../sources/cobertura-nacional-estrategia.md`](../sources/cobertura-nacional-estrategia.md) | Orden técnico de cobertura país |
+| [`QUE-ES.md`](QUE-ES.md) | Propósito del producto |
+| [`../sources/source-registry.md`](../sources/source-registry.md) | Inventario de fuentes |
 | Constitution | Invariantes que ninguna fase puede romper |

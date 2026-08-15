@@ -47,7 +47,22 @@ const DEFAULT_SOURCES: Array<Partial<SourceEntity> & { id: string; name: string 
     attributionRequired: true,
     updateFrequency: 'UNKNOWN',
     integrationStatus: 'TESTING',
-    notes: 'Fase 2: capa MEDICAL nacional (~20k puntos). Sync por bbox del mapa.',
+    notes: 'Fase 2+: capa MEDICAL nacional (~20k puntos). Sync por capitales (no solo Bogotá).',
+  },
+  {
+    id: 'curated',
+    name: 'Directorio curado — enlaces públicos nacionales',
+    type: 'OPEN_DATA',
+    tier: 2,
+    country: 'CO',
+    url: null,
+    apiUrl: null,
+    license: 'Deep-links a sitios de terceros; sin scrapeo de contenido',
+    attributionRequired: true,
+    updateFrequency: 'UNKNOWN',
+    integrationStatus: 'INTEGRATED',
+    notes:
+      'Cruz Roja, ABACO, bancos de alimentos, UNGRD, etc. No inventa acopios temporales.',
   },
   {
     id: 'community',
@@ -65,16 +80,18 @@ const DEFAULT_SOURCES: Array<Partial<SourceEntity> & { id: string; name: string 
   },
   {
     id: 'osm',
-    name: 'OpenStreetMap (tiles / atribución)',
+    name: 'OpenStreetMap — centros sociales / ONG',
     type: 'OPEN_DATA',
     tier: 2,
     country: 'CO',
     url: 'https://www.openstreetmap.org/copyright',
+    apiUrl: 'https://overpass-api.de/api/interpreter',
     license: 'ODbL',
     attributionRequired: true,
     updateFrequency: 'UNKNOWN',
-    integrationStatus: 'INTEGRATED',
-    notes: 'Tiles de mapa en el frontend. No es capa de alertas.',
+    integrationStatus: 'TESTING',
+    notes:
+      'Amenities social_facility / community_centre / shelter / office=ngo por bbox de capitales. Cobertura irregular.',
   },
 ];
 

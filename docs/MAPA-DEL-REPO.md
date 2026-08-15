@@ -104,16 +104,14 @@ Si algo falla al implementar: **primero** corregir spec/plan, no solo el código
 ```text
 docs/
   MAPA-DEL-REPO.md           ← este archivo
-  DECISIONS.md               ← resumen de decisiones
-  product/ROADMAP-FASES.md   ← fases canónicas (master → cumplimiento)
-  product/vision.md
-  product/QUE-ES.md
-  architecture/              ← overview + ADRs
-  sources/                   ← registry de APIs externas
-  sdd/workflow.md
+  product/QUE-ES.md          ← propósito
+  product/ROADMAP-FASES.md   ← fases canónicas
+  architecture/adr/          ← decisiones de stack
+  sources/                   ← registry de APIs
+  sdd/workflow.md            ← loop SDD
   legal/
   api/
-  dev/ESTADO-FASES.md        ← tablero corto de estado
+  dev/COMO-CORRER.md
 ```
 
 ### C) Reglas permanentes

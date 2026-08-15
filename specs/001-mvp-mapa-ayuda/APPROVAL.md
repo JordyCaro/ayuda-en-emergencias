@@ -15,7 +15,7 @@
 
 ## Qué sigue
 
-1. ~~Fase 0~~ — hecha (`docs/sources/FASE0-RESUMEN.md`)  
+1. ~~Fase 0~~ — hecha (`docs/sources/source-registry.md`)  
 2. Cuando digas **“empezar código”** — ejecutar `tasks.md` desde T1  
 
 No hay código de producto todavía (correcto según SDD).

@@ -1,0 +1,343 @@
+/**
+ * Directorio curado por ciudades del chip UI.
+ * Deep-links a canales públicos (no inventa acopios temporales ni cantidades).
+ * Fuente interna: `curated` — en la web no mostramos el id técnico.
+ */
+
+export interface CuratedPlaceSeed {
+  sourceRecordId: string;
+  type: 'HELP_CENTER' | 'DONATION_POINT' | 'VOLUNTEER_POINT' | 'SHELTER' | 'OTHER';
+  title: string;
+  description: string;
+  lat: number;
+  lng: number;
+  cityCode: string;
+  municipality: string;
+  department: string;
+  externalUrl: string;
+  needTags: string[];
+}
+
+export const CURATED_HELP_PLACES: CuratedPlaceSeed[] = [
+  // —— Nacional / Bogotá ——
+  {
+    sourceRecordId: 'curated:cruz-roja-nacional',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Colombiana',
+    description: 'Red nacional: voluntariado, donaciones y orientación. Entra a su sitio para sedes y cómo ayudar.',
+    lat: 4.6486,
+    lng: -74.107,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'FOOD', 'CLOTHING', 'BLOOD', 'OTHER'],
+  },
+  {
+    sourceRecordId: 'curated:abaco',
+    type: 'DONATION_POINT',
+    title: 'ABACO — Bancos de Alimentos',
+    description: 'Red de bancos de alimentos en varias ciudades. Busca el de tu zona en su directorio.',
+    lat: 4.67,
+    lng: -74.05,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://www.abaco.org.co/',
+    needTags: ['FOOD'],
+  },
+  {
+    sourceRecordId: 'curated:defensa-civil',
+    type: 'VOLUNTEER_POINT',
+    title: 'Defensa Civil Colombiana',
+    description: 'Voluntariado y respuesta. Consulta cómo vincularte (alistar ayudas, logística, terreno).',
+    lat: 4.64,
+    lng: -74.09,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://www.defensacivil.gov.co/',
+    needTags: ['VOLUNTEER'],
+  },
+  {
+    sourceRecordId: 'curated:dnbc',
+    type: 'VOLUNTEER_POINT',
+    title: 'Bomberos de Colombia',
+    description: 'Orientación del cuerpo de bomberos. Útil para voluntariado y apoyo en emergencias.',
+    lat: 4.65,
+    lng: -74.08,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://dnbc.gov.co/',
+    needTags: ['VOLUNTEER'],
+  },
+  {
+    sourceRecordId: 'curated:banco-alimentos-bogota',
+    type: 'DONATION_POINT',
+    title: 'Banco de Alimentos de Bogotá',
+    description: 'Llevar comida no perecedera o preguntar turnos de voluntariado para clasificar y repartir.',
+    lat: 4.68,
+    lng: -74.12,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://bancodealimentosdebogota.org/',
+    needTags: ['FOOD', 'VOLUNTEER'],
+  },
+  {
+    sourceRecordId: 'curated:hemocentro-distrital',
+    type: 'HELP_CENTER',
+    title: 'Hemocentro Distrital (Bogotá)',
+    description: 'Donación de sangre en Bogotá. Confirma horarios y requisitos en su canal.',
+    lat: 4.648,
+    lng: -74.084,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://www.saludcapital.gov.co/',
+    needTags: ['BLOOD'],
+  },
+  {
+    sourceRecordId: 'curated:techo',
+    type: 'VOLUNTEER_POINT',
+    title: 'TECHO Colombia',
+    description: 'Voluntariado y apoyo en vivienda de emergencia / reconstrucción.',
+    lat: 4.66,
+    lng: -74.06,
+    cityCode: '11001',
+    municipality: 'Bogotá',
+    department: 'Bogotá, D.C.',
+    externalUrl: 'https://www.techo.org/colombia/',
+    needTags: ['VOLUNTEER', 'SHELTER'],
+  },
+
+  // —— Medellín ——
+  {
+    sourceRecordId: 'curated:cruz-roja-antioquia',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Antioquia',
+    description: 'Sede seccional: voluntariado, donaciones y orientación en Medellín y Antioquia.',
+    lat: 6.25,
+    lng: -75.57,
+    cityCode: '05001',
+    municipality: 'Medellín',
+    department: 'Antioquia',
+    externalUrl: 'https://www.cruzrojaantioquia.org.co/',
+    needTags: ['VOLUNTEER', 'BLOOD', 'CLOTHING', 'OTHER'],
+  },
+  {
+    sourceRecordId: 'curated:banco-alimentos-medellin',
+    type: 'DONATION_POINT',
+    title: 'Banco de Alimentos de Medellín',
+    description: 'Acopio de comida y voluntariado para clasificar / repartir en el Valle de Aburrá.',
+    lat: 6.2476,
+    lng: -75.5658,
+    cityCode: '05001',
+    municipality: 'Medellín',
+    department: 'Antioquia',
+    externalUrl: 'https://www.bancoalimentosmedellin.org/',
+    needTags: ['FOOD', 'VOLUNTEER'],
+  },
+
+  // —— Cali ——
+  {
+    sourceRecordId: 'curated:cruz-roja-valle',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Valle',
+    description: 'Voluntariado y ayuda humanitaria en Cali y el Valle.',
+    lat: 3.44,
+    lng: -76.52,
+    cityCode: '76001',
+    municipality: 'Cali',
+    department: 'Valle del Cauca',
+    externalUrl: 'https://www.cruzrojavalle.org.co/',
+    needTags: ['VOLUNTEER', 'CLOTHING', 'BLOOD', 'OTHER'],
+  },
+  {
+    sourceRecordId: 'curated:banco-alimentos-cali',
+    type: 'DONATION_POINT',
+    title: 'Banco de Alimentos de Cali',
+    description: 'Llevar donaciones de comida o preguntar por turnos de apoyo.',
+    lat: 3.4516,
+    lng: -76.532,
+    cityCode: '76001',
+    municipality: 'Cali',
+    department: 'Valle del Cauca',
+    externalUrl: 'https://www.bancoalimentoscali.org/',
+    needTags: ['FOOD', 'VOLUNTEER'],
+  },
+  {
+    sourceRecordId: 'curated:socorro-cali',
+    type: 'HELP_CENTER',
+    title: 'Organismos de socorro — Cali',
+    description: 'Referencia de ubicaciones de socorro publicadas por la Alcaldía de Cali.',
+    lat: 3.44,
+    lng: -76.53,
+    cityCode: '76001',
+    municipality: 'Cali',
+    department: 'Valle del Cauca',
+    externalUrl:
+      'https://datos.cali.gov.co/dataset/ubicacion-organismos-de-socorro-y-secretaria-de-gestion-de-riesgo-2024',
+    needTags: ['VOLUNTEER', 'OTHER'],
+  },
+
+  // —— Barranquilla ——
+  {
+    sourceRecordId: 'curated:cruz-roja-atlantico',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Atlántico',
+    description: 'Orientación, voluntariado y canales de ayuda en Barranquilla / Atlántico.',
+    lat: 10.9685,
+    lng: -74.7813,
+    cityCode: '08001',
+    municipality: 'Barranquilla',
+    department: 'Atlántico',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'BLOOD', 'CLOTHING', 'OTHER'],
+  },
+  {
+    sourceRecordId: 'curated:banco-alimentos-atlantico',
+    type: 'DONATION_POINT',
+    title: 'Banco de Alimentos de Atlántico',
+    description: 'Acopio de alimentos en la Costa. Confirma horarios en su organización.',
+    lat: 10.99,
+    lng: -74.79,
+    cityCode: '08001',
+    municipality: 'Barranquilla',
+    department: 'Atlántico',
+    externalUrl: 'https://www.abaco.org.co/',
+    needTags: ['FOOD', 'VOLUNTEER'],
+  },
+
+  // —— Cartagena ——
+  {
+    sourceRecordId: 'curated:cruz-roja-bolivar',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Bolívar / Cartagena',
+    description: 'Canal de socorro y voluntariado en Cartagena.',
+    lat: 10.391,
+    lng: -75.479,
+    cityCode: '13001',
+    municipality: 'Cartagena',
+    department: 'Bolívar',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'BLOOD', 'OTHER'],
+  },
+
+  // —— Bucaramanga ——
+  {
+    sourceRecordId: 'curated:cruz-roja-santander',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Santander',
+    description: 'Voluntariado y ayuda en Bucaramanga y Santander.',
+    lat: 7.125,
+    lng: -73.119,
+    cityCode: '68001',
+    municipality: 'Bucaramanga',
+    department: 'Santander',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'BLOOD', 'CLOTHING', 'OTHER'],
+  },
+
+  // —— Pereira ——
+  {
+    sourceRecordId: 'curated:cruz-roja-risaralda',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Risaralda',
+    description: 'Sede en Pereira: voluntariado, donaciones y orientación.',
+    lat: 4.8143,
+    lng: -75.6946,
+    cityCode: '66001',
+    municipality: 'Pereira',
+    department: 'Risaralda',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'FOOD', 'CLOTHING', 'OTHER'],
+  },
+  {
+    sourceRecordId: 'curated:banco-alimentos-eje',
+    type: 'DONATION_POINT',
+    title: 'Bancos de alimentos — Eje Cafetero',
+    description: 'Consulta en ABACO el banco más cercano a Pereira / Manizales / Armenia.',
+    lat: 4.81,
+    lng: -75.7,
+    cityCode: '66001',
+    municipality: 'Pereira',
+    department: 'Risaralda',
+    externalUrl: 'https://www.abaco.org.co/',
+    needTags: ['FOOD'],
+  },
+
+  // —— Manizales ——
+  {
+    sourceRecordId: 'curated:cruz-roja-caldas',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Caldas',
+    description: 'Voluntariado y canales de ayuda en Manizales.',
+    lat: 5.0689,
+    lng: -75.5174,
+    cityCode: '17001',
+    municipality: 'Manizales',
+    department: 'Caldas',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'CLOTHING', 'OTHER'],
+  },
+
+  // —— Ibagué ——
+  {
+    sourceRecordId: 'curated:cruz-roja-tolima',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Tolima',
+    description: 'Orientación y voluntariado en Ibagué / Tolima.',
+    lat: 4.4389,
+    lng: -75.2322,
+    cityCode: '73001',
+    municipality: 'Ibagué',
+    department: 'Tolima',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'FOOD', 'OTHER'],
+  },
+
+  // —— Villavicencio ——
+  {
+    sourceRecordId: 'curated:cruz-roja-meta',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Meta',
+    description: 'Voluntariado y ayuda humanitaria en Villavicencio.',
+    lat: 4.142,
+    lng: -73.626,
+    cityCode: '50001',
+    municipality: 'Villavicencio',
+    department: 'Meta',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'CLOTHING', 'OTHER'],
+  },
+
+  // —— Quibdó ——
+  {
+    sourceRecordId: 'curated:cruz-roja-choco',
+    type: 'HELP_CENTER',
+    title: 'Cruz Roja Chocó',
+    description: 'Canal de socorro y voluntariado en Quibdó / Chocó.',
+    lat: 5.6947,
+    lng: -76.6611,
+    cityCode: '27001',
+    municipality: 'Quibdó',
+    department: 'Chocó',
+    externalUrl: 'https://www.cruzrojacolombiana.org/',
+    needTags: ['VOLUNTEER', 'FOOD', 'MEDICINE', 'OTHER'],
+  },
+  {
+    sourceRecordId: 'curated:defensa-civil-choco',
+    type: 'VOLUNTEER_POINT',
+    title: 'Defensa Civil — Chocó',
+    description: 'Voluntariado local: logística, alistamiento y apoyo en terreno.',
+    lat: 5.69,
+    lng: -76.66,
+    cityCode: '27001',
+    municipality: 'Quibdó',
+    department: 'Chocó',
+    externalUrl: 'https://www.defensacivil.gov.co/',
+    needTags: ['VOLUNTEER'],
+  },
+];

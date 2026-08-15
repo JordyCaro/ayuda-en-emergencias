@@ -1,9 +1,8 @@
 # Source Registry Extended — inventario amplio Colombia
 
-**Pasada:** 2026-08-14 (continuación Fase 0)  
-**Registro corto MVP:** [`source-registry.md`](source-registry.md)  
-**Open source a estudiar:** [`open-source-catalog.md`](open-source-catalog.md)  
-**Resumen:** [`FASE0-RESUMEN.md`](FASE0-RESUMEN.md)
+**Pasada:** 2026-08-14  
+**Registro corto:** [`source-registry.md`](source-registry.md)  
+**Open source:** [`open-source-catalog.md`](open-source-catalog.md)
 
 Principio: **integrar / enlazar / no reinventar**. Si no hay API redistribuible → deep-link + atribución, o vacío ciudadano propio.
 
@@ -376,8 +375,6 @@ Reportes ciudadanos de VOLUNTEER_POINT = vacío a construir (post-001).
 | P2 | HDX / IDECA acopio / más CDGRD | Oportunista |
 | Deep-link | Cruz Roja, ABACO, SGC, SIRDEC, UNGRD… | CTAs |
 | Skip auto | SGC query roto, gcd5-td78 404 | — |
-
-Ver: [`cobertura-nacional-estrategia.md`](cobertura-nacional-estrategia.md) · [`entidades-territoriales.md`](entidades-territoriales.md)
 
 ## Legal rápido
 

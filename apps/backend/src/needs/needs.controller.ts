@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import type { NeedCategory } from '@aee/shared-types';
+import type { NeedCategory, NeedIntent } from '@aee/shared-types';
 import { NeedsService } from './needs.service';
 import { CreateNeedDto } from './dto/create-need.dto';
 
@@ -17,6 +17,8 @@ export class NeedsController {
     @Query('lng') lng?: string,
     @Query('radius') radius?: string,
     @Query('category') category?: NeedCategory,
+    @Query('intent') intent?: NeedIntent,
+    @Query('cityCode') cityCode?: string,
   ) {
     const data = await this.needs.list({
       country,
@@ -24,6 +26,8 @@ export class NeedsController {
       lng: lng != null ? Number(lng) : undefined,
       radius: radius != null ? Number(radius) : undefined,
       category,
+      intent,
+      cityCode,
     });
     return { data };
   }

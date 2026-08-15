@@ -25,7 +25,12 @@ export type NeedCategory =
   | 'TRANSPORT'
   | 'COMMUNICATION'
   | 'VOLUNTEER'
+  | 'CLOTHING'
+  | 'BLOOD'
   | 'OTHER';
+
+/** Aviso de foro: necesito ayuda vs puedo aportar. */
+export type NeedIntent = 'NEED' | 'OFFER';
 
 export type EventType =
   | 'HYDRO_ALERT'
@@ -113,18 +118,26 @@ export interface EventDto {
 export interface NeedDto {
   id: string;
   category: NeedCategory;
+  intent: NeedIntent;
   description: string;
   geometry: GeoJsonPoint;
   verification: Verification;
   status: NeedStatus;
   createdAt: string;
   source: 'USER';
+  cityCode?: string | null;
+  municipality?: string | null;
+  /** Solo dígitos con prefijo país si hay contacto (ej. 57300…). */
+  contactWhatsapp?: string | null;
 }
 
 export interface CreateNeedRequest {
   category: NeedCategory;
+  intent: NeedIntent;
   description: string;
-  geometry: GeoJsonPoint;
+  geometry?: GeoJsonPoint;
+  cityCode?: string;
+  contactWhatsapp?: string;
 }
 
 export interface PlaceDto {

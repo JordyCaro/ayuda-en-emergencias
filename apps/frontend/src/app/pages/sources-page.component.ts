@@ -9,27 +9,27 @@ import { statusLabel } from '../plain-labels';
   standalone: true,
   imports: [NgFor, NgIf, DatePipe],
   template: `
-    <section class="page-hero">
-      <div class="wrap">
+    <section class="page-hero-band">
+      <div class="page-wrap">
         <p class="kicker">Transparencia</p>
-        <h1>Confianza</h1>
+        <h1>Fuentes</h1>
         <p class="lead">
-          Aquí ves de dónde sale cada dato. Preferimos decir “aún no” antes que inventar una
-          emergencia.
+          De dónde sale cada dato del directorio y las alertas. Preferimos decir “aún no” antes que
+          inventar una emergencia.
         </p>
       </div>
     </section>
 
-    <section class="band">
-      <div class="wrap">
+    <section class="page-body">
+      <div class="page-wrap">
         <div class="guide">
-          <div>
+          <div class="panel-card">
             <strong>Oficial</strong>
-            <p>Alertas de entidades (por ejemplo IDEAM). Color verde agua en Comunidad.</p>
+            <p>Alertas y catálogos de entidades (IDEAM, salud, etc.).</p>
           </div>
-          <div>
-            <strong>Persona</strong>
-            <p>Avisos / comentarios en el mapa. Siempre “sin verificar”. Color coral.</p>
+          <div class="panel-card">
+            <strong>Persona / org</strong>
+            <p>Lugares y avisos del foro. Son señales; no los verificamos en la ficha.</p>
           </div>
         </div>
 

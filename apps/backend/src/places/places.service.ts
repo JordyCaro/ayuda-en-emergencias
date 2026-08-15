@@ -29,6 +29,8 @@ export interface ListPlacesQuery {
   cityCode?: string;
   origin?: 'community' | 'official' | 'all';
   tag?: string;
+  /** Directorio “Ayudar”: acopios/ONG/comunidad (excluye IPS MEDICAL). */
+  helpOnly?: boolean;
 }
 
 export interface ListPlacesResult {
@@ -57,6 +59,16 @@ export class PlacesService {
 
     if (query.type) {
       qb.andWhere('p.type = :type', { type: query.type });
+    } else if (query.helpOnly) {
+      // Sin ciudad: no inundar con hospitales/IPS. Con ciudad: sí se pueden ver.
+      if (
+        (query.tag === 'MEDICINE' || query.tag === 'BLOOD') &&
+        query.cityCode
+      ) {
+        // allow MEDICAL for that city
+      } else {
+        qb.andWhere('p.type != :medical', { medical: 'MEDICAL' });
+      }
     }
     if (query.cityCode) {
       qb.andWhere('p.city_code = :cityCode', { cityCode: query.cityCode });
@@ -199,6 +211,7 @@ export class PlacesService {
     department?: string | null;
     cityCode?: string | null;
     externalUrl?: string | null;
+    needTags?: string[];
     retrievedAt: Date;
     properties?: Record<string, unknown>;
   }): Promise<PlaceEntity> {
@@ -217,6 +230,7 @@ export class PlacesService {
       status: 'ACTIVE' as const,
       country: 'CO',
       cityCode: input.cityCode ?? null,
+      needTags: input.needTags ?? [],
       properties: input.properties ?? {},
     };
     if (!row) {
@@ -264,7 +278,11 @@ export class PlacesService {
           ? 'SISPRO / REPS (MinSalud)'
           : p.sourceId === 'community'
             ? 'Comunidad'
-            : p.sourceId,
+            : p.sourceId === 'osm'
+              ? 'OpenStreetMap'
+              : p.sourceId === 'curated'
+                ? 'Directorio curado (enlaces públicos)'
+                : p.sourceId,
       verification: p.verification,
       status: p.status,
       address: p.address,

@@ -1,8 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import type { CityDto, NeedTag, PlaceDto, PlaceType } from '@aee/shared-types';
+import maplibregl, { Map, Marker } from 'maplibre-gl';
 import { ApiService } from '../api.service';
 import {
   CITY_CHIPS,
@@ -12,172 +23,213 @@ import {
 } from '../help-categories';
 import { placeTypeLabel } from '../plain-labels';
 
+const CO_BOUNDS: [[number, number], [number, number]] = [
+  [-79.2, -4.3],
+  [-66.8, 13.5],
+];
+
 @Component({
   selector: 'aee-ayudar-page',
   standalone: true,
   imports: [NgIf, NgFor, FormsModule, RouterLink, DatePipe],
   template: `
-    <section class="hero">
-      <div class="wrap">
-        <p class="kicker">Colombia · dónde ayudar</p>
-        <h1>Lugares y organizaciones que necesitan apoyo</h1>
-        <p class="lead">
-          Lista nacional (no solo Bogotá). Elige ciudad y qué se necesita. Nosotros
-          <strong>no recibimos donaciones</strong>: si hay enlace, es el canal de ellos.
-        </p>
-        <p class="stamp" *ngIf="updatedHint()">Última carga: {{ updatedHint() }}</p>
-        <div class="toolbar">
-          <a class="cta" routerLink="/buscar">¿Qué necesitas?</a>
-          <a class="ghost" routerLink="/publicar-punto">Publicar un lugar</a>
+    <section class="page-hero-band">
+      <div class="page-wrap hero-grid">
+        <div>
+          <p class="kicker">Ayudar · Colombia</p>
+          <h1>Dónde ayudar ahora</h1>
+          <p class="lead">
+            Centros de acopio, Cruz Roja, hospitales, sangre, voluntariado y albergues. Filtra y abre
+            el mapa en el lugar. <strong>No recibimos donaciones</strong>: el enlace es el canal de
+            ellos.
+          </p>
+          <p class="stamp" *ngIf="updatedHint()">Actualizado: {{ updatedHint() }}</p>
+          <div class="toolbar">
+            <a class="cta" routerLink="/buscar">¿Qué necesitas?</a>
+            <a class="ghost" routerLink="/publicar-punto">Publicar un lugar</a>
+          </div>
         </div>
+        <aside class="hero-side panel-card">
+          <p class="side-k">Cómo usarlo</p>
+          <ul>
+            <li>Filtra por ciudad y qué se necesita</li>
+            <li>El mapa guía es un complemento</li>
+            <li>“Cómo llegar” abre el mapa aquí mismo</li>
+          </ul>
+        </aside>
       </div>
     </section>
 
-    <section class="body">
-      <div class="wrap">
-        <div class="filters">
-          <p class="label">Qué se necesita</p>
-          <div class="chips">
-            <button type="button" class="chip" [class.on]="!tag" (click)="setTag('')">Todos</button>
-            <button
-              type="button"
-              class="chip"
-              *ngFor="let c of cats"
-              [class.on]="tag === c.id"
-              (click)="setTag(c.id)"
-            >
-              {{ c.title }}
-            </button>
+    <section class="page-body">
+      <div class="page-wrap layout">
+        <div class="main-col">
+          <div class="filters panel-card">
+            <p class="label">Qué se necesita</p>
+            <div class="chips">
+              <button type="button" class="chip" [class.on]="!tag" (click)="setTag('')">Todos</button>
+              <button
+                type="button"
+                class="chip"
+                *ngFor="let c of cats"
+                [class.on]="tag === c.id"
+                (click)="setTag(c.id)"
+              >
+                {{ c.title }}
+              </button>
+            </div>
+
+            <p class="label">Tipo de lugar</p>
+            <div class="chips">
+              <button
+                type="button"
+                class="chip soft"
+                *ngFor="let k of kinds"
+                [class.on]="placeType === k.id"
+                (click)="setType(k.id)"
+              >
+                {{ k.label }}
+              </button>
+            </div>
+
+            <p class="label">Ciudad</p>
+            <div class="chips">
+              <button
+                type="button"
+                class="chip city"
+                *ngFor="let c of cityChips"
+                [class.on]="cityCode === c.code"
+                (click)="setCity(c.code)"
+              >
+                {{ c.label }}
+              </button>
+            </div>
+            <label class="more">
+              Más ciudades
+              <select [(ngModel)]="cityCode" (ngModelChange)="reload()">
+                <option value="">Todo el país</option>
+                <option *ngFor="let c of cities()" [value]="c.code">
+                  {{ c.name }} — {{ c.department }}
+                </option>
+              </select>
+            </label>
           </div>
 
-          <p class="label">Tipo de lugar</p>
-          <div class="chips">
-            <button
-              type="button"
-              class="chip soft"
-              *ngFor="let k of kinds"
-              [class.on]="placeType === k.id"
-              (click)="setType(k.id)"
-            >
-              {{ k.label }}
-            </button>
-          </div>
+          <p class="toast err" *ngIf="error()">{{ error() }}</p>
+          <p class="count" *ngIf="!loading()">
+            {{ places().length }} lugar{{ places().length === 1 ? '' : 'es' }}
+            <span *ngIf="cityLabel()"> · {{ cityLabel() }}</span>
+            <span *ngIf="tag"> · {{ needTagLabel(tag) }}</span>
+          </p>
 
-          <p class="label">Filtrar por ciudad</p>
-          <div class="chips">
-            <button
-              type="button"
-              class="chip city"
-              *ngFor="let c of cityChips"
-              [class.on]="cityCode === c.code"
-              (click)="setCity(c.code)"
-            >
-              {{ c.label }}
-            </button>
-          </div>
-          <label class="more">
-            Más ciudades
-            <select [(ngModel)]="cityCode" (ngModelChange)="reload()">
-              <option value="">Todo el país</option>
-              <option *ngFor="let c of cities()" [value]="c.code">
-                {{ c.name }} — {{ c.department }}
-              </option>
-            </select>
-          </label>
-        </div>
-
-        <p class="toast err" *ngIf="error()">{{ error() }}</p>
-        <p class="count" *ngIf="!loading()">
-          {{ places().length }} lugar{{ places().length === 1 ? '' : 'es' }}
-          <span *ngIf="cityLabel()"> · {{ cityLabel() }}</span>
-          <span *ngIf="tag"> · {{ needTagLabel(tag) }}</span>
-        </p>
-
-        <ul class="feed" *ngIf="places().length; else empty">
-          <li *ngFor="let p of places()">
-            <article class="card">
-              <div class="top">
-                <div class="who">
-                  <span class="avatar" aria-hidden="true">{{ initials(p.title) }}</span>
-                  <div>
-                    <h2>{{ p.title }}</h2>
-                    <p class="kind">{{ placeTypeLabel(p.type) }}</p>
+          <ul class="feed" *ngIf="places().length; else empty">
+            <li *ngFor="let p of places()">
+              <article class="card" (click)="focusPlace(p)">
+                <div class="top">
+                  <div class="who">
+                    <span class="avatar" aria-hidden="true">{{ initials(p.title) }}</span>
+                    <div>
+                      <h2>{{ p.title }}</h2>
+                      <p class="kind">{{ placeTypeLabel(p.type) }}</p>
+                    </div>
                   </div>
                 </div>
-                <span class="urgent" *ngIf="hasUrgent(p)">Necesita apoyo</span>
-              </div>
-              <p class="desc">{{ p.description || 'Sin detalle adicional. Contacta por su enlace si existe.' }}</p>
-              <div class="tags" *ngIf="p.needTags?.length">
-                <span *ngFor="let t of p.needTags">{{ needTagLabel(t) }}</span>
-              </div>
-              <div class="foot">
-                <span>{{ p.municipality || 'Colombia' }}<ng-container *ngIf="p.department"> · {{ p.department }}</ng-container></span>
-                <span class="trust">Sin verificar</span>
-                <span *ngIf="p.updatedAt">{{ p.updatedAt | date: 'd MMM, HH:mm' }}</span>
-              </div>
-              <div class="actions">
-                <a
-                  *ngIf="p.externalUrl"
-                  class="btn"
-                  [href]="p.externalUrl"
-                  target="_blank"
-                  rel="noopener"
-                  >Ir a su canal</a
-                >
-                <span class="note" *ngIf="!p.externalUrl">Sin enlace externo · solo referencia en esta lista</span>
-              </div>
-            </article>
-          </li>
-        </ul>
-        <ng-template #empty>
-          <div class="empty" *ngIf="!loading()">
-            <strong>No hay lugares con esos filtros todavía.</strong>
-            <p>
-              El directorio es nacional: prueba “Todo el país”, otra categoría, o publica el primer
-              punto de tu ciudad.
-            </p>
-            <a routerLink="/publicar-punto" class="cta">Publicar un lugar</a>
-            <a routerLink="/buscar" class="ghost">Cambiar búsqueda</a>
+                <p class="desc">{{ cleanDesc(p.description) }}</p>
+                <div class="tags" *ngIf="p.needTags?.length">
+                  <span *ngFor="let t of p.needTags">{{ needTagLabel(t) }}</span>
+                </div>
+                <div class="foot">
+                  <span
+                    >{{ p.municipality || 'Colombia'
+                    }}<ng-container *ngIf="p.department"> · {{ p.department }}</ng-container></span
+                  >
+                  <span *ngIf="p.updatedAt">{{ p.updatedAt | date: 'd MMM, HH:mm' }}</span>
+                </div>
+                <div class="actions" (click)="$event.stopPropagation()">
+                  <a
+                    *ngIf="p.externalUrl"
+                    class="btn"
+                    [href]="p.externalUrl"
+                    target="_blank"
+                    rel="noopener"
+                    >Ir a su canal</a
+                  >
+                  <button type="button" class="btn soft" (click)="openDirections(p)">Cómo llegar</button>
+                </div>
+              </article>
+            </li>
+          </ul>
+          <ng-template #empty>
+            <div class="empty panel-card" *ngIf="!loading()">
+              <strong>No hay lugares con esos filtros todavía.</strong>
+              <p>Prueba otra ciudad o publica un punto. Hospitales: ciudad + Medicinas.</p>
+              <a routerLink="/publicar-punto" class="cta">Publicar un lugar</a>
+            </div>
+          </ng-template>
+        </div>
+
+        <aside class="side-col">
+          <div class="mini-map panel-card" aria-label="Mapa de orientación">
+            <div class="map-head">
+              <strong>Mapa guía</strong>
+              <span>Complemento</span>
+            </div>
+            <div #mapHost class="map-host"></div>
           </div>
-        </ng-template>
+          <p class="sources-note">
+            Datos de orgs públicas, comunidad y catálogos abiertos.
+            <a routerLink="/fuentes-detalle">Ver fuentes</a>
+          </p>
+        </aside>
       </div>
     </section>
+
+    <div class="modal" *ngIf="directions()" role="dialog" aria-modal="true" [attr.aria-label]="'Cómo llegar'">
+      <button type="button" class="backdrop" (click)="closeDirections()" aria-label="Cerrar"></button>
+      <div class="modal-panel">
+        <div class="modal-head">
+          <div>
+            <p class="mk">Cómo llegar</p>
+            <h3>{{ directions()!.title }}</h3>
+            <p class="msub">
+              {{ directions()!.municipality || 'Colombia'
+              }}<ng-container *ngIf="directions()!.department">
+                · {{ directions()!.department }}</ng-container
+              >
+            </p>
+          </div>
+          <button type="button" class="x" (click)="closeDirections()">Cerrar</button>
+        </div>
+        <iframe
+          class="embed"
+          title="Mapa del lugar"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          [src]="directionsEmbedUrl()"
+        ></iframe>
+        <div class="modal-actions">
+          <a class="btn" [href]="mapsUrl(directions()!)" target="_blank" rel="noopener"
+            >Abrir en Google Maps</a
+          >
+          <button type="button" class="btn soft" (click)="closeDirections()">Listo</button>
+        </div>
+      </div>
+    </div>
   `,
   styles: [
     `
-      .hero {
-        background: var(--ink);
-        color: #f7f3ec;
-        padding: 2rem 0 2.1rem;
+      .hero-grid {
+        display: grid;
+        gap: 1.2rem;
+        position: relative;
+        z-index: 1;
       }
-      .wrap {
-        width: min(800px, calc(100% - 1.5rem));
-        margin: 0 auto;
-      }
-      .kicker {
-        margin: 0;
-        font-weight: 800;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        font-size: 0.72rem;
-        opacity: 0.75;
-      }
-      h1 {
-        margin: 0.45rem 0 0;
-        font-family: var(--font-display);
-        font-size: clamp(1.7rem, 5vw, 2.4rem);
-        letter-spacing: -0.03em;
-        max-width: 16ch;
-      }
-      .lead {
-        margin: 0.7rem 0 0;
-        max-width: 40rem;
-        font-weight: 600;
-        opacity: 0.92;
-        line-height: 1.45;
+      @media (min-width: 900px) {
+        .hero-grid {
+          grid-template-columns: 1.45fr 0.8fr;
+        }
       }
       .stamp {
-        margin: 0.6rem 0 0;
+        margin: 0.55rem 0 0;
         font-size: 0.85rem;
         font-weight: 700;
         opacity: 0.75;
@@ -186,7 +238,7 @@ import { placeTypeLabel } from '../plain-labels';
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
-        margin-top: 1.15rem;
+        margin-top: 1.1rem;
       }
       .cta,
       .ghost,
@@ -212,17 +264,41 @@ import { placeTypeLabel } from '../plain-labels';
         color: #fff;
         border: 1.5px solid rgba(255, 255, 255, 0.35);
       }
-      .body {
-        background: var(--cream);
-        padding: 1.25rem 0 3rem;
+      .hero-side {
+        background: rgba(255, 252, 247, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.14) !important;
+        color: #f7f3ec;
+        box-shadow: none !important;
+      }
+      .side-k {
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.7;
+      }
+      .hero-side ul {
+        margin: 0.7rem 0 0;
+        padding-left: 1.1rem;
+        font-weight: 600;
+      }
+      .layout {
+        display: grid;
+        gap: 1.1rem;
+      }
+      @media (min-width: 980px) {
+        .layout {
+          grid-template-columns: 1.35fr 0.75fr;
+          align-items: start;
+        }
+        .side-col {
+          position: sticky;
+          top: calc(var(--nav-h) + 0.75rem);
+        }
       }
       .filters {
-        background: #fff;
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        box-shadow: var(--shadow);
+        margin-bottom: 0.85rem;
       }
       .label {
         margin: 0.55rem 0 0.45rem;
@@ -275,6 +351,27 @@ import { placeTypeLabel } from '../plain-labels';
         font: inherit;
         font-weight: 600;
       }
+      .map-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem 0.75rem;
+        align-items: baseline;
+        padding: 0 0 0.65rem;
+      }
+      .map-head strong {
+        font-family: var(--font-display);
+      }
+      .map-head span {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .map-host {
+        height: 280px;
+        width: 100%;
+        border-radius: 14px;
+        overflow: hidden;
+      }
       .count {
         font-weight: 800;
         margin: 0 0 0.85rem;
@@ -295,12 +392,12 @@ import { placeTypeLabel } from '../plain-labels';
         box-shadow: 0 10px 28px rgba(16, 35, 63, 0.05);
         display: grid;
         gap: 0.55rem;
+        cursor: pointer;
       }
       .top {
         display: flex;
         justify-content: space-between;
         gap: 0.75rem;
-        align-items: flex-start;
       }
       .who {
         display: flex;
@@ -329,15 +426,6 @@ import { placeTypeLabel } from '../plain-labels';
         font-weight: 700;
         font-size: 0.85rem;
       }
-      .urgent {
-        background: #e4574c;
-        color: #fff;
-        font-size: 0.72rem;
-        font-weight: 800;
-        padding: 0.35rem 0.55rem;
-        border-radius: 999px;
-        white-space: nowrap;
-      }
       .desc {
         margin: 0;
         color: var(--muted);
@@ -364,9 +452,6 @@ import { placeTypeLabel } from '../plain-labels';
         font-weight: 700;
         color: var(--muted);
       }
-      .trust {
-        color: var(--teal-deep);
-      }
       .actions {
         display: flex;
         flex-wrap: wrap;
@@ -383,28 +468,20 @@ import { placeTypeLabel } from '../plain-labels';
         padding: 0 0.95rem;
         display: inline-flex;
         align-items: center;
+        font-size: 0.88rem;
+        border: 0;
+        cursor: pointer;
+        font: inherit;
       }
-      .note {
-        font-size: 0.82rem;
-        color: var(--muted);
-        font-weight: 600;
+      .btn.soft {
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line);
       }
       .empty {
-        background: #fff;
-        border: 1px dashed var(--line);
-        border-radius: 18px;
-        padding: 1.5rem 1.1rem;
         display: grid;
         gap: 0.55rem;
         justify-items: start;
-      }
-      .empty strong {
-        font-family: var(--font-display);
-        font-size: 1.2rem;
-      }
-      .empty .ghost {
-        color: var(--ink);
-        border-color: var(--line);
       }
       .toast.err {
         background: #f8d7d3;
@@ -413,12 +490,104 @@ import { placeTypeLabel } from '../plain-labels';
         border-radius: 12px;
         font-weight: 700;
       }
+      .sources-note {
+        margin: 0.85rem 0 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .sources-note a {
+        color: var(--teal);
+        font-weight: 800;
+      }
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: grid;
+        place-items: end center;
+        padding: 0.75rem;
+      }
+      @media (min-width: 720px) {
+        .modal {
+          place-items: center;
+        }
+      }
+      .backdrop {
+        position: absolute;
+        inset: 0;
+        border: 0;
+        background: rgba(16, 35, 63, 0.55);
+        cursor: pointer;
+      }
+      .modal-panel {
+        position: relative;
+        width: min(640px, 100%);
+        background: #fff;
+        border-radius: 20px 20px 12px 12px;
+        padding: 1rem;
+        box-shadow: var(--shadow);
+        display: grid;
+        gap: 0.75rem;
+        max-height: min(90dvh, 720px);
+      }
+      .modal-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: start;
+      }
+      .mk {
+        margin: 0;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--teal);
+      }
+      .modal-head h3 {
+        margin: 0.2rem 0 0;
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+      }
+      .msub {
+        margin: 0.25rem 0 0;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.88rem;
+      }
+      .x {
+        border: 1px solid var(--line);
+        background: var(--cream);
+        border-radius: 999px;
+        min-height: 40px;
+        padding: 0 0.9rem;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .embed {
+        width: 100%;
+        height: min(42vh, 320px);
+        border: 0;
+        border-radius: 14px;
+        background: var(--cream-2);
+      }
+      .modal-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
     `,
   ],
 })
-export class AyudarPageComponent implements OnInit {
+export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('mapHost') mapHost?: ElementRef<HTMLDivElement>;
+
   private readonly api = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
+  private readonly sanitizer = inject(DomSanitizer);
+  private map: Map | null = null;
+  private markers: Marker[] = [];
 
   readonly cats = HELP_CATEGORIES;
   readonly kinds = PLACE_KIND_FILTERS;
@@ -428,6 +597,7 @@ export class AyudarPageComponent implements OnInit {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly updatedHint = signal<string | null>(null);
+  readonly directions = signal<PlaceDto | null>(null);
 
   tag: NeedTag | '' = '';
   placeType: PlaceType | '' = '';
@@ -448,6 +618,17 @@ export class AyudarPageComponent implements OnInit {
       this.cityCode = city && /^\d{5}$/.test(city) ? city : '';
       this.reload();
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.initMap();
+    this.syncMarkers();
+  }
+
+  ngOnDestroy(): void {
+    this.clearMarkers();
+    this.map?.remove();
+    this.map = null;
   }
 
   setTag(t: NeedTag | ''): void {
@@ -473,27 +654,79 @@ export class AyudarPageComponent implements OnInit {
     return c ? c.name : this.cityCode;
   }
 
-  hasUrgent(p: PlaceDto): boolean {
-    return (p.needTags?.length ?? 0) > 0 || Boolean(p.description?.trim());
-  }
-
   initials(title: string): string {
     const parts = title.trim().split(/\s+/).slice(0, 2);
     return parts.map((p) => p[0]?.toUpperCase() ?? '').join('') || '?';
+  }
+
+  cleanDesc(description: string | null | undefined): string {
+    const raw = (description ?? '').trim();
+    if (!raw) return 'Toca “Cómo llegar” o “Street View” para ubicarlo. Si hay canal, abre su sitio.';
+    return raw
+      .replace(/\bOpenStreetMap\b/gi, '')
+      .replace(/\bOSM\b/g, '')
+      .replace(/\(\s*\)/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s·\s·/g, ' · ')
+      .replace(/^[\s·]+|[\s·]+$/g, '')
+      .trim();
+  }
+
+  coords(p: PlaceDto): [number, number] | null {
+    const g = p.geometry;
+    if (!g || g.type !== 'Point' || !Array.isArray(g.coordinates)) return null;
+    const lng = Number(g.coordinates[0]);
+    const lat = Number(g.coordinates[1]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    return [lng, lat];
+  }
+
+  mapsUrl(p: PlaceDto): string {
+    const c = this.coords(p);
+    if (!c) return 'https://www.google.com/maps';
+    return `https://www.google.com/maps/search/?api=1&query=${c[1]},${c[0]}`;
+  }
+
+  openDirections(p: PlaceDto): void {
+    this.directions.set(p);
+    this.focusPlace(p);
+  }
+
+  closeDirections(): void {
+    this.directions.set(null);
+  }
+
+  directionsEmbedUrl(): SafeResourceUrl {
+    const p = this.directions();
+    const c = p ? this.coords(p) : null;
+    const q = c ? `${c[1]},${c[0]}` : 'Colombia';
+    const url = `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=15&output=embed`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  focusPlace(p: PlaceDto): void {
+    const c = this.coords(p);
+    if (!c || !this.map) return;
+    this.map.flyTo({ center: c, zoom: Math.max(this.map.getZoom(), 13), essential: true });
   }
 
   reload(): void {
     this.loading.set(true);
     this.error.set(null);
     const params: {
-      origin: 'community';
+      origin: 'all';
+      helpOnly: boolean;
       limit: number;
       cityCode?: string;
       type?: string;
       tag?: string;
-    } = { origin: 'community', limit: 200 };
+    } = { origin: 'all', helpOnly: true, limit: 200 };
     if (this.cityCode) params.cityCode = this.cityCode;
-    if (this.placeType) params.type = this.placeType;
+    if (this.placeType) {
+      params.type = this.placeType;
+      params.helpOnly = this.placeType !== 'MEDICAL';
+      if (this.placeType === 'MEDICAL') params.helpOnly = false;
+    }
     if (this.tag) params.tag = this.tag;
 
     this.api.places(params).subscribe({
@@ -508,9 +741,15 @@ export class AyudarPageComponent implements OnInit {
               (p.municipality ?? '').toLowerCase().includes(q),
           );
         }
+        data = data.filter((p) => !isLowSignalPlace(p));
+        // Priorizar puntos útiles de ayuda sobre ruido genérico
+        data = [...data].sort((a, b) => scorePlace(b) - scorePlace(a));
         this.places.set(data);
         this.loading.set(false);
-        this.updatedHint.set(new Date().toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }));
+        this.updatedHint.set(
+          new Date().toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }),
+        );
+        queueMicrotask(() => this.syncMarkers());
       },
       error: () => {
         this.loading.set(false);
@@ -518,4 +757,114 @@ export class AyudarPageComponent implements OnInit {
       },
     });
   }
+
+  private initMap(): void {
+    if (!this.mapHost?.nativeElement || this.map) return;
+    this.map = new maplibregl.Map({
+      container: this.mapHost.nativeElement,
+      style: {
+        version: 8,
+        sources: {
+          basemap: {
+            type: 'raster',
+            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            attribution: '© colaboradores del mapa',
+          },
+        },
+        layers: [{ id: 'basemap', type: 'raster', source: 'basemap' }],
+      },
+      bounds: CO_BOUNDS,
+      fitBoundsOptions: { padding: 20 },
+      attributionControl: false,
+    });
+    this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+    this.map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+    this.map.on('load', () => this.map?.resize());
+  }
+
+  private syncMarkers(): void {
+    if (!this.map) this.initMap();
+    if (!this.map) return;
+    this.clearMarkers();
+    const bounds = new maplibregl.LngLatBounds();
+    let n = 0;
+    for (const p of this.places().slice(0, 80)) {
+      const c = this.coords(p);
+      if (!c) continue;
+      const color =
+        p.type === 'DONATION_POINT'
+          ? '#e4574c'
+          : p.type === 'VOLUNTEER_POINT'
+            ? '#0f6e6a'
+            : p.type === 'SHELTER'
+              ? '#2f6fed'
+              : p.type === 'MEDICAL'
+                ? '#1c64a0'
+                : '#b47828';
+      const el = document.createElement('div');
+      el.style.width = '14px';
+      el.style.height = '14px';
+      el.style.borderRadius = '50%';
+      el.style.background = color;
+      el.style.border = '2px solid #fff';
+      el.style.boxShadow = '0 1px 4px rgba(0,0,0,0.25)';
+      this.markers.push(
+        new maplibregl.Marker({ element: el })
+          .setLngLat(c)
+          .setPopup(
+            new maplibregl.Popup({ offset: 10 }).setHTML(
+              `<strong>${esc(p.title)}</strong><br/>${esc(placeTypeLabel(p.type))}`,
+            ),
+          )
+          .addTo(this.map),
+      );
+      bounds.extend(c);
+      n += 1;
+    }
+    if (n === 1) {
+      this.map.flyTo({ center: bounds.getCenter(), zoom: 12, essential: true });
+    } else if (n > 1) {
+      this.map.fitBounds(bounds, { padding: 36, maxZoom: 12, duration: 500 });
+    } else {
+      this.map.fitBounds(CO_BOUNDS, { padding: 20 });
+    }
+    queueMicrotask(() => this.map?.resize());
+  }
+
+  private clearMarkers(): void {
+    for (const m of this.markers) m.remove();
+    this.markers = [];
+  }
+}
+
+function isLowSignalPlace(p: PlaceDto): boolean {
+  const t = p.title.toLowerCase();
+  // Salones comunales / eventos genéricos saturan y no son “dónde ayudar” accionable.
+  if (/sal[oó]n comunal|casa de eventos|c[aá]mara de comercio|federaci[oó]n nacional de cafeteros/i.test(t)) {
+    return true;
+  }
+  return false;
+}
+
+function scorePlace(p: PlaceDto): number {
+  let s = 0;
+  if (p.sourceId === 'curated') s += 30;
+  if (p.sourceId === 'community') s += 20;
+  if (p.externalUrl) s += 10;
+  if (p.needTags?.length) s += p.needTags.length * 2;
+  if (p.type === 'DONATION_POINT' || p.type === 'VOLUNTEER_POINT' || p.type === 'SHELTER') s += 8;
+  if (p.type === 'HELP_CENTER') s += 6;
+  if (/cruz roja|banco de alimentos|defensa civil|bomberos|hemocentro|techo/i.test(p.title)) {
+    s += 25;
+  }
+  return s;
+}
+
+function esc(v: string): string {
+  return v
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }

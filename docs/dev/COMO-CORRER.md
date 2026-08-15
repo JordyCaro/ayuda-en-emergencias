@@ -88,11 +88,9 @@ pnpm --filter @aee/backend start:prod
 ## 6. Probar el MVP en 2 minutos
 
 1. Abrir inicio → leer de qué va.  
-2. **Dejar un aviso** → texto + ubicación → publicar.  
-3. **Comunidad** → ver el aviso; **Actualizar** para traer alertas IDEAM.  
-4. **Confianza** → ver fuentes.
-
-Más detalle por fases: [`COMO-PROBAR-FASES.md`](COMO-PROBAR-FASES.md)
+2. **¿Qué necesitas?** → publicar o leer un aviso.  
+3. **Ayudar** → ver directorio / ciudad.  
+4. **Fuentes** → procedencia de datos.
 
 ---
 

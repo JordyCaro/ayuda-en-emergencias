@@ -1,14 +1,14 @@
 # Ayuda en Emergencias
 
-**Capa abierta que conecta** información de emergencias en Colombia: alertas oficiales, avisos de la comunidad en el mapa, y (más adelante) enlaces a centros de acopio, fundaciones y ONG.
+**Capa abierta que conecta** información de emergencias en Colombia: datos oficiales (cuando se integran), avisos de la comunidad (“necesito” / “puedo aportar”), y directorio de acopios u organizaciones.
 
 > **No** somos autoridad de emergencias.  
 > **No** pedimos ni recibimos donaciones (ni dinero ni especie). Solo conectamos información y actores.
 
 | | |
 |---|---|
-| **Estado** | MVP **001** usable en local (API + PWA + PostGIS + IDEAM) |
-| **Metodología** | Spec-Driven Development (SDD) |
+| **Estado** | Fases **0–3** hechas. Siguiente: **Fase 4** (slice `003+`). |
+| **Metodología** | Spec-Driven Development (SDD) — lean |
 | **Forma** | Monorepo pnpm (`apps/frontend`, `apps/backend`, …) |
 
 ---
@@ -17,32 +17,30 @@
 
 | Si eres… | Abre esto |
 |----------|-----------|
-| **Nuevo en el repo / compartir con alguien** | [`docs/product/QUE-ES.md`](docs/product/QUE-ES.md) → [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md) |
-| **Mapa de carpetas** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
+| **Propósito** | [`docs/product/QUE-ES.md`](docs/product/QUE-ES.md) |
+| **Correr en local** | [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md) |
+| **Roadmap** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
+| **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
 | **Agente de IA** | [`AGENTS.md`](AGENTS.md) |
-| **Contrato MVP** | [`specs/001-mvp-mapa-ayuda/spec.md`](specs/001-mvp-mapa-ayuda/spec.md) |
+| **Specs** | [`specs/001-mvp-mapa-ayuda/`](specs/001-mvp-mapa-ayuda/) · [`specs/002-registro-facil-lugares/`](specs/002-registro-facil-lugares/) |
 | **Reglas** | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) |
 
 ---
 
-## Qué hace el MVP 001
+## Qué hace hoy
 
-1. **Inicio** — explica el producto.  
-2. **Dejar un aviso** — comentario en un lugar (“hace falta agua / ayuda con escombros…”). No es un pedido que prometamos cumplir.  
-3. **Comunidad** — lista + mapa: alertas oficiales (IDEAM) + avisos de personas (sin verificar).  
-4. **Confianza** — de dónde sale cada dato.  
-5. **API** — NestJS documentada en Swagger.
-
-Detalle: [`docs/product/QUE-ES.md`](docs/product/QUE-ES.md)
+1. **Inicio** — qué es, utilidad, conteos reales, fuentes.  
+2. **¿Qué necesitas?** (`/buscar`) — avisos necesito / puedo aportar.  
+3. **Ayudar** (`/ayudar`) — directorio de lugares + mini-mapa.  
+4. **Publicar punto** — registro de acopio / org.  
+5. **Fuentes** — procedencia e integración.  
+6. **API** — NestJS `/api/v1` + Swagger.
 
 ---
 
-## Cómo compilar y correr
-
-Guía completa: **[`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md)**
+## Cómo correr
 
 ```powershell
-# Requisitos: Node 20+, pnpm 9, Docker Desktop
 Copy-Item .env.example .env
 pnpm install
 pnpm --filter @aee/shared-types build
@@ -51,52 +49,29 @@ pnpm dev:backend     # :3000  Swagger → /api/docs
 pnpm dev:frontend    # :4200
 ```
 
-Build:
-
-```powershell
-pnpm --filter @aee/shared-types build
-pnpm --filter @aee/backend build
-pnpm --filter @aee/frontend build
-```
+Detalle: [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md)
 
 ---
 
-## Estructura del monorepo
+## Documentación (mínima)
 
-```text
-apps/frontend   → Angular PWA
-apps/backend    → NestJS API + connector IDEAM
-packages/       → tipos compartidos
-infra/docker    → PostGIS
-connectors/     → anclas de integraciones
-specs/          → contratos SDD
-docs/           → explicación humana
-```
-
----
-
-## Documentación índice
+Preferimos **pocos docs vivos** + specs SDD. No crear memos de estado, inspiración o resúmenes duplicados.
 
 | Tema | Archivo |
 |------|---------|
-| Confianza | `docs/product/QUE-ES.md` |
-| Visión | `docs/product/vision.md` |
-| **Roadmap completo (master → fases)** | `docs/product/ROADMAP-FASES.md` |
-| Correr / compilar | `docs/dev/COMO-CORRER.md` |
-| Estado de fases | `docs/dev/ESTADO-FASES.md` |
-| Fases + backend (para nuevos devs) | `docs/dev/FASES-Y-BACKEND.md` |
-| Probar por fases | `docs/dev/COMO-PROBAR-FASES.md` |
-| Spec 001 | `specs/001-mvp-mapa-ayuda/` |
-| Fuentes | `docs/sources/` |
+| Propósito | `docs/product/QUE-ES.md` |
+| Fases | `docs/product/ROADMAP-FASES.md` |
+| Correr | `docs/dev/COMO-CORRER.md` |
+| Fuentes | `docs/sources/source-registry.md` |
 | ADRs | `docs/architecture/adr/` |
+| Workflow SDD | `docs/sdd/workflow.md` |
 
 ---
 
-## Fuera de alcance (nosotros no lo hacemos)
+## Fuera de alcance
 
 - Recaudar o custodiar donaciones  
 - Prometer cumplimiento de avisos  
-- Ser base oficial de desaparecidos / app de mascotas  
+- Base oficial de desaparecidos / app de mascotas  
 
-Vínculos a **terceros** (acopio, donación, voluntariado, RND): fases **3–7** del roadmap.  
 **Offline avanzado:** fase **12**, última y casi opcional.

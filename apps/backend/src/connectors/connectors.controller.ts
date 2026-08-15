@@ -38,4 +38,16 @@ export class ConnectorsController {
     const result = await this.runner.runSispro(bbox);
     return { ok: !result.skipped, bbox, ...result };
   }
+
+  /** Barrido nacional: capitales SISPRO + OSM help (rate-limited). */
+  @Post('national/run')
+  @Throttle({ default: { limit: 1, ttl: 300_000 } })
+  @ApiOperation({ summary: 'Sync nacional por capitales (SISPRO + OSM help)' })
+  async runNational() {
+    const result = await this.runner.runNationalDirectorySync({
+      includeSispro: true,
+      includeOsm: true,
+    });
+    return { ok: !result.skipped, ...result };
+  }
 }

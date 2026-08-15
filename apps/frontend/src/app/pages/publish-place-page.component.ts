@@ -20,20 +20,19 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
   standalone: true,
   imports: [FormsModule, NgIf, NgFor, RouterLink],
   template: `
-    <section class="page-hero">
-      <div class="wrap">
-        <p class="kicker">Fase 3 · lugares</p>
+    <section class="page-hero-band">
+      <div class="page-wrap">
+        <p class="kicker">Lugares · comunidad</p>
         <h1>Publicar un punto de ayuda</h1>
         <p class="lead">
-          Acopio, albergue, voluntariado u ONG. Queda
-          <strong>sin verificar</strong>. Nosotros <strong>no recibimos donaciones</strong>: solo
-          mostramos el punto y, si pones URL, el canal de la organización.
+          Acopio, albergue, voluntariado u ONG. Nosotros <strong>no recibimos donaciones</strong>:
+          solo mostramos el punto y, si pones URL, el canal de la organización.
         </p>
       </div>
     </section>
 
-    <section class="body">
-      <div class="wrap narrow">
+    <section class="page-body">
+      <div class="page-wrap layout-pub">
         <div class="progress" aria-label="Progreso">
           <span [class.on]="step() >= 1">1 · Tipo</span>
           <span [class.on]="step() >= 2">2 · Texto</span>
@@ -157,6 +156,9 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
   `,
   styles: [
     `
+      .layout-pub {
+        max-width: 720px;
+      }
       .page-hero {
         background: var(--teal);
         color: #f3fffc;

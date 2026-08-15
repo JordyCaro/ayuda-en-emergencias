@@ -37,8 +37,17 @@ export class ApiService {
     return this.http.get<{ data: EventDto[] }>(`${this.base}/events`);
   }
 
-  needs(): Observable<{ data: NeedDto[] }> {
-    return this.http.get<{ data: NeedDto[] }>(`${this.base}/needs`);
+  needs(params?: {
+    category?: string;
+    intent?: 'NEED' | 'OFFER';
+    cityCode?: string;
+  }): Observable<{ data: NeedDto[] }> {
+    const q = new URLSearchParams();
+    if (params?.category) q.set('category', params.category);
+    if (params?.intent) q.set('intent', params.intent);
+    if (params?.cityCode) q.set('cityCode', params.cityCode);
+    const qs = q.toString();
+    return this.http.get<{ data: NeedDto[] }>(`${this.base}/needs${qs ? `?${qs}` : ''}`);
   }
 
   createNeed(body: CreateNeedRequest): Observable<NeedDto> {
@@ -60,6 +69,7 @@ export class ApiService {
     cityCode?: string;
     origin?: 'community' | 'official' | 'all';
     tag?: string;
+    helpOnly?: boolean;
   }): Observable<{ data: PlaceDto[]; meta?: { limit: number; offset: number; count: number } }> {
     const q = new URLSearchParams();
     if (params?.type) q.set('type', params.type);
@@ -71,6 +81,7 @@ export class ApiService {
     if (params?.cityCode) q.set('cityCode', params.cityCode);
     if (params?.origin) q.set('origin', params.origin);
     if (params?.tag) q.set('tag', params.tag);
+    if (params?.helpOnly) q.set('helpOnly', 'true');
     const qs = q.toString();
     return this.http.get<{
       data: PlaceDto[];

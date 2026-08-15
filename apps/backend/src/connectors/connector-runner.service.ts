@@ -9,10 +9,13 @@ import {
   SisproBBox,
   SisproConnector,
 } from './sispro.connector';
+import { OsmHelpConnector } from './osm-help.connector';
 import { EventsService } from '../events/events.service';
 import { SourcesService } from '../sources/sources.service';
 import { PlacesService } from '../places/places.service';
 import { RawRecordEntity } from '../events/raw-record.entity';
+import { NATIONAL_SYNC_CITIES } from '../geo/city-bboxes';
+import { findCityByCode } from '../geo/cities.seed';
 
 export interface SisproRunResult {
   placesUpserted: number;
@@ -21,15 +24,23 @@ export interface SisproRunResult {
   fetched: number;
 }
 
+export interface NationalSyncResult {
+  sispro: { cities: number; placesUpserted: number };
+  osm: { cities: number; placesUpserted: number };
+  skipped: boolean;
+}
+
 @Injectable()
 export class ConnectorRunnerService {
   private readonly logger = new Logger(ConnectorRunnerService.name);
   private ideamRunning = false;
   private sisproRunning = false;
+  private nationalRunning = false;
 
   constructor(
     private readonly ideam: IdeamConnector,
     private readonly sispro: SisproConnector,
+    private readonly osmHelp: OsmHelpConnector,
     private readonly events: EventsService,
     private readonly places: PlacesService,
     private readonly sources: SourcesService,
@@ -42,10 +53,31 @@ export class ConnectorRunnerService {
     await this.runIdeam();
   }
 
-  /** Sync SISPRO around Bogotá every 6h (bbox fijo; el mapa pide sync on-demand). */
+  /** Sync SISPRO en capitales (no solo Bogotá) cada 6h. */
   @Cron(process.env.SISPRO_POLL_CRON ?? '0 0 */6 * * *')
   async scheduledSispro(): Promise<void> {
-    await this.runSispro(DEFAULT_SISPRO_BBOX);
+    await this.runNationalDirectorySync({ includeOsm: false, cityLimit: 12 });
+  }
+
+  /** OSM help points por ciudad (más liviano) cada 12h. */
+  @Cron(process.env.OSM_HELP_POLL_CRON ?? '0 30 */12 * * *')
+  async scheduledOsmHelp(): Promise<void> {
+    await this.runNationalDirectorySync({ includeSispro: false, cityLimit: 16 });
+  }
+
+  /** Primera carga OSM (pocas ciudades) al arrancar el API. */
+  async warmOsmHelp(): Promise<void> {
+    setTimeout(() => {
+      void this.runNationalDirectorySync({
+        includeSispro: false,
+        includeOsm: true,
+        cityLimit: 8,
+      }).catch((err) =>
+        this.logger.warn(
+          `warmOsmHelp failed: ${err instanceof Error ? err.message : String(err)}`,
+        ),
+      );
+    }, 4000);
   }
 
   /** Expira places comunitarios con expiresAt pasado (cada hora). */
@@ -141,7 +173,9 @@ export class ConnectorRunnerService {
           address: p.address,
           municipality: p.municipality,
           department: p.department,
+          cityCode: this.matchCityCode(p.municipality, p.department),
           externalUrl: p.externalUrl,
+          needTags: ['MEDICINE'],
           retrievedAt: p.retrievedAt,
           properties: p.properties,
         })),
@@ -166,6 +200,123 @@ export class ConnectorRunnerService {
     } finally {
       this.sisproRunning = false;
     }
+  }
+
+  /**
+   * Barrido nacional por capitales: SISPRO (salud) + OSM (centros sociales / ONG).
+   * Evita un bbox país-entero (timeouts Overpass / abuso ArcGIS).
+   */
+  async runNationalDirectorySync(opts?: {
+    includeSispro?: boolean;
+    includeOsm?: boolean;
+    cityLimit?: number;
+  }): Promise<NationalSyncResult> {
+    if (this.nationalRunning) {
+      this.logger.warn('National directory sync already running — skip');
+      return {
+        sispro: { cities: 0, placesUpserted: 0 },
+        osm: { cities: 0, placesUpserted: 0 },
+        skipped: true,
+      };
+    }
+    this.nationalRunning = true;
+    const includeSispro = opts?.includeSispro !== false;
+    const includeOsm = opts?.includeOsm !== false;
+    const cities = NATIONAL_SYNC_CITIES.slice(0, opts?.cityLimit ?? NATIONAL_SYNC_CITIES.length);
+
+    let sisproCities = 0;
+    let sisproPlaces = 0;
+    let osmCities = 0;
+    let osmPlaces = 0;
+
+    try {
+      for (const city of cities) {
+        if (includeSispro) {
+          try {
+            const r = await this.runSispro(city.bbox);
+            if (!r.skipped) {
+              sisproCities += 1;
+              sisproPlaces += r.placesUpserted;
+            }
+          } catch (err) {
+            this.logger.warn(
+              `SISPRO ${city.name} failed: ${err instanceof Error ? err.message : String(err)}`,
+            );
+          }
+        }
+
+        if (includeOsm) {
+          try {
+            const { rows, fetchedAt } = await this.osmHelp.fetchCity(city);
+            const n = await this.places.upsertOfficialBatch(
+              rows.map((p) => ({
+                type: p.type,
+                title: p.title,
+                description: p.description,
+                lat: p.lat,
+                lng: p.lng,
+                sourceId: 'osm',
+                sourceRecordId: p.sourceRecordId,
+                verification: 'UNVERIFIED' as const,
+                address: p.address,
+                municipality: p.municipality,
+                department: findCityByCode(city.code)?.department ?? null,
+                cityCode: p.cityCode,
+                externalUrl: p.externalUrl,
+                needTags: p.needTags,
+                retrievedAt: fetchedAt,
+                properties: p.properties,
+              })),
+            );
+            osmCities += 1;
+            osmPlaces += n;
+            await this.sources.markFetchSuccess('osm');
+          } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            this.logger.warn(`OSM help ${city.name} failed: ${message}`);
+            await this.sources.markFetchError('osm', message);
+          }
+        }
+      }
+
+      this.logger.log(
+        `National sync done — SISPRO cities=${sisproCities} places=${sisproPlaces}; OSM cities=${osmCities} places=${osmPlaces}`,
+      );
+      return {
+        sispro: { cities: sisproCities, placesUpserted: sisproPlaces },
+        osm: { cities: osmCities, placesUpserted: osmPlaces },
+        skipped: false,
+      };
+    } finally {
+      this.nationalRunning = false;
+    }
+  }
+
+  private matchCityCode(
+    municipality: string | null,
+    department: string | null,
+  ): string | null {
+    if (!municipality) return null;
+    const norm = (s: string) =>
+      s
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    const m = norm(municipality);
+    const d = department ? norm(department) : '';
+    const hit = NATIONAL_SYNC_CITIES.find((c) => {
+      const city = findCityByCode(c.code);
+      if (!city) return false;
+      const cn = norm(city.name.replace(', D.C.', ''));
+      if (m.includes(cn) || cn.includes(m)) {
+        if (!d) return true;
+        return norm(city.department).includes(d) || d.includes(norm(city.department));
+      }
+      return false;
+    });
+    return hit?.code ?? null;
   }
 
   private repoCreateRaw(

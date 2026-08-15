@@ -12,7 +12,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <span class="mark" aria-hidden="true"></span>
           <span class="brand-copy">
             <strong>Ayuda en Emergencias</strong>
-            <small>Colombia</small>
           </span>
         </a>
 
@@ -32,10 +31,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
             Inicio
           </a>
           <a routerLink="/buscar" routerLinkActive="on" (click)="close()">¿Qué necesitas?</a>
-          <a routerLink="/ayudar" routerLinkActive="on" (click)="close()">Dónde ayudar</a>
+          <a routerLink="/ayudar" routerLinkActive="on" (click)="close()">Ayudar</a>
           <a routerLink="/publicar-punto" routerLinkActive="on" (click)="close()">Publicar</a>
-          <a routerLink="/fuentes" routerLinkActive="on" (click)="close()">Confianza</a>
-          <a class="cta" routerLink="/ayudar" (click)="close()">Ver lugares</a>
+          <a routerLink="/fuentes-detalle" routerLinkActive="on" (click)="close()">Fuentes</a>
         </nav>
       </div>
     </header>
@@ -91,13 +89,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .brand-copy small {
-        color: var(--muted);
-        font-weight: 700;
-        font-size: 0.72rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
       .burger {
         display: inline-flex;
         align-items: center;
@@ -149,12 +140,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         background: var(--sky-band);
         color: var(--ink);
       }
-      .links .cta {
-        margin-top: 0.25rem;
-        text-align: center;
-        background: var(--coral);
-        color: #fff !important;
-      }
       @media (min-width: 880px) {
         .burger {
           display: none;
@@ -173,11 +158,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         .links a {
           padding: 0.55rem 0.8rem;
           font-size: 0.92rem;
-        }
-        .links .cta {
-          margin: 0 0 0 0.45rem;
-          padding: 0.7rem 1.05rem;
-          border-radius: 999px;
         }
       }
     `,

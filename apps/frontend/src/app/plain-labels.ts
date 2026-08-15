@@ -15,6 +15,8 @@ export const NEED_CATS: Record<NeedCategory, CatMeta> = {
   TRANSPORT: { title: 'Transporte', hint: 'Moverse o salir', short: 'Viaje' },
   COMMUNICATION: { title: 'Comunicación', hint: 'Avisar a alguien', short: 'Avisar' },
   VOLUNTEER: { title: 'Manos amigas', hint: 'Personas que ayuden', short: 'Manos' },
+  CLOTHING: { title: 'Ropa', hint: 'Abrigo o vestuario', short: 'Ropa' },
+  BLOOD: { title: 'Sangre', hint: 'Donación de sangre', short: 'Sangre' },
   OTHER: { title: 'Otra necesidad', hint: 'Algo distinto', short: 'Otra' },
 };
 
@@ -80,7 +82,7 @@ export function eventPlainDetail(summary?: string | null): string {
 export function placeTypeLabel(type: string): string {
   switch (type) {
     case 'DONATION_POINT':
-      return 'Acopio / donaciones';
+      return 'Llevar donación / acopio';
     case 'HELP_CENTER':
       return 'Centro de ayuda';
     case 'SHELTER':
@@ -90,7 +92,7 @@ export function placeTypeLabel(type: string): string {
     case 'MEETING_POINT':
       return 'Punto de encuentro';
     case 'MEDICAL':
-      return 'Salud';
+      return 'Hospital / clínica';
     default:
       return 'Punto de ayuda';
   }

@@ -1,481 +1,484 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgIf } from '@angular/common';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
+import type { SourceDto } from '@aee/shared-types';
 import { ApiService } from '../api.service';
+import { statusLabel } from '../plain-labels';
 
 @Component({
   selector: 'aee-home-page',
   standalone: true,
-  imports: [RouterLink, NgIf],
+  imports: [RouterLink, NgIf, NgFor, DatePipe],
   template: `
-    <section class="hero">
-      <div class="hero-grid">
-        <div class="hero-copy fade-up">
-          <p class="eyebrow">Colombia · capa que conecta</p>
-          <h1>
-            ¿Dónde ayudar
-            <span>en Colombia?</span>
-            Sin intermediarnos en donaciones.
-          </h1>
-          <p class="lead">
-            Encuentra <strong>lugares y organizaciones</strong> que piden apoyo, filtra por ciudad y
-            categoría. Nosotros <strong>no pedimos ni manejamos donaciones</strong>: solo conectamos
-            información. Si hay enlace, donas o ayudas en su canal.
-          </p>
-          <div class="hero-actions">
-            <a class="btn coral" routerLink="/buscar">¿Qué necesitas?</a>
-            <a class="btn ghost" routerLink="/ayudar">Ver lugares</a>
-            <a class="btn ghost" routerLink="/publicar-punto">Publicar un lugar</a>
-          </div>
-          <a class="sos" href="tel:123">Si es grave ahora mismo → llama al 123</a>
+    <section class="hero" aria-label="Inicio">
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-inner fade-up">
+        <p class="brand">Ayuda en Emergencias</p>
+        <h1>Encuentra ayuda. Ofrece ayuda. Sin rodeos.</h1>
+        <p class="lead">
+          Un lugar para publicar lo que necesitas, lo que puedes aportar, y ver dónde hay acopios u
+          organizaciones. Nosotros no pedimos ni manejamos donaciones: solo conectamos.
+        </p>
+        <div class="actions">
+          <a class="btn primary" routerLink="/buscar">¿Qué necesitas?</a>
+          <a class="btn secondary" routerLink="/ayudar">Quiero ayudar</a>
         </div>
-
-        <aside class="hero-panel fade-up" aria-label="Resumen en vivo">
-          <div class="panel-head">Ahora mismo</div>
-          <div class="stats" *ngIf="loaded(); else loadingStats">
-            <div>
-              <strong>{{ places() }}</strong>
-              <span>Lugares publicados</span>
-            </div>
-            <div>
-              <strong>{{ needs() }}</strong>
-              <span>Avisos abiertos</span>
-            </div>
-          </div>
-          <ng-template #loadingStats>
-            <p class="loading">Cargando actividad…</p>
-          </ng-template>
-          <p class="panel-note">Directorio nacional · sin verificar hasta moderación.</p>
-          <div class="geo" aria-hidden="true">
-            <span class="bar"></span>
-            <span class="bar short"></span>
-            <span class="bar mid"></span>
-          </div>
-        </aside>
+        <a class="sos" href="tel:123">Urgencia grave → 123</a>
       </div>
     </section>
 
-    <section class="band teal" id="que-es">
-      <div class="wrap">
-        <p class="band-kicker">Qué es esto</p>
-        <h2>Una web que conecta — no un mostrador de donaciones.</h2>
-        <div class="split">
-          <p>
-            Mostramos alertas oficiales (cuando hay fuente viable) y avisos de la comunidad en un
-            mapa. Más adelante enlazaremos centros de acopio, fundaciones y ONG
-            <strong>de terceros</strong>.
-          </p>
-          <p>
-            <strong>No recaudamos dinero ni especie.</strong> No prometemos que un aviso será
-            atendido. Si quieres donar, será en los canales de esas organizaciones — no a través
-            nuestro.
+    <section class="pulse" aria-label="Actividad en vivo">
+      <div class="wrap wide">
+        <p class="pulse-kicker">Lo que ya está en movimiento</p>
+        <div class="stats" *ngIf="loaded(); else loadingPulse">
+          <div>
+            <strong>{{ needs() }}</strong>
+            <span>Avisos de la comunidad</span>
+          </div>
+          <div>
+            <strong>{{ places() }}</strong>
+            <span>Lugares en el directorio</span>
+          </div>
+          <div>
+            <strong>{{ events() }}</strong>
+            <span>Alertas oficiales cargadas</span>
+          </div>
+          <div>
+            <strong>{{ sourcesLive() }}</strong>
+            <span>Fuentes activas o en prueba</span>
+          </div>
+        </div>
+        <ng-template #loadingPulse>
+          <p class="pulse-loading">Cargando actividad…</p>
+        </ng-template>
+        <p class="pulse-note">
+          Cada publicación acerca a alguien a una respuesta. Tú también puedes sumarte ahora.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="que-es">
+      <div class="wrap wide">
+        <div class="intro">
+          <div>
+            <p class="kicker">Qué es esto</p>
+            <h2>Para pedirlo o darlo, en un solo sitio.</h2>
+          </div>
+          <p class="body">
+            Sirve para dos cosas: que una persona diga “necesito agua / un vehículo / manos” (o “tengo
+            mercado / carro libre”), y que otra encuentre acopios u organizaciones por ciudad. La
+            conversación, si hay WhatsApp, es entre ustedes.
           </p>
         </div>
+        <div class="quick">
+          <a routerLink="/buscar">Publicar o leer avisos</a>
+          <a routerLink="/ayudar">Ver directorio</a>
+          <a routerLink="/publicar-punto">Registrar un lugar</a>
+          <a href="tel:123">Llamar al 123</a>
+        </div>
       </div>
     </section>
 
-    <section class="band cream" id="como">
-      <div class="wrap">
-        <p class="section-kicker">Cómo usarla</p>
-        <h2 class="dark">Tres pasos. Sin cuentas.</h2>
-        <ol class="steps">
-          <li>
-            <span class="num">01</span>
-            <div>
-              <h3>Elige qué quieres hacer</h3>
-              <p>Dejar un aviso, mirar la comunidad o leer de dónde salen los datos.</p>
-            </div>
-          </li>
-          <li>
-            <span class="num">02</span>
-            <div>
-              <h3>Escribe un comentario en el mapa</h3>
-              <p>
-                Texto libre + lugar. Ejemplo: “Aquí hacen falta agua y manos para escombros”.
-                Opcional: una etiqueta (agua, comida…).
-              </p>
-            </div>
-          </li>
-          <li>
-            <span class="num">03</span>
-            <div>
-              <h3>Mira Comunidad</h3>
-              <p>Lista + mapa: oficiales y avisos. Todo con su origen a la vista.</p>
-            </div>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="band sky" id="caminos">
-      <div class="wrap">
-        <p class="section-kicker">Tres caminos</p>
-        <h2 class="dark">Buscar, ayudar o publicar.</h2>
-        <div class="paths">
-          <a class="path" routerLink="/buscar">
-            <span class="label">Buscar</span>
+    <section class="section soft" id="caminos">
+      <div class="wrap wide">
+        <p class="kicker teal">Empieza aquí</p>
+        <h2>Elige cómo quieres ayudar o pedirlo.</h2>
+        <div class="ways">
+          <a class="way" routerLink="/buscar">
+            <span class="way-label">Comunidad</span>
             <strong>¿Qué necesitas?</strong>
-            <p>Categorías claras + ciudad. Luego ves lugares en lista (cards), no un mapa lleno.</p>
-            <span class="go">Empezar →</span>
+            <p>
+              Muro de avisos: necesidades y aportes por categoría. Contacto directo por WhatsApp si
+              la persona lo deja.
+            </p>
+            <span class="way-go">Abrir →</span>
           </a>
-          <a class="path alt" routerLink="/ayudar">
-            <span class="label">Directorio</span>
+          <a class="way alt" routerLink="/ayudar">
+            <span class="way-label">Directorio</span>
             <strong>Dónde ayudar</strong>
-            <p>Organizaciones y puntos en todo el país. Filtra y abre su canal.</p>
-            <span class="go">Ver lista →</span>
-          </a>
-          <a class="path" routerLink="/publicar-punto">
-            <span class="label">Aportar</span>
-            <strong>Publicar un lugar</strong>
-            <p>Si tu acopio u ONG necesita apoyo, publícalo con ciudad y enlace.</p>
-            <span class="go">Publicar →</span>
+            <p>
+              Acopios, Cruz Roja, bancos de alimentos y puntos publicados. Filtra y abre su canal.
+            </p>
+            <span class="way-go">Ver lista →</span>
           </a>
         </div>
-        <a class="trust-link" routerLink="/fuentes">¿De dónde sale la información? Ver Confianza →</a>
+      </div>
+    </section>
+
+    <section class="section" id="fuentes">
+      <div class="wrap wide">
+        <div class="intro">
+          <div>
+            <p class="kicker">Fuentes</p>
+            <h2>Datos reales, con procedencia.</h2>
+          </div>
+          <p class="body">
+            En la fase de discovery conectamos APIs y catálogos públicos (salud, hidrología, mapas,
+            directorios). Aquí ves cuáles están integrados o en prueba — sin inventar cifras.
+          </p>
+        </div>
+
+        <ul class="sources" *ngIf="sources().length; else noSources">
+          <li *ngFor="let s of sources()">
+            <div>
+              <strong>{{ s.name }}</strong>
+              <p>{{ sourceBlurb(s) }}</p>
+            </div>
+            <span class="badge" [attr.data-status]="s.integrationStatus">{{
+              statusLabel(s.integrationStatus)
+            }}</span>
+          </li>
+        </ul>
+        <ng-template #noSources>
+          <p class="body">Aún no pudimos cargar el listado de fuentes.</p>
+        </ng-template>
+
+        <p class="source-meta" *ngIf="latestFetch()">
+          Última actualización registrada:
+          {{ latestFetch() | date: 'd MMM y, HH:mm' }}
+        </p>
+        <a class="more" routerLink="/fuentes-detalle">Ver detalle de fuentes →</a>
       </div>
     </section>
   `,
   styles: [
     `
       .hero {
-        background: var(--ink);
-        color: #f7f3ec;
         position: relative;
-        overflow: hidden;
-        padding: 2.4rem 0 3rem;
-      }
-      .hero::before {
-        content: '';
-        position: absolute;
-        width: 420px;
-        height: 420px;
-        right: -120px;
-        top: -80px;
-        border: 40px solid rgba(228, 87, 76, 0.18);
-        border-radius: 40% 60% 55% 45%;
-        animation: drift 12s ease-in-out infinite;
-        pointer-events: none;
-      }
-      .hero::after {
-        content: '';
-        position: absolute;
-        width: 280px;
-        height: 280px;
-        left: -90px;
-        bottom: -100px;
-        background: rgba(15, 110, 106, 0.35);
-        border-radius: 32px;
-        transform: rotate(18deg);
-        pointer-events: none;
-      }
-      .hero-grid {
-        width: min(1120px, calc(100% - 1.5rem));
-        margin: 0 auto;
+        min-height: min(82vh, 700px);
         display: grid;
-        gap: 1.5rem;
+        align-items: end;
+        color: #f7f3ec;
+        background:
+          #10233f
+          url('https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1800&q=75')
+          center 30% / cover no-repeat;
+        padding: 0 0 2.8rem;
+      }
+      .hero-shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(16, 35, 63, 0.35) 0%,
+          rgba(16, 35, 63, 0.55) 42%,
+          rgba(16, 35, 63, 0.92) 100%
+        );
+        pointer-events: none;
+      }
+      .hero-inner {
         position: relative;
         z-index: 1;
+        width: min(1120px, calc(100% - 1.5rem));
+        margin: 0 auto;
+        padding-top: 5rem;
+        max-width: 40rem;
       }
-      @media (min-width: 920px) {
-        .hero {
-          padding: 3.5rem 0 4rem;
-        }
-        .hero-grid {
-          grid-template-columns: 1.35fr 0.85fr;
-          align-items: stretch;
-          gap: 2rem;
-        }
-      }
-      .eyebrow {
+      .brand {
         margin: 0;
-        font-weight: 800;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        font-size: 0.78rem;
-        color: rgba(247, 243, 236, 0.7);
+        font-family: var(--font-display);
+        font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
       }
       h1 {
-        margin: 0.7rem 0 0;
+        margin: 0.85rem 0 0;
         font-family: var(--font-display);
-        font-size: clamp(2rem, 6.5vw, 3.35rem);
-        line-height: 1.05;
+        font-size: clamp(2rem, 5.8vw, 3.05rem);
+        line-height: 1.12;
         letter-spacing: -0.03em;
-        font-weight: 800;
-      }
-      h1 span {
-        color: #ffb4ad;
+        font-weight: 700;
       }
       .lead {
-        margin: 1rem 0 0;
-        max-width: 38rem;
-        font-size: 1.05rem;
-        color: rgba(247, 243, 236, 0.78);
-        font-weight: 600;
+        margin: 1.05rem 0 0;
+        font-size: 1.08rem;
+        font-weight: 500;
+        line-height: 1.5;
+        color: rgba(247, 243, 236, 0.9);
       }
-      .hero-actions {
+      .actions {
         display: flex;
         flex-wrap: wrap;
         gap: 0.65rem;
-        margin-top: 1.5rem;
+        margin-top: 1.6rem;
       }
       .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         min-height: var(--tap);
-        padding: 0 1.25rem;
+        padding: 0 1.3rem;
         border-radius: 999px;
         text-decoration: none;
-        font-weight: 800;
+        font-weight: 700;
+        font-size: 1rem;
       }
-      .btn.coral {
+      .btn.primary {
         background: var(--coral);
         color: #fff;
       }
-      .btn.ghost {
-        border: 1.5px solid rgba(255, 255, 255, 0.35);
+      .btn.secondary {
+        border: 1.5px solid rgba(255, 255, 255, 0.45);
         color: #fff;
       }
       .sos {
         display: inline-block;
-        margin-top: 1rem;
-        color: rgba(247, 243, 236, 0.7);
-        font-weight: 700;
-        font-size: 0.92rem;
+        margin-top: 1.1rem;
+        color: rgba(247, 243, 236, 0.72);
+        font-weight: 600;
+        font-size: 0.95rem;
       }
-      .hero-panel {
-        background: rgba(255, 252, 247, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 24px;
-        padding: 1.25rem 1.2rem 1.3rem;
-        backdrop-filter: blur(6px);
-        display: flex;
-        flex-direction: column;
-        gap: 0.85rem;
+      .pulse {
+        background: var(--ink);
+        color: #f7f3ec;
+        padding: 1.8rem 0 2rem;
       }
-      .panel-head {
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
+      .pulse-kicker {
+        margin: 0;
         font-size: 0.75rem;
-        color: rgba(247, 243, 236, 0.65);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0.7;
       }
       .stats {
+        margin-top: 1rem;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0.75rem;
       }
+      @media (min-width: 800px) {
+        .stats {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
       .stats div {
-        background: rgba(0, 0, 0, 0.18);
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
-        padding: 0.9rem 0.85rem;
+        padding: 1rem 0.95rem;
       }
       .stats strong {
         display: block;
         font-family: var(--font-display);
-        font-size: 2rem;
+        font-size: clamp(1.6rem, 4vw, 2.1rem);
         line-height: 1;
         color: #fff;
       }
       .stats span {
         display: block;
-        margin-top: 0.4rem;
-        font-size: 0.82rem;
-        font-weight: 700;
+        margin-top: 0.45rem;
+        font-size: 0.86rem;
+        font-weight: 600;
         color: rgba(247, 243, 236, 0.7);
       }
-      .panel-note,
-      .loading {
-        margin: 0;
-        font-size: 0.88rem;
+      .pulse-note,
+      .pulse-loading {
+        margin: 1rem 0 0;
         font-weight: 600;
-        color: rgba(247, 243, 236, 0.68);
+        color: rgba(247, 243, 236, 0.75);
+        font-size: 0.95rem;
       }
-      .geo {
-        display: flex;
-        align-items: flex-end;
-        gap: 0.45rem;
-        height: 64px;
-        margin-top: auto;
-      }
-      .bar {
-        flex: 1;
-        height: 100%;
-        border-radius: 10px 10px 4px 4px;
-        background: rgba(15, 110, 106, 0.85);
-      }
-      .bar.short {
-        height: 42%;
-        background: rgba(228, 87, 76, 0.85);
-      }
-      .bar.mid {
-        height: 68%;
-        background: rgba(220, 234, 245, 0.55);
-      }
-      .band {
+      .section {
         padding: 3.2rem 0;
+        background: var(--white);
       }
-      .band.teal {
-        background: var(--teal);
-        color: #f3fffc;
-      }
-      .band.cream {
+      .section.soft {
         background: var(--cream);
-        color: var(--ink);
-      }
-      .band.sky {
-        background: var(--sky-band);
-        color: var(--ink);
       }
       .wrap {
-        width: min(1120px, calc(100% - 1.5rem));
+        width: min(720px, calc(100% - 1.5rem));
         margin: 0 auto;
       }
-      .band-kicker,
-      .section-kicker {
+      .wrap.wide {
+        width: min(1120px, calc(100% - 1.5rem));
+      }
+      .kicker {
         margin: 0;
-        font-weight: 800;
-        letter-spacing: 0.12em;
+        font-weight: 700;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         font-size: 0.78rem;
-        opacity: 0.8;
+        color: var(--coral);
       }
-      .section-kicker {
+      .kicker.teal {
         color: var(--teal);
-        opacity: 1;
       }
-      .band h2 {
-        margin: 0.65rem 0 0;
+      h2 {
+        margin: 0.55rem 0 0;
         font-family: var(--font-display);
-        font-size: clamp(1.7rem, 4.5vw, 2.55rem);
-        line-height: 1.12;
+        font-size: clamp(1.65rem, 4vw, 2.35rem);
+        line-height: 1.15;
         letter-spacing: -0.02em;
-        max-width: 20ch;
-      }
-      .band h2.dark {
+        font-weight: 700;
+        max-width: 18ch;
         color: var(--ink);
       }
-      .split {
+      .intro {
         display: grid;
         gap: 1rem;
-        margin-top: 1.4rem;
-      }
-      @media (min-width: 800px) {
-        .split {
-          grid-template-columns: 1fr 1fr;
-          gap: 1.75rem;
-        }
-      }
-      .split p {
-        margin: 0;
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: rgba(243, 255, 252, 0.88);
-      }
-      .steps {
-        list-style: none;
-        margin: 1.6rem 0 0;
-        padding: 0;
-        display: grid;
-        gap: 0.85rem;
       }
       @media (min-width: 860px) {
-        .steps {
-          grid-template-columns: repeat(3, 1fr);
+        .intro {
+          grid-template-columns: 1fr 1.1fr;
+          align-items: end;
+          gap: 2rem;
         }
       }
-      .steps li {
-        background: var(--white);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 1.2rem 1.15rem;
-        display: grid;
-        gap: 0.85rem;
-        box-shadow: var(--shadow);
-      }
-      .num {
-        font-family: var(--font-display);
-        font-size: 1.6rem;
-        color: var(--coral);
-        font-weight: 800;
-      }
-      .steps h3 {
+      .body {
         margin: 0;
-        font-family: var(--font-display);
-        font-size: 1.2rem;
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: var(--ink-soft);
+        line-height: 1.55;
       }
-      .steps p {
-        margin: 0.4rem 0 0;
-        color: var(--muted);
-        font-weight: 600;
-      }
-      .paths {
-        display: grid;
-        gap: 0.9rem;
+      .quick {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
         margin-top: 1.5rem;
       }
-      @media (min-width: 900px) {
-        .paths {
-          grid-template-columns: 1fr 1fr 1fr;
+      .quick a {
+        text-decoration: none;
+        background: var(--cream);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.65rem 1rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .ways {
+        display: grid;
+        gap: 0.9rem;
+        margin-top: 1.6rem;
+      }
+      @media (min-width: 860px) {
+        .ways {
+          grid-template-columns: 1fr 1fr;
         }
       }
-      .path {
+      .way {
         text-decoration: none;
         background: var(--white);
-        border-radius: 22px;
-        padding: 1.35rem 1.25rem 1.25rem;
         border: 1px solid var(--line);
-        box-shadow: var(--shadow);
+        border-radius: 22px;
+        padding: 1.4rem 1.3rem 1.25rem;
         display: grid;
-        gap: 0.4rem;
-        min-height: 220px;
+        gap: 0.35rem;
+        min-height: 200px;
         transition: transform 0.2s var(--ease);
+        box-shadow: var(--shadow);
       }
-      .path:hover {
+      .way:hover {
         transform: translateY(-3px);
       }
-      .path.alt {
+      .way.alt {
         background: var(--ink);
         color: #f7f3ec;
         border-color: transparent;
       }
-      .label {
+      .way-label {
         font-size: 0.75rem;
-        font-weight: 800;
-        letter-spacing: 0.1em;
+        font-weight: 700;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--coral);
       }
-      .path.alt .label {
+      .way.alt .way-label {
         color: #ffb4ad;
       }
-      .path strong {
+      .way strong {
         font-family: var(--font-display);
         font-size: 1.55rem;
         letter-spacing: -0.02em;
+        font-weight: 700;
       }
-      .path p {
+      .way p {
         margin: 0;
         color: var(--muted);
-        font-weight: 600;
+        font-weight: 500;
+        line-height: 1.45;
       }
-      .path.alt p {
+      .way.alt p {
         color: rgba(247, 243, 236, 0.72);
       }
-      .go {
+      .way-go {
         margin-top: auto;
         padding-top: 1rem;
-        font-weight: 800;
+        font-weight: 700;
         color: var(--teal);
       }
-      .path.alt .go {
+      .way.alt .way-go {
         color: #fff;
       }
-      .trust-link {
-        display: inline-block;
-        margin-top: 1.25rem;
+      .sources {
+        list-style: none;
+        margin: 1.5rem 0 0;
+        padding: 0;
+        display: grid;
+        gap: 0.65rem;
+      }
+      @media (min-width: 800px) {
+        .sources {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .sources li {
+        background: var(--cream);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 1rem 1.05rem;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .sources strong {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        display: block;
+      }
+      .sources p {
+        margin: 0.35rem 0 0;
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      .badge {
+        flex: 0 0 auto;
+        font-size: 0.72rem;
         font-weight: 800;
-        color: var(--ink);
+        padding: 0.3rem 0.55rem;
+        border-radius: 999px;
+        background: var(--sky-band);
+        color: var(--ink-soft);
+        white-space: nowrap;
+      }
+      .badge[data-status='INTEGRATED'] {
+        background: #d8f0ec;
+        color: var(--teal-deep);
+      }
+      .badge[data-status='TESTING'] {
+        background: #fff3cd;
+        color: #7a5b00;
+      }
+      .badge[data-status='BLOCKED'] {
+        background: #f8d7d3;
+        color: var(--coral-deep);
+      }
+      .source-meta {
+        margin: 1rem 0 0;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .more {
+        display: inline-block;
+        margin-top: 1rem;
+        font-weight: 700;
+        color: var(--teal);
+        text-decoration: none;
       }
     `,
   ],
@@ -484,15 +487,18 @@ export class HomePageComponent implements OnInit {
   private readonly api = inject(ApiService);
   readonly places = signal(0);
   readonly needs = signal(0);
+  readonly events = signal(0);
+  readonly sources = signal<SourceDto[]>([]);
   readonly loaded = signal(false);
+  readonly statusLabel = statusLabel;
 
   ngOnInit(): void {
-    let left = 2;
+    let left = 4;
     const done = () => {
       left -= 1;
       if (left <= 0) this.loaded.set(true);
     };
-    this.api.places({ origin: 'community', limit: 200 }).subscribe({
+    this.api.places({ helpOnly: true, origin: 'all', limit: 200 }).subscribe({
       next: (r) => {
         this.places.set(r.data.length);
         done();
@@ -506,5 +512,45 @@ export class HomePageComponent implements OnInit {
       },
       error: () => done(),
     });
+    this.api.events().subscribe({
+      next: (r) => {
+        this.events.set(r.data.length);
+        done();
+      },
+      error: () => done(),
+    });
+    this.api.sources().subscribe({
+      next: (r) => {
+        this.sources.set(
+          r.data.filter((s) => s.id !== 'community').slice(0, 8),
+        );
+        done();
+      },
+      error: () => done(),
+    });
+  }
+
+  sourcesLive(): number {
+    return this.sources().filter(
+      (s) => s.integrationStatus === 'INTEGRATED' || s.integrationStatus === 'TESTING',
+    ).length;
+  }
+
+  latestFetch(): string | null {
+    const dates = this.sources()
+      .map((s) => s.lastSuccessfulFetch)
+      .filter((d): d is string => Boolean(d))
+      .sort()
+      .reverse();
+    return dates[0] ?? null;
+  }
+
+  sourceBlurb(s: SourceDto): string {
+    if (s.id === 'ideam') return 'Alertas hidrológicas oficiales (niveles de ríos).';
+    if (s.id === 'sispro') return 'Sedes de salud / IPS a escala país (MinSalud).';
+    if (s.id === 'osm') return 'Puntos de ayuda comunitaria en mapa abierto.';
+    if (s.id === 'curated') return 'Enlaces públicos a redes y organizaciones.';
+    if (s.id === 'sgc') return 'Sismos: enlace al visor oficial cuando la API lo permita.';
+    return s.type === 'OFFICIAL' ? 'Fuente oficial o institucional.' : 'Fuente abierta o de organización.';
   }
 }

@@ -1,20 +1,20 @@
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './pages/home-page.component';
-import { MapPageComponent } from './pages/map-page.component';
-import { NeedHelpPageComponent } from './pages/need-help-page.component';
-import { PublishPlacePageComponent } from './pages/publish-place-page.component';
-import { SourcesPageComponent } from './pages/sources-page.component';
 import { BuscarPageComponent } from './pages/buscar-page.component';
 import { AyudarPageComponent } from './pages/ayudar-page.component';
+import { PublishPlacePageComponent } from './pages/publish-place-page.component';
+import { SourcesPageComponent } from './pages/sources-page.component';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'buscar', component: BuscarPageComponent },
+  { path: 'necesito-ayuda', redirectTo: 'buscar', pathMatch: 'full' },
   { path: 'ayudar', component: AyudarPageComponent },
+  { path: 'fuentes', redirectTo: 'fuentes-detalle', pathMatch: 'full' },
+  { path: 'confianza', redirectTo: 'fuentes-detalle', pathMatch: 'full' },
   { path: 'mapa', redirectTo: 'ayudar', pathMatch: 'full' },
-  { path: 'oficial', component: MapPageComponent },
-  { path: 'necesito-ayuda', component: NeedHelpPageComponent },
+  { path: 'comunidad', redirectTo: 'ayudar', pathMatch: 'full' },
   { path: 'publicar-punto', component: PublishPlacePageComponent },
-  { path: 'fuentes', component: SourcesPageComponent },
+  { path: 'fuentes-detalle', component: SourcesPageComponent },
   { path: '**', redirectTo: '' },
 ];

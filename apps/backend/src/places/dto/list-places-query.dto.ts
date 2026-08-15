@@ -1,5 +1,14 @@
-import { IsIn, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 import type { PlaceType } from '@aee/shared-types';
 
 const PLACE_TYPES = [
@@ -83,4 +92,9 @@ export class ListPlacesQueryDto {
   @IsOptional()
   @IsIn(['FOOD', 'WATER', 'MEDICINE', 'CLOTHING', 'SHELTER', 'VOLUNTEER', 'BLOOD', 'OTHER'])
   tag?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true' || value === '1')
+  @IsBoolean()
+  helpOnly?: boolean;
 }

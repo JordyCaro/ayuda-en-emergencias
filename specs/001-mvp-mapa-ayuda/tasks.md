@@ -18,8 +18,8 @@ Convención: `[ ]` pendiente · paths relativos al root del monorepo.
 - [x] T0.4 Confirmar tiles OSM + atribución para UI  
 - [x] T0.5 Actualizar `research.md` con resultados de pruebas manuales  
 - [x] T0.6 Inventario extendido: donaciones, ONG, RND, mascotas, OSM amenities, HDX, OSS (`source-registry-extended.md`, `open-source-catalog.md`)  
-- [x] T0.7 Contexto sismo ago-2026 + entidades territoriales nacionales/multi-ciudad (`contexto-sismo-2026.md`, `entidades-territoriales.md`)  
-- [x] T0.8 Cobertura país: REPS/SISPRO + estrategia auto-registro (`cobertura-nacional-estrategia.md`, `specs/002-registro-facil-lugares/`)  
+- [x] T0.7 Discovery multi-ciudad / SNGRD (notas absorbidas en registry)  
+- [x] T0.8 Cobertura país: REPS/SISPRO + auto-registro (`specs/002-registro-facil-lugares/`)  
 
 Detalle: `docs/sources/` · `research.md`  
 
@@ -44,7 +44,7 @@ Detalle: `docs/sources/` · `research.md`
 - [x] T2.5 OpenAPI/Swagger habilitado  
 - [x] T2.6 Framework connector: interface `fetch/validate/normalize/upsert` + logging  
 
-> **Nota producto:** la “Fase 2 de producto” (más fuentes oficiales) continúa **fuera** de este checklist 001 — ver `docs/dev/ESTADO-FASES.md` (SISPRO + Places).  
+> **Nota producto:** la “Fase 2 de producto” (más fuentes oficiales) continúa **fuera** de este checklist 001 — ver `docs/product/ROADMAP-FASES.md` (SISPRO + Places).  
 
 ---
 
@@ -86,7 +86,7 @@ Detalle: `docs/sources/` · `research.md`
 - [x] T6.4 README quickstart de desarrollo  
 - [ ] T6.5 Converge: recorrer checklist `checklists/requirements.md`  
 
-Detalle de prueba local: `docs/dev/COMO-PROBAR-FASES.md`  
+Detalle de prueba local: `docs/dev/COMO-CORRER.md`  
 
 ---
 

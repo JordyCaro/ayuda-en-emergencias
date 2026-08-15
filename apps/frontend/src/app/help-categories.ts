@@ -1,4 +1,4 @@
-import type { NeedTag, PlaceType } from '@aee/shared-types';
+import type { NeedCategory, NeedTag, PlaceType } from '@aee/shared-types';
 
 export type HelpCategory = {
   id: NeedTag;
@@ -18,12 +18,78 @@ export const HELP_CATEGORIES: HelpCategory[] = [
   { id: 'OTHER', title: 'Otra ayuda', hint: 'Algo distinto de emergencia' },
 ];
 
+/** Categorías del foro (NeedCategory API). */
+export type ForumCat = {
+  id: NeedCategory;
+  title: string;
+  needHint: string;
+  offerHint: string;
+};
+
+export const FORUM_CATEGORIES: ForumCat[] = [
+  {
+    id: 'WATER',
+    title: 'Agua',
+    needHint: 'Necesito agua o filtros',
+    offerHint: 'Tengo agua / puedo llevar',
+  },
+  {
+    id: 'FOOD',
+    title: 'Mercado / comida',
+    needHint: 'Necesito alimentos',
+    offerHint: 'Tengo mercado y no sé dónde llevarlo',
+  },
+  {
+    id: 'CLOTHING',
+    title: 'Ropa / cobijas',
+    needHint: 'Necesito ropa o abrigo',
+    offerHint: 'Tengo ropa y no sé dónde dejarla',
+  },
+  {
+    id: 'TRANSPORT',
+    title: 'Vehículo / transporte',
+    needHint: 'Necesito un vehículo para mover ayudas',
+    offerHint: 'Tengo vehículo libre para llevar ayuda',
+  },
+  {
+    id: 'VOLUNTEER',
+    title: 'Voluntariado',
+    needHint: 'Necesito manos (alistar, repartir, escombros…)',
+    offerHint: 'Quiero ayudar y no sé dónde',
+  },
+  {
+    id: 'SHELTER',
+    title: 'Techo / albergue',
+    needHint: 'Necesito un lugar seguro',
+    offerHint: 'Puedo ofrecer techo temporal (con cuidado)',
+  },
+  {
+    id: 'MEDICAL',
+    title: 'Salud / medicinas',
+    needHint: 'Necesito orientación o insumos',
+    offerHint: 'Puedo orientar o aportar insumos (sin diagnóstico)',
+  },
+  {
+    id: 'BLOOD',
+    title: 'Sangre',
+    needHint: 'Se necesita donación de sangre',
+    offerHint: 'Puedo donar sangre / informar campañas',
+  },
+  {
+    id: 'OTHER',
+    title: 'Otra ayuda',
+    needHint: 'Otra necesidad de emergencia',
+    offerHint: 'Otro aporte que puedo hacer',
+  },
+];
+
 export const PLACE_KIND_FILTERS: Array<{ id: PlaceType | ''; label: string }> = [
   { id: '', label: 'Todos' },
-  { id: 'DONATION_POINT', label: 'Acopio' },
+  { id: 'DONATION_POINT', label: 'Llevar donación' },
   { id: 'HELP_CENTER', label: 'Centro de ayuda' },
   { id: 'SHELTER', label: 'Albergue' },
   { id: 'VOLUNTEER_POINT', label: 'Voluntariado' },
+  { id: 'MEDICAL', label: 'Hospital / salud' },
   { id: 'MEETING_POINT', label: 'Punto de encuentro' },
 ];
 
@@ -45,4 +111,8 @@ export const CITY_CHIPS: Array<{ code: string; label: string }> = [
 
 export function needTagLabel(tag: string): string {
   return HELP_CATEGORIES.find((c) => c.id === tag)?.title ?? tag;
+}
+
+export function forumCatLabel(id: string): string {
+  return FORUM_CATEGORIES.find((c) => c.id === id)?.title ?? id;
 }

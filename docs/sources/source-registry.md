@@ -4,16 +4,11 @@ Inventario vivo. **Ningún connector = INTEGRATED sin prueba documentada + licen
 
 | Documento | Contenido |
 |-----------|-----------|
-| **Este archivo** | Prioridad MVP 001 (IDEAM, SGC, OSM tiles, community) |
-| [`source-registry-extended.md`](source-registry-extended.md) | Donaciones, ONG, UNGRD, IDIGER, sangre, RND, mascotas, HDX… |
-| [`cobertura-nacional-estrategia.md`](cobertura-nacional-estrategia.md) | APIs nacionales + auto-registro |
-| [`entidades-territoriales.md`](entidades-territoriales.md) | SNGRD + CDGRD/CMGRD + ciudades |
-| [`../product/contexto-sismo-2026.md`](../product/contexto-sismo-2026.md) | Por qué: terremoto 10 ago 2026 |
-| [`open-source-catalog.md`](open-source-catalog.md) | Sahana, Ushahidi, ResponseGrid, proyectos CO |
-| [`FASE0-RESUMEN.md`](FASE0-RESUMEN.md) | Resumen ejecutivo |
-| [`../../specs/002-registro-facil-lugares/spec.md`](../../specs/002-registro-facil-lugares/spec.md) | Registrar puntos fácil (draft) |
+| **Este archivo** | Fuentes prioritarias (IDEAM, SGC, OSM, community…) |
+| [`source-registry-extended.md`](source-registry-extended.md) | Inventario amplio (UNGRD, IDIGER, ONG, etc.) |
+| [`open-source-catalog.md`](open-source-catalog.md) | OSS relacionado |
 
-Última pasada: **2026-08-14** (MVP + extendida).
+Última pasada: **2026-08-14**.
 
 ## Leyenda de status
 
