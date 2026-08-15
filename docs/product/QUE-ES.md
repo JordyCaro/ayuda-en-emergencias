@@ -19,11 +19,12 @@ Somos una **capa abierta que conecta**: datos oficiales cuando se integran, avis
 | **¿Qué necesitas?** | `/buscar` | Foro Necesito / Puedo aportar |
 | **Quiero ayudar** | `/ayudar` | Lugares + cómo ayudar + Cerca de mí |
 | **Publicar lugar** | `/publicar-punto` | Motor de crecimiento: acopios/bodegas/centros |
+| **Perdidos** | `/perdidos` | Mascotas (señales) + personas → RND/SIRDEC |
 | **Orígenes** | `/origenes` | Canales oficiales + estado de integraciones |
 
 ---
 
-## Personas vs mascotas (Fase 8)
+## Personas vs mascotas
 
 | Tema | Enfoque |
 |------|---------|
@@ -42,9 +43,8 @@ Las APIs oficiales no cubren bien “dónde dejar mercados esta semana”. Si un
 
 | Fase | Estado |
 |------|--------|
-| **0–7** | Hechas |
-| **8** | Perdidos/encontrados (mascotas + personas vía oficial) — siguiente |
-| **9–10** | Moderación → producción |
+| **0–9** | Hechas |
+| **10** | Producción — siguiente |
 | **12** | Offline — casi opcional |
 
 Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)

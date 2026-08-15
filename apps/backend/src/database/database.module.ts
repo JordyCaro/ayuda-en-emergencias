@@ -6,6 +6,8 @@ import { RawRecordEntity } from '../events/raw-record.entity';
 import { EventEntity } from '../events/event.entity';
 import { NeedEntity } from '../needs/need.entity';
 import { PlaceEntity } from '../places/place.entity';
+import { PetReportEntity } from '../pets/pet-report.entity';
+import { ModerationAuditEntity } from '../moderation/moderation-audit.entity';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { PlaceEntity } from '../places/place.entity';
           EventEntity,
           NeedEntity,
           PlaceEntity,
+          PetReportEntity,
+          ModerationAuditEntity,
         ],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging: config.get<string>('TYPEORM_LOGGING') === 'true',

@@ -6,7 +6,7 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–7 hechas**. Siguiente: **Fase 8** (perdidos/encontrados: mascotas + personas vía canal oficial).  
+**Estado:** fases **0–9 hechas**. Siguiente: **Fase 10** (producción y API madura).  
 **Motor de crecimiento:** `/publicar-punto` (acopios/bodegas/centros de la comunidad) + API pública.
 
 ---
@@ -132,12 +132,12 @@ Spec: `specs/005-densificacion-territorial/` (**APROBADA**).
 - Personas desaparecidas: enlace a RND/SIRDEC (sin base propia).  
 Spec: `specs/006-deep-links-oficiales/` (**APROBADA**; UI fusionada post-entrega).
 
-### Fase 8 — Perdidos / encontrados *(siguiente)*
+### Fase 8 — Perdidos / encontrados ✅
 
-- **Mascotas:** reportar perdida/encontrada (`UNVERIFIED`), ciudad, contacto seguro.  
-- **Personas:** no CRUD nuestro — flujo claro hacia RND/SIRDEC + líneas de atención (constitution).  
+- **Mascotas:** `POST/GET /api/v1/pets` — perdida/encontrada (`UNVERIFIED`), ciudad, WhatsApp opcional, ~14d.  
+- **Personas:** pestaña en `/perdidos` → RND/SIRDEC + 123/141/155 (sin CRUD nuestro).  
 - No marketplace de servicios.  
-- Slice: `007+`.
+- Spec: `specs/007-perdidos-encontrados/` (**APROBADA**).
 
 ### Publicar (transversal, refuerzo continuo)
 
@@ -145,13 +145,13 @@ Spec: `specs/006-deep-links-oficiales/` (**APROBADA**; UI fusionada post-entrega
 - Alimenta el directorio y la **API pública**; crece con uso real.  
 - Cuidado: rate-limit, expiración, copy claro, moderación (Fase 9).
 
-### Fase 9 — Moderación
+### Fase 9 — Cierre comunitario (sin moderador) ✅
 
-- `apps/admin` (o equivalente).  
-- Moderación de Places/avisos/mascotas → `VERIFIED` / ocultar abuso.  
-- Audit trail mínimo. Sigue sin ser autoridad.
+- Al publicar aviso/lugar/mascota → **enlace secreto** para cerrarlo sin cuenta (`/cerrar`).  
+- Sin panel de moderación en el producto público.  
+- Spec: `specs/008-moderacion/` (**APROBADA**, pivote self-close).
 
-### Fase 10 — Producción y API madura
+### Fase 10 — Producción y API madura *(siguiente)*
 
 - Deploy real (HTTPS, backups, secretos).  
 - Migraciones TypeORM (sin `synchronize` en prod).  

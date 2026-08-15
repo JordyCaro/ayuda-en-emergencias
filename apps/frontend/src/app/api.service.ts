@@ -4,9 +4,17 @@ import { Observable } from 'rxjs';
 import type {
   CityDto,
   CreateNeedRequest,
+  CreatePetReportRequest,
   CreatePlaceRequest,
   EventDto,
+  ManageCloseRequest,
+  ManagePreviewDto,
+  ManageTargetKind,
+  NeedCreateResponse,
   NeedDto,
+  PetReportCreateResponse,
+  PetReportDto,
+  PlaceCreateResponse,
   PlaceDto,
   SourceDto,
 } from '@aee/shared-types';
@@ -50,8 +58,8 @@ export class ApiService {
     return this.http.get<{ data: NeedDto[] }>(`${this.base}/needs${qs ? `?${qs}` : ''}`);
   }
 
-  createNeed(body: CreateNeedRequest): Observable<NeedDto> {
-    return this.http.post<NeedDto>(`${this.base}/needs`, body);
+  createNeed(body: CreateNeedRequest): Observable<NeedCreateResponse> {
+    return this.http.post<NeedCreateResponse>(`${this.base}/needs`, body);
   }
 
   cities(q?: string): Observable<{ data: CityDto[] }> {
@@ -95,8 +103,44 @@ export class ApiService {
     }>(`${this.base}/places${qs ? `?${qs}` : ''}`);
   }
 
-  createPlace(body: CreatePlaceRequest): Observable<PlaceDto> {
-    return this.http.post<PlaceDto>(`${this.base}/places`, body);
+  createPlace(body: CreatePlaceRequest): Observable<PlaceCreateResponse> {
+    return this.http.post<PlaceCreateResponse>(`${this.base}/places`, body);
+  }
+
+  pets(params?: {
+    kind?: 'LOST' | 'FOUND';
+    species?: string;
+    cityCode?: string;
+  }): Observable<{ data: PetReportDto[] }> {
+    const q = new URLSearchParams();
+    if (params?.kind) q.set('kind', params.kind);
+    if (params?.species) q.set('species', params.species);
+    if (params?.cityCode) q.set('cityCode', params.cityCode);
+    const qs = q.toString();
+    return this.http.get<{ data: PetReportDto[] }>(`${this.base}/pets${qs ? `?${qs}` : ''}`);
+  }
+
+  createPet(body: CreatePetReportRequest): Observable<PetReportCreateResponse> {
+    return this.http.post<PetReportCreateResponse>(`${this.base}/pets`, body);
+  }
+
+  managePreview(
+    kind: ManageTargetKind,
+    id: string,
+    token: string,
+  ): Observable<ManagePreviewDto> {
+    const q = new URLSearchParams({ kind, id, token });
+    return this.http.get<ManagePreviewDto>(`${this.base}/manage/preview?${q}`);
+  }
+
+  manageClose(body: ManageCloseRequest): Observable<unknown> {
+    return this.http.post(`${this.base}/manage/close`, body);
+  }
+
+  /** Construye URL relativa para guardar/compartir. */
+  manageUrl(kind: ManageTargetKind, id: string, manageToken: string): string {
+    const q = new URLSearchParams({ kind, id, token: manageToken });
+    return `/cerrar?${q.toString()}`;
   }
 
   runIdeam(): Observable<{ ok: boolean; eventsUpserted: number; skipped?: boolean }> {

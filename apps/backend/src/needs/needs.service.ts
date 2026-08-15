@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import type { NeedCategory, NeedDto, NeedIntent } from '@aee/shared-types';
+import type { NeedCategory, NeedCreateResponse, NeedDto, NeedIntent } from '@aee/shared-types';
 import { NeedEntity } from './need.entity';
 import { CreateNeedDto } from './dto/create-need.dto';
 import { cityCenter } from '../geo/city-centers';
 import { findCityByCode } from '../geo/cities.seed';
+import { hashManageToken, issueManageToken } from '../common/manage-token';
 
 export interface ListNeedsQuery {
   country?: string;
@@ -24,7 +25,7 @@ export class NeedsService {
     private readonly repo: Repository<NeedEntity>,
   ) {}
 
-  async create(dto: CreateNeedDto): Promise<NeedDto> {
+  async create(dto: CreateNeedDto): Promise<NeedCreateResponse> {
     let lng: number;
     let lat: number;
     let cityCode = dto.cityCode?.trim() || null;
@@ -69,6 +70,7 @@ export class NeedsService {
       throw new BadRequestException('Describe un poco más (mín. 8 caracteres)');
     }
 
+    const token = issueManageToken();
     const row = await this.repo.save(
       this.repo.create({
         category: dto.category,
@@ -84,10 +86,11 @@ export class NeedsService {
         cityCode,
         municipality,
         contactWhatsapp: whatsapp,
+        manageTokenHash: token.hash,
         expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
       }),
     );
-    return this.toDto(row);
+    return { ...this.toDto(row), manageToken: token.plain };
   }
 
   async list(query: ListNeedsQuery): Promise<NeedDto[]> {
@@ -137,6 +140,30 @@ export class NeedsService {
   async getById(id: string): Promise<NeedDto> {
     const n = await this.repo.findOne({ where: { id } });
     if (!n) throw new NotFoundException(`Need ${id} not found`);
+    return this.toDto(n);
+  }
+
+  async previewForManage(id: string, manageToken: string) {
+    const n = await this.repo.findOne({ where: { id } });
+    if (!n || !n.manageTokenHash || n.manageTokenHash !== hashManageToken(manageToken)) {
+      throw new NotFoundException('Aviso no encontrado o enlace inválido');
+    }
+    return {
+      kind: 'need' as const,
+      id: n.id,
+      title: n.description.slice(0, 160),
+      status: n.status,
+      municipality: n.municipality,
+    };
+  }
+
+  async closeWithToken(id: string, manageToken: string): Promise<NeedDto> {
+    const n = await this.repo.findOne({ where: { id } });
+    if (!n || !n.manageTokenHash || n.manageTokenHash !== hashManageToken(manageToken)) {
+      throw new NotFoundException('Aviso no encontrado o enlace inválido');
+    }
+    n.status = 'CLOSED';
+    await this.repo.save(n);
     return this.toDto(n);
   }
 

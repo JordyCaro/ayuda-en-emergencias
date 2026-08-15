@@ -11,6 +11,9 @@ import { NeedsModule } from './needs/needs.module';
 import { ConnectorsModule } from './connectors/connectors.module';
 import { PlacesModule } from './places/places.module';
 import { GeoModule } from './geo/geo.module';
+import { PetsModule } from './pets/pets.module';
+import { ModerationModule } from './moderation/moderation.module';
+import { ManageModule } from './manage/manage.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { GeoModule } from './geo/geo.module';
     PlacesModule,
     ConnectorsModule,
     GeoModule,
+    PetsModule,
+    ModerationModule,
+    ManageModule,
   ],
   providers: [
     {

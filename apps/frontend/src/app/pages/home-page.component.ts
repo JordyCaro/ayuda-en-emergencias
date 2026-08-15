@@ -74,7 +74,7 @@ import { statusLabel } from '../plain-labels';
           <a routerLink="/buscar">Publicar o leer avisos</a>
           <a routerLink="/ayudar">Quiero ayudar</a>
           <a routerLink="/origenes">Orígenes</a>
-          <a routerLink="/ayudar" [queryParams]="{ type: 'DONATION_POINT' }">Llevar ayuda / acopio</a>
+          <a routerLink="/perdidos">Perdidos / encontrados</a>
           <a routerLink="/publicar-punto">Publicar un lugar</a>
           <a href="tel:123">Llamar al 123</a>
         </div>
@@ -103,6 +103,15 @@ import { statusLabel } from '../plain-labels';
               pasar por nosotros.
             </p>
             <span class="way-go">Ver lugares →</span>
+          </a>
+          <a class="way" routerLink="/perdidos">
+            <span class="way-label">Comunidad</span>
+            <strong>Perdidos y encontrados</strong>
+            <p>
+              Mascotas: publica una señal. Personas: canales oficiales (RND/SIRDEC) — sin registro
+              paralelo nuestro.
+            </p>
+            <span class="way-go">Abrir →</span>
           </a>
         </div>
       </div>

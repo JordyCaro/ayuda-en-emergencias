@@ -131,6 +131,11 @@ export interface NeedDto {
   contactWhatsapp?: string | null;
 }
 
+/** Respuesta de creación: el token solo se entrega una vez. */
+export interface NeedCreateResponse extends NeedDto {
+  manageToken: string;
+}
+
 export interface CreateNeedRequest {
   category: NeedCategory;
   intent: NeedIntent;
@@ -160,6 +165,10 @@ export interface PlaceDto {
   updatedAt?: string | null;
 }
 
+export interface PlaceCreateResponse extends PlaceDto {
+  manageToken: string;
+}
+
 export interface CreatePlaceRequest {
   type: PlaceType;
   title: string;
@@ -175,4 +184,86 @@ export interface CityDto {
   name: string;
   department: string;
   departmentCode: string;
+}
+
+/** Mascota: perdida o encontrada (señal comunitaria). */
+export type PetReportKind = 'LOST' | 'FOUND';
+
+export type PetSpecies = 'DOG' | 'CAT' | 'OTHER';
+
+export type PetReportStatus = 'OPEN' | 'CLOSED' | 'EXPIRED';
+
+export interface PetReportDto {
+  id: string;
+  kind: PetReportKind;
+  species: PetSpecies;
+  description: string;
+  geometry: GeoJsonPoint;
+  verification: Verification;
+  status: PetReportStatus;
+  createdAt: string;
+  source: 'USER';
+  cityCode?: string | null;
+  municipality?: string | null;
+  contactWhatsapp?: string | null;
+}
+
+export interface PetReportCreateResponse extends PetReportDto {
+  manageToken: string;
+}
+
+export type ManageTargetKind = 'place' | 'need' | 'pet';
+
+export interface ManagePreviewDto {
+  kind: ManageTargetKind;
+  id: string;
+  title: string;
+  status: string;
+  municipality?: string | null;
+}
+
+export interface ManageCloseRequest {
+  kind: ManageTargetKind;
+  id: string;
+  manageToken: string;
+}
+
+export interface CreatePetReportRequest {
+  kind: PetReportKind;
+  species: PetSpecies;
+  description: string;
+  geometry?: GeoJsonPoint;
+  cityCode?: string;
+  contactWhatsapp?: string;
+}
+
+/** Moderación (Fase 9) — no es autoridad estatal. */
+export type ModerationTargetKind = 'place' | 'need' | 'pet';
+
+export type ModerationAction = 'VERIFY' | 'HIDE';
+
+export interface ModerationQueueItem {
+  kind: ModerationTargetKind;
+  id: string;
+  title: string;
+  detail?: string | null;
+  municipality?: string | null;
+  cityCode?: string | null;
+  verification: Verification;
+  status: string;
+  createdAt: string;
+}
+
+export interface ModerationAuditDto {
+  id: string;
+  targetKind: ModerationTargetKind;
+  targetId: string;
+  action: ModerationAction;
+  actor: string;
+  note?: string | null;
+  createdAt: string;
+}
+
+export interface ModerateRequest {
+  note?: string;
 }

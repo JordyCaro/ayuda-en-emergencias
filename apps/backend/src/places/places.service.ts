@@ -5,7 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
-import type { CreatePlaceRequest, PlaceDto, PlaceType } from '@aee/shared-types';
+import type {
+  CreatePlaceRequest,
+  PlaceCreateResponse,
+  PlaceDto,
+  PlaceType,
+} from '@aee/shared-types';
 import { PlaceEntity } from './place.entity';
 import {
   assertValidBBox,
@@ -14,6 +19,7 @@ import {
   isValidLatLng,
 } from '../common/geo';
 import { findCityByCode } from '../geo/cities.seed';
+import { hashManageToken, issueManageToken } from '../common/manage-token';
 
 export interface ListPlacesQuery {
   lat?: number;
@@ -168,7 +174,7 @@ export class PlacesService {
     return this.toDto(p);
   }
 
-  async createCommunity(dto: CreatePlaceRequest): Promise<PlaceDto> {
+  async createCommunity(dto: CreatePlaceRequest): Promise<PlaceCreateResponse> {
     const coords = dto.geometry?.coordinates;
     if (!Array.isArray(coords) || coords.length !== 2) {
       throw new BadRequestException('geometry.coordinates must be [lng, lat]');
@@ -189,6 +195,7 @@ export class PlacesService {
       );
     }
 
+    const token = issueManageToken();
     const row = await this.repo.save(
       this.repo.create({
         type: dto.type,
@@ -211,10 +218,45 @@ export class PlacesService {
           : [],
         retrievedAt: new Date(),
         expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+        manageTokenHash: token.hash,
         properties: { origin: 'USER_FORM', divipola: city.code },
       }),
     );
-    return this.toDto(row);
+    return { ...this.toDto(row), manageToken: token.plain };
+  }
+
+  async previewForManage(id: string, manageToken: string) {
+    const p = await this.repo.findOne({ where: { id } });
+    if (
+      !p ||
+      p.sourceId !== 'community' ||
+      !p.manageTokenHash ||
+      p.manageTokenHash !== hashManageToken(manageToken)
+    ) {
+      throw new NotFoundException('Lugar no encontrado o enlace inválido');
+    }
+    return {
+      kind: 'place' as const,
+      id: p.id,
+      title: p.title,
+      status: p.status,
+      municipality: p.municipality,
+    };
+  }
+
+  async closeWithToken(id: string, manageToken: string): Promise<PlaceDto> {
+    const p = await this.repo.findOne({ where: { id } });
+    if (
+      !p ||
+      p.sourceId !== 'community' ||
+      !p.manageTokenHash ||
+      p.manageTokenHash !== hashManageToken(manageToken)
+    ) {
+      throw new NotFoundException('Lugar no encontrado o enlace inválido');
+    }
+    p.status = 'HIDDEN';
+    await this.repo.save(p);
+    return this.toDto(p);
   }
 
   async upsertOfficial(input: {

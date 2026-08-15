@@ -90,7 +90,8 @@ pnpm --filter @aee/backend start:prod
 1. Abrir inicio → leer de qué va.  
 2. **¿Qué necesitas?** → publicar o leer un aviso.  
 3. **Ayudar** → ver directorio / ciudad.  
-4. **Fuentes** → procedencia de datos.
+4. **Fuentes** → procedencia de datos.  
+5. **Cerrar publicación** — enlace secreto al publicar (`/cerrar`), sin cuenta.
 
 ---
 

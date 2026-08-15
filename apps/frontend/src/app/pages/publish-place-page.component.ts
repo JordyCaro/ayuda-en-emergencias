@@ -143,6 +143,13 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
             Punto publicado (sin verificar).
             <a routerLink="/ayudar">Ver en Dónde ayudar</a>
           </p>
+          <div class="manage" *ngIf="manageLink()">
+            <p>
+              <strong>Guarda este enlace</strong> para ocultar el lugar cuando ya no reciba ayudas:
+            </p>
+            <a [href]="manageLink()">{{ manageLink() }}</a>
+            <button type="button" class="copy" (click)="copyManage()">Copiar enlace</button>
+          </div>
           <div class="row">
             <button type="button" class="ghost" (click)="step.set(2)" [disabled]="sending()">
               Atrás
@@ -352,6 +359,30 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
         color: var(--teal);
         font-weight: 800;
       }
+      .manage {
+        margin: 0.75rem 0;
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: #eef7f5;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .manage a {
+        display: block;
+        margin: 0.35rem 0;
+        word-break: break-all;
+        color: var(--teal);
+        font-weight: 800;
+      }
+      .manage .copy {
+        border: 0;
+        border-radius: 999px;
+        background: var(--ink);
+        color: #fff;
+        font-weight: 800;
+        padding: 0.4rem 0.85rem;
+        cursor: pointer;
+      }
     `,
   ],
 })
@@ -367,6 +398,7 @@ export class PublishPlacePageComponent implements OnInit {
   readonly sending = signal(false);
   readonly error = signal<string | null>(null);
   readonly okId = signal<string | null>(null);
+  readonly manageLink = signal<string | null>(null);
 
   type: PlaceType = 'DONATION_POINT';
   title = '';
@@ -448,6 +480,7 @@ export class PublishPlacePageComponent implements OnInit {
         next: (p) => {
           this.sending.set(false);
           this.okId.set(p.id);
+          this.manageLink.set(this.api.manageUrl('place', p.id, p.manageToken));
         },
         error: (err) => {
           this.sending.set(false);
@@ -461,5 +494,11 @@ export class PublishPlacePageComponent implements OnInit {
           );
         },
       });
+  }
+
+  copyManage(): void {
+    const link = this.manageLink();
+    if (!link) return;
+    void navigator.clipboard?.writeText(`${window.location.origin}${link}`);
   }
 }

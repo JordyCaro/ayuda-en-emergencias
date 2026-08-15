@@ -1,5 +1,7 @@
-# apps/admin — Moderación (ni front ciudadano ni API pública)
+# apps/admin — Moderación
 
-**Estado:** fuera del slice 001. Carpeta reservada.
+**Fase 9 (pivote):** no hay panel ciudadano de moderador.  
+El cierre lo hace quien publica con un **enlace secreto** (`/cerrar`).
 
-App separada del `frontend` ciudadano. Hablará con el `backend` con autenticación de moderadores (spec futura).
+API `/api/v1/moderation/*` (token) queda solo por si algún día hay ops de emergencia.  
+Esta carpeta sigue reservada para una app admin futura (Fase 10+).

@@ -7,7 +7,7 @@
 
 | | |
 |---|---|
-| **Estado** | Fases **0–7** hechas. Siguiente: **Fase 8** (perdidos/encontrados). |
+| **Estado** | Fases **0–9** hechas. Siguiente: **Fase 10** (producción). |
 | **Metodología** | Spec-Driven Development (SDD) — lean |
 | **Forma** | Monorepo pnpm (`apps/frontend`, `apps/backend`, …) |
 
@@ -22,7 +22,7 @@
 | **Roadmap** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
 | **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
 | **Agente de IA** | [`AGENTS.md`](AGENTS.md) |
-| **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`006`](specs/006-deep-links-oficiales/) |
+| **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`008`](specs/008-moderacion/) |
 | **Reglas** | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) |
 
 ---
@@ -33,8 +33,9 @@
 2. **¿Qué necesitas?** (`/buscar`) — avisos necesito / puedo aportar.  
 3. **Quiero ayudar** (`/ayudar`) — lugares + cómo ayudar + Cerca de mí.  
 4. **Publicar lugar** (`/publicar-punto`) — acopios/bodegas/centros (crecimiento).  
-5. **Orígenes** (`/origenes`) — canales oficiales + integraciones.  
-6. **API** — NestJS `/api/v1` + Swagger.
+5. **Perdidos** (`/perdidos`) — mascotas (señales) + personas → RND/SIRDEC.  
+6. **Orígenes** (`/origenes`) — canales oficiales + integraciones.  
+7. **API** — NestJS `/api/v1` + Swagger.
 
 ---
 

@@ -18,9 +18,9 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 ## Antes de escribir código de producto
 
 1. Leer `.specify/memory/constitution.md`  
-2. Slice activo: `001`–`006` hechos; siguiente **Fase 8** (mascotas + personas vía RND) → `specs/007+`  
+2. Slice activo: `001`–`008` hechos; siguiente **Fase 10** (producción) → `specs/009+`  
    - Personas: **nunca** base propia de desaparecidos (constitution).  
-   - Publicar lugar = capacidad estratégica de crecimiento; cuidar en Fase 9.  
+   - Publicar lugar = capacidad estratégica de crecimiento.  
 3. Leer `spec.md` → `plan.md` → `tasks.md`  
 4. Si el pedido contradice OUT del spec o la constitution → **parar y preguntar**  
 5. No implementar OUT del slice activo  
@@ -65,7 +65,7 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 
 ## Estado del proyecto
 
-Fases **0–7** hechas. Siguiente: **Fase 8** (mascotas reportes + personas → RND).  
-Superficie: `/` · `/buscar` · `/ayudar` · `/publicar-punto` · `/origenes`.  
+Fases **0–9** hechas. Siguiente: **Fase 10** (producción).  
+Superficie: `/` · `/buscar` · `/ayudar` · `/perdidos` · `/publicar-punto` · `/origenes` · `/cerrar` (enlace privado).  
 Publicar lugar = motor de crecimiento (acopios comunitarios + API).  
 Offline = **12**.

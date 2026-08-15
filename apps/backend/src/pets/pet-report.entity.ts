@@ -6,23 +6,27 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import type { NeedCategory, NeedIntent, NeedStatus, Verification } from '@aee/shared-types';
+import type {
+  PetReportKind,
+  PetReportStatus,
+  PetSpecies,
+  Verification,
+} from '@aee/shared-types';
 
-@Entity({ name: 'needs' })
-@Index(['category'])
+@Entity({ name: 'pet_reports' })
+@Index(['kind'])
 @Index(['status'])
 @Index(['createdAt'])
-@Index(['intent'])
 @Index(['cityCode'])
-export class NeedEntity {
+export class PetReportEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar', length: 32 })
-  category!: NeedCategory;
+  @Column({ type: 'varchar', length: 16 })
+  kind!: PetReportKind;
 
-  @Column({ type: 'varchar', length: 16, default: 'NEED' })
-  intent!: NeedIntent;
+  @Column({ type: 'varchar', length: 16 })
+  species!: PetSpecies;
 
   @Column({ type: 'text' })
   description!: string;
@@ -43,7 +47,7 @@ export class NeedEntity {
   verification!: Verification;
 
   @Column({ type: 'varchar', length: 16, default: 'OPEN' })
-  status!: NeedStatus;
+  status!: PetReportStatus;
 
   @Column({ type: 'varchar', length: 8, default: 'CO' })
   country!: string;
@@ -54,11 +58,9 @@ export class NeedEntity {
   @Column({ type: 'varchar', length: 128, nullable: true })
   municipality!: string | null;
 
-  /** Dígitos internacionales, ej. 573001234567. Nunca se muestra “verificado”. */
   @Column({ name: 'contact_whatsapp', type: 'varchar', length: 32, nullable: true })
   contactWhatsapp!: string | null;
 
-  /** SHA-256 del token de cierre (nunca se expone en listados). */
   @Column({ name: 'manage_token_hash', type: 'varchar', length: 64, nullable: true })
   manageTokenHash!: string | null;
 

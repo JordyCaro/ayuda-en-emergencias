@@ -79,6 +79,10 @@ export class PlaceEntity {
   @Column({ name: 'expires_at', type: 'timestamptz', nullable: true })
   expiresAt!: Date | null;
 
+  /** SHA-256 del token de cierre (solo lugares community). */
+  @Column({ name: 'manage_token_hash', type: 'varchar', length: 64, nullable: true })
+  manageTokenHash!: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 

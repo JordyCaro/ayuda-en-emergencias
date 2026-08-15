@@ -93,19 +93,20 @@ export const PLACE_KIND_FILTERS: Array<{ id: PlaceType | ''; label: string }> = 
   { id: 'MEETING_POINT', label: 'Punto de encuentro' },
 ];
 
-/** Ciudades frecuentes para chips (DIVIPOLA). */
+/** Ciudades frecuentes para chips (DIVIPOLA). Primero = todo el país. */
 export const CITY_CHIPS: Array<{ code: string; label: string }> = [
   { code: '', label: 'Todo el país' },
-  { code: '27001', label: 'Quibdó' },
-  { code: '66001', label: 'Pereira' },
-  { code: '76001', label: 'Cali' },
-  { code: '05001', label: 'Medellín' },
-  { code: '11001', label: 'Bogotá' },
   { code: '08001', label: 'Barranquilla' },
-  { code: '13001', label: 'Cartagena' },
+  { code: '11001', label: 'Bogotá' },
   { code: '68001', label: 'Bucaramanga' },
-  { code: '17001', label: 'Manizales' },
+  { code: '76001', label: 'Cali' },
+  { code: '13001', label: 'Cartagena' },
+  { code: '54001', label: 'Cúcuta' },
   { code: '73001', label: 'Ibagué' },
+  { code: '17001', label: 'Manizales' },
+  { code: '05001', label: 'Medellín' },
+  { code: '66001', label: 'Pereira' },
+  { code: '27001', label: 'Quibdó' },
   { code: '50001', label: 'Villavicencio' },
 ];
 

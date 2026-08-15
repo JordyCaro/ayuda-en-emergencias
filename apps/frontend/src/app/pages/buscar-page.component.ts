@@ -289,6 +289,14 @@ const DEMO: NeedDto[] = [
               {{ posting() ? 'Publicando…' : 'Publicar en el muro' }}
             </button>
             <p class="toast ok" *ngIf="ok()">{{ ok() }}</p>
+            <div class="manage" *ngIf="manageLink()">
+              <p>
+                <strong>Guarda este enlace</strong> para cerrar el aviso cuando ya no aplique (sin
+                cuenta):
+              </p>
+              <a [href]="manageLink()">{{ manageLink() }}</a>
+              <button type="button" class="copy" (click)="copyManage()">Copiar enlace</button>
+            </div>
             <p class="toast err" *ngIf="formError()">{{ formError() }}</p>
           </div>
 
@@ -564,6 +572,30 @@ const DEMO: NeedDto[] = [
       .toast.err {
         color: var(--coral-deep);
       }
+      .manage {
+        margin: 0.5rem 0 0;
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: #eef7f5;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .manage a {
+        display: block;
+        margin: 0.35rem 0;
+        word-break: break-all;
+        color: var(--teal);
+        font-weight: 800;
+      }
+      .manage .copy {
+        border: 0;
+        border-radius: 999px;
+        background: var(--ink);
+        color: #fff;
+        font-weight: 800;
+        padding: 0.4rem 0.85rem;
+        cursor: pointer;
+      }
       .city-row {
         display: flex;
         flex-wrap: wrap;
@@ -749,6 +781,7 @@ export class BuscarPageComponent implements OnInit {
   readonly posting = signal(false);
   readonly showForm = signal(false);
   readonly ok = signal<string | null>(null);
+  readonly manageLink = signal<string | null>(null);
   readonly formError = signal<string | null>(null);
 
   intent: NeedIntent | null = null;
@@ -844,6 +877,7 @@ export class BuscarPageComponent implements OnInit {
 
   publish(): void {
     this.ok.set(null);
+    this.manageLink.set(null);
     this.formError.set(null);
     if (!this.intent || !this.category) return;
     if (!this.cityCode) {
@@ -864,9 +898,10 @@ export class BuscarPageComponent implements OnInit {
         contactWhatsapp: this.whatsapp.trim() || undefined,
       })
       .subscribe({
-        next: () => {
+        next: (r) => {
           this.posting.set(false);
           this.ok.set('Publicado. Caduca en ~72 horas.');
+          this.manageLink.set(this.api.manageUrl('need', r.id, r.manageToken));
           this.description = '';
           this.whatsapp = '';
           this.showForm.set(false);
@@ -881,6 +916,13 @@ export class BuscarPageComponent implements OnInit {
           this.formError.set(typeof msg === 'string' ? msg : 'No se pudo publicar.');
         },
       });
+  }
+
+  copyManage(): void {
+    const link = this.manageLink();
+    if (!link) return;
+    const full = `${window.location.origin}${link}`;
+    void navigator.clipboard?.writeText(full);
   }
 
   initials(n: NeedDto): string {
