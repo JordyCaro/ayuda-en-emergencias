@@ -18,7 +18,7 @@
 | Si eres… | Abre esto |
 |----------|-----------|
 | **Propósito** | [`docs/product/QUE-ES.md`](docs/product/QUE-ES.md) |
-| **Correr en local** | [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md) |
+| **Correr en local (guía base)** | [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md) |
 | **Roadmap + mejoras** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
 | **Deploy gratis / capacidad** | [`infra/deploy/README.md`](infra/deploy/README.md) |
 | **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
