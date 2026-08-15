@@ -6,7 +6,7 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–6 hechas**. Siguiente: **Fase 7** (deep-links oficiales extra).
+**Estado:** fases **0–7 hechas**. Siguiente: **Fase 8** (mascotas perdidas/encontradas — prioritaria).
 
 ---
 
@@ -16,7 +16,8 @@ Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs
 2. **Conectar, no intermediarios** — no pedimos, recaudamos ni custodiamos donaciones (dinero o especie).  
 3. **Avisos = señales** — no son tickets que la plataforma prometa cumplir.  
 4. **Procedencia visible** en todo dato.  
-5. **Offline / PWA avanzada** = **última fase y casi opcional** (el producto se considera completo sin ella si el resto está).
+5. **Personas desaparecidas** → solo deep-link oficial (RND/SIRDEC); **nunca** base propia.  
+6. **Offline / PWA avanzada** = **última fase y casi opcional**.
 
 ---
 
@@ -31,13 +32,13 @@ El master condensaba:
 | 2 Connectors Tier 1 | **Fases 1–2** (+ más en 6–7) |
 | 3 Reportes / necesidades | **Fase 1** (avisos) |
 | 4 Mapa y acciones home | **Fase 1** |
-| 5 Moderación | **Fase 8** |
+| 5 Moderación | **Fase 9** |
 | + Donaciones | **Fase 5** (solo enlaces a terceros) |
 | + Voluntariado | **Fase 4** (encuentro / deep-link, sin matching de nómina) |
-| + Mascotas | **Fase 10** (opcional, slice aparte) |
+| + Mascotas perdidas/encontradas | **Fase 8** (**prioritaria**, no marketplace) |
 | + RND / desaparecidos | **Fase 7** (deep-link oficial; nunca autoridad) |
 | + Offline avanzado | **Fase 12** (última, casi opcional) |
-| + API externa amplia | **Fase 9** (API pública madura + ops) |
+| + API externa amplia | **Fase 10** (producción + ops) |
 
 El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se parte en fases 2–12 para no mezclar contratos.
 
@@ -47,22 +48,23 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 
 | Fase | Nombre | Outcome (cumplimiento) | Slice SDD | Estado |
 |------|--------|------------------------|-----------|--------|
-| **0** | Discovery de fuentes | Inventario legal/técnico, pruebas de endpoints, OSS, contexto | docs `sources/` | **Hecha** |
-| **1** | Foundation + núcleo accionable | Monorepo, API, PostGIS, PWA, avisos, mapa, Confianza, IDEAM | `001` | **Hecha** |
-| **2** | Connectors oficiales + Places | SISPRO/REPS → Places salud; modelo Place; filtros; sync robusto | post-001 | **Hecha (robusta)** |
-| **3** | Registro fácil de lugares / orgs | Acopio, fundaciones, ONG; filtro ciudad (DIVIPOLA); listado “quién necesita apoyo”; expiración | `002` | **Hecha** |
-| **4** | Quiero ayudar / voluntariado (enlace) | Flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs; sin intermediación laboral | `003` | **Hecha** |
-| **5** | Descubrimiento de donación (solo enlace) | Mostrar *dónde* llevar ayuda / canal de orgs; **cero** pasarela ni custodia; sin enfatizar dinero | `004` | **Hecha** |
-| **6** | Densificación territorial | Connectors municipales/OSM cacheado, cobertura multi-ciudad, cerca de mí | `005` | **Hecha** |
-| **7** | Deep-links y datos oficiales extra | UX a SGC/RND/UNGRD/IDIGER según registry; connectors solo si dejan de estar `BLOCKED`/`LEGAL_REVIEW` | docs + slice | Pendiente |
-| **8** | Moderación y confianza operativa | Admin mínimo; cola VERIFIED/REJECTED; sin fingir autoridad nacional | `admin` / slice | Pendiente |
-| **9** | Plataforma de producción | Deploy HTTPS, migraciones formales, jobs robustos, rate limits, OpenAPI alineado, métricas, API pública madura, push opcional | infra + harden | Pendiente |
-| **10** | Verticales opcionales | Mascotas u otros marketplaces locales **solo** si se aprueba slice; fuera del core | opcional | Opcional |
-| **11** | Multi-país / expansión | Activar arquitectura multi-país cuando haya país #2 con discovery propio | opcional | Opcional |
-| **12** | Offline / PWA avanzada | Cache de mapa/datos críticos, cola offline de avisos, etc. | **Última** | **Casi opcional** |
+| **0** | Discovery de fuentes | Inventario legal/técnico, pruebas de endpoints, OSS | docs `sources/` | **Hecha** |
+| **1** | Foundation + núcleo accionable | Monorepo, API, PostGIS, PWA, avisos, IDEAM | `001` | **Hecha** |
+| **2** | Connectors oficiales + Places | SISPRO/REPS → Places; sync robusto | post-001 | **Hecha** |
+| **3** | Registro fácil de lugares / orgs | Acopio/ONG; ciudad DIVIPOLA; expiración | `002` | **Hecha** |
+| **4** | Quiero ayudar / voluntariado (enlace) | Lugares + cómo ayudar; sin matching laboral | `003` | **Hecha** |
+| **5** | Descubrimiento llevar ayuda (enlace) | Acopio/especie vía terceros; cero pasarela | `004` | **Hecha** |
+| **6** | Densificación territorial | OSM multi-ciudad; cerca de mí | `005` | **Hecha** |
+| **7** | Deep-links oficiales extra | `/oficiales`: SGC, RND, UNGRD, IDIGER… | `006` | **Hecha** |
+| **8** | Mascotas perdidas / encontradas | Reportes UNVERIFIED de mascotas; no marketplace de servicios | `007+` | **Siguiente (prioritaria)** |
+| **9** | Moderación y confianza operativa | Admin; VERIFIED/REJECTED; sin fingir autoridad | `admin` / slice | Pendiente |
+| **10** | Plataforma de producción | Deploy HTTPS, migraciones, OpenAPI, métricas | infra + harden | Pendiente |
+| **11** | Multi-país / expansión | País #2 con discovery propio | opcional | Opcional |
+| **12** | Offline / PWA avanzada | Cache crítico; cola offline | **Última** | **Casi opcional** |
 
-**Criterio de “producto completo” respecto al master:** fases **0–9** entregadas con specs aprobadas.  
-**10–11** = expansión. **12** = mejora de resiliencia; el cumplimiento del master **no** depende de ella.
+**Cumplimiento master (ajustado):** fases **0–10** con specs.  
+**Personas desaparecidas** no son un “CRUD nuestro”: viven en Fase **7** como enlace.  
+**Mascotas** dejan de ser “vertical opcional tipo marketplace” y pasan a **Fase 8 crítica** (perdidas/encontradas).
 
 ---
 
@@ -122,43 +124,41 @@ Spec: `specs/004-donacion-descubrimiento-enlace/` (**APROBADA**).
 - Quiero ayudar: **Cerca de mí** (radio + orden por distancia).  
 Spec: `specs/005-densificacion-territorial/` (**APROBADA**).
 
-### Fase 7 — Deep-links oficiales extra *(siguiente)*
+### Fase 7 — Deep-links oficiales extra *(hecha — 006)*
 
-- RND / desaparecidos → solo derivación oficial.  
-- SGC mientras esté `BLOCKED` → visor oficial.  
-- UNGRD / datasets históricos → connector o deep-link según licencia.  
-- Nunca presentarnos como base oficial de desaparecidos.
+- UI `/oficiales`: SGC, RND/SIRDEC, UNGRD, IDIGER, Cruz Roja, 123.  
+- **Personas desaparecidas:** solo enlace a Medicina Legal — sin base propia.  
+- Seed sources `rnd`, `ungrd`, `idiger` (+ `sgc` ya existía).  
+Spec: `specs/006-deep-links-oficiales/` (**APROBADA**).
 
-### Fase 8 — Moderación
+### Fase 8 — Mascotas perdidas / encontradas *(siguiente — prioritaria)*
+
+- Reportar mascota perdida o encontrada (señal `UNVERIFIED`, ciudad, foto opcional más adelante).  
+- **No** es marketplace de veterinaria/paseos.  
+- Moderación humana reforzada en Fase 9.  
+- Slice: `007+` (abrir antes de código).
+
+### Fase 9 — Moderación
 
 - `apps/admin` (o equivalente).  
-- Moderación de Places/avisos → `VERIFIED` / ocultar abuso.  
+- Moderación de Places/avisos/mascotas → `VERIFIED` / ocultar abuso.  
 - Audit trail mínimo. Sigue sin ser autoridad.
 
-### Fase 9 — Producción y API madura
+### Fase 10 — Producción y API madura
 
 - Deploy real (HTTPS, backups, secretos).  
 - Migraciones TypeORM (sin `synchronize` en prod).  
-- Observabilidad de connectors (`last_fetch`, errores).  
-- OpenAPI = contrato real; clientes externos posibles.  
-- Push notifications: opcional dentro de esta fase si hay spec.
-
-### Fase 10 — Verticales opcionales
-
-- Mascotas, plomería, jurídico tipo marketplace: **no** core.  
-- Solo con spec nueva y aprobación explícita.
+- Observabilidad de connectors.  
+- OpenAPI = contrato real.
 
 ### Fase 11 — Multi-país
 
-- Reusar modelo `country` + discovery Fase 0 por país.  
-- Sin hardcode Colombia-only en dominio.
+- Reusar modelo `country` + discovery Fase 0 por país.
 
 ### Fase 12 — Offline / PWA avanzada *(última, casi opcional)*
 
 - Service worker más allá de “instalable”.  
-- Cache de tiles/datos recientes; cola de avisos offline.  
-- **No bloquea** el cierre de cumplimiento master 0–9.  
-- Implementar solo si hay necesidad operativa clara (redes caídas post-desastre) y spec dedicada.
+- **No bloquea** el cierre de cumplimiento 0–10.
 
 ---
 
@@ -178,10 +178,10 @@ Spec: `specs/005-densificacion-territorial/` (**APROBADA**).
 | Quiero ayudar / voluntariado enlace | 4 |
 | Donar vía terceros (descubrimiento) | 5 |
 | Densidad municipal + OSM | 6 |
-| RND / SGC / UNGRD UX | 7 |
-| Moderación humana | 8 |
-| Deploy + API externa amplia + ops | 9 |
-| Mascotas / verticales | 10 (opc.) |
+| RND / SGC / UNGRD UX (personas = solo enlace) | 7 |
+| Mascotas perdidas/encontradas | **8 (prioritaria)** |
+| Moderación humana | 9 |
+| Deploy + API madura | 10 |
 | Multi-país | 11 (opc.) |
 | Offline avanzado | **12 (casi opc.)** |
 
@@ -196,8 +196,9 @@ Spec: `specs/005-densificacion-territorial/` (**APROBADA**).
 | `003-quiero-ayudar-enlace` | 4 |
 | `004-donacion-descubrimiento-enlace` | 5 |
 | `005-densificacion-territorial` | 6 |
-| Futuros `006+` | 7… |
-| Docs-only / infra | 0, partes de 7 y 9 |
+| `006-deep-links-oficiales` | 7 |
+| Futuros `007+` | 8 (mascotas), 9… |
+| Docs-only / infra | 0, partes de 10 |
 
 Si una idea está en este roadmap pero **OUT** del slice activo → no implementar; abrir o avanzar el slice correcto.
 

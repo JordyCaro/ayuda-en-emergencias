@@ -7,7 +7,7 @@
 
 | | |
 |---|---|
-| **Estado** | Fases **0–6** hechas. Siguiente: **Fase 7** (deep-links oficiales). |
+| **Estado** | Fases **0–7** hechas. Siguiente: **Fase 8** (mascotas perdidas/encontradas). |
 | **Metodología** | Spec-Driven Development (SDD) — lean |
 | **Forma** | Monorepo pnpm (`apps/frontend`, `apps/backend`, …) |
 
@@ -22,7 +22,7 @@
 | **Roadmap** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
 | **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
 | **Agente de IA** | [`AGENTS.md`](AGENTS.md) |
-| **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) · [`002`](specs/002-registro-facil-lugares/) · [`003`](specs/003-quiero-ayudar-enlace/) · [`004`](specs/004-donacion-descubrimiento-enlace/) · [`005`](specs/005-densificacion-territorial/) |
+| **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`006`](specs/006-deep-links-oficiales/) |
 | **Reglas** | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) |
 
 ---
@@ -32,9 +32,10 @@
 1. **Inicio** — qué es, utilidad, conteos reales, fuentes.  
 2. **¿Qué necesitas?** (`/buscar`) — avisos necesito / puedo aportar.  
 3. **Quiero ayudar** (`/ayudar`) — lugares + cómo ayudar + Cerca de mí.  
-4. **Publicar punto** — registro de acopio / org.  
-5. **Fuentes** — procedencia e integración.  
-6. **API** — NestJS `/api/v1` + Swagger.
+4. **Oficiales** (`/oficiales`) — SGC, RND, UNGRD, IDIGER (solo enlaces).  
+5. **Publicar punto** — registro de acopio / org.  
+6. **Fuentes** — procedencia e integración.  
+7. **API** — NestJS `/api/v1` + Swagger.
 
 ---
 

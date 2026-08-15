@@ -6,41 +6,30 @@ Documento para humanos (y quien reciba el repo). Léelo antes de mirar el códig
 
 ## Propósito exacto (una frase)
 
-Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integrar, avisos de la comunidad (“necesito” / “puedo aportar”), y directorio de acopios u organizaciones — para que la gente **se encuentre**.  
-**No** somos la autoridad de emergencias. **No** pedimos, recaudamos ni custodiamos donaciones. Solo **mostramos, enlazamos y señalamos**.
+Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integrar, avisos de la comunidad, directorio de acopios/orgs, y **enlaces a canales oficiales**.  
+**No** somos la autoridad de emergencias. **No** pedimos ni custodiamos donaciones. **No** somos el registro de desaparecidos.
 
 ---
 
-## Para qué existe
-
-1. **Alertas / datos oficiales** cuando hay API legal y viable.  
-2. **Avisos** de necesidad u oferta en `/buscar` (señales, no tickets).  
-3. **Quiero ayudar**: lugares (acopio, albergue, centro…) y **cómo ayudar** en el canal de la org.  
-4. **Fuentes** con procedencia.  
-5. Llevar ayuda / acopio = discovery de terceros **sin** pasar dinero por nosotros.
-
----
-
-## Qué no hacemos
-
-| No hacemos | Por qué |
-|------------|---------|
-| Cobrar / custodiar donaciones o dinero | No somos intermediarios |
-| Asignar voluntarios / turnos | Solo enlazamos |
-| Prometer que “la ayuda llega” | Un aviso no es un ticket |
-| Inventar emergencias ni cifras | Solo datos con fuente o avisos no verificados |
-
----
-
-## Superficie (fases 0–5)
+## Superficie (fases 0–7)
 
 | Pieza | Ruta | Qué hace |
 |-------|------|----------|
 | **Inicio** | `/` | Qué es, utilidad, fuentes |
 | **¿Qué necesitas?** | `/buscar` | Foro Necesito / Puedo aportar |
-| **Quiero ayudar** | `/ayudar` | Solo lugares + cómo ayudar / acopio |
+| **Quiero ayudar** | `/ayudar` | Lugares + cómo ayudar + Cerca de mí |
+| **Oficiales** | `/oficiales` | Deep-links SGC, RND, UNGRD, IDIGER… |
 | **Publicar punto** | `/publicar-punto` | Registro de acopio / org |
-| **Fuentes** | `/fuentes-detalle` | Registry |
+| **Fuentes** | `/fuentes-detalle` | Estado de integración |
+
+---
+
+## Personas vs mascotas
+
+| Tema | Enfoque |
+|------|---------|
+| **Personas desaparecidas** | Solo **enlace** a Medicina Legal / RND (Fase 7). Sin fichas nuestras. |
+| **Mascotas perdidas/encontradas** | **Fase 8 prioritaria**: reportes comunitarios UNVERIFIED (próximo slice). No marketplace. |
 
 ---
 
@@ -48,9 +37,9 @@ Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integra
 
 | Fase | Estado |
 |------|--------|
-| **0–6** | Hechas |
-| **7** | Deep-links oficiales — siguiente |
-| **8–9** | Moderación → producción |
+| **0–7** | Hechas |
+| **8** | Mascotas perdidas/encontradas — siguiente |
+| **9–10** | Moderación → producción |
 | **12** | Offline — casi opcional |
 
 Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
@@ -59,4 +48,4 @@ Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
 
 ## Docs
 
-- Roadmap · Cómo correr · Fuentes · Specs `001`–`005` · Constitution  
+Roadmap · Cómo correr · Fuentes · Specs `001`–`006` · Constitution  

@@ -201,20 +201,30 @@ export class SourcesPageComponent implements OnInit {
     if (s.id === 'community') return 'Comunidad (avisos y lugares)';
     if (s.id === 'ideam') return 'IDEAM — ríos y clima';
     if (s.id === 'sgc') return 'SGC — sismos';
-    if (s.id === 'osm') return 'OpenStreetMap — mapa base';
+    if (s.id === 'rnd') return 'RND / SIRDEC — desaparecidos';
+    if (s.id === 'ungrd') return 'UNGRD — gestión del riesgo';
+    if (s.id === 'idiger') return 'IDIGER — Bogotá';
+    if (s.id === 'osm') return 'OpenStreetMap — puntos de ayuda';
+    if (s.id === 'curated') return 'Directorio curado (enlaces)';
     return s.name;
   }
 
   friendlyDesc(s: SourceDto): string {
     if (s.id === 'sispro') {
-      return 'Sedes IPS en el mapa (filtro Salud). Datos MinSalud / SISPRO.';
+      return 'Sedes IPS (salud). Datos MinSalud / SISPRO.';
     }
     if (s.id === 'community') {
       return 'Avisos y puntos publicados por personas (sin verificar).';
     }
-    if (s.id === 'ideam') return 'Alertas oficiales que ves en Comunidad.';
-    if (s.id === 'sgc') return 'Todavía no entra automático; usa el enlace oficial.';
-    if (s.id === 'osm') return 'Dibuja las calles del mapa. No es una alerta.';
+    if (s.id === 'ideam') return 'Alertas hidrológicas oficiales.';
+    if (s.id === 'sgc') return 'Sismos: usa el visor oficial (deep-link en /oficiales).';
+    if (s.id === 'rnd') {
+      return 'Solo enlace a Medicina Legal. No tenemos base propia de desaparecidos.';
+    }
+    if (s.id === 'ungrd') return 'Portal y datos abiertos históricos (no feed en vivo de afectados).';
+    if (s.id === 'idiger') return 'Gestión del riesgo Bogotá — deep-link.';
+    if (s.id === 'osm') return 'Centros sociales / ONG / albergues vía Overpass (cobertura irregular).';
+    if (s.id === 'curated') return 'Enlaces públicos a redes y organizaciones.';
     return 'Fuente registrada en el sistema.';
   }
 }

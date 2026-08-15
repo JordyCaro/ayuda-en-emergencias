@@ -73,6 +73,7 @@ import { statusLabel } from '../plain-labels';
         <div class="quick">
           <a routerLink="/buscar">Publicar o leer avisos</a>
           <a routerLink="/ayudar">Quiero ayudar</a>
+          <a routerLink="/oficiales">Canales oficiales</a>
           <a routerLink="/ayudar" [queryParams]="{ type: 'DONATION_POINT' }">Llevar ayuda / acopio</a>
           <a href="tel:123">Llamar al 123</a>
         </div>
