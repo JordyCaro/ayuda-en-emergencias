@@ -7,7 +7,7 @@
 
 | | |
 |---|---|
-| **Estado** | Fases **0–7** hechas. Siguiente: **Fase 8** (mascotas perdidas/encontradas). |
+| **Estado** | Fases **0–7** hechas. Siguiente: **Fase 8** (perdidos/encontrados). |
 | **Metodología** | Spec-Driven Development (SDD) — lean |
 | **Forma** | Monorepo pnpm (`apps/frontend`, `apps/backend`, …) |
 
@@ -32,10 +32,9 @@
 1. **Inicio** — qué es, utilidad, conteos reales, fuentes.  
 2. **¿Qué necesitas?** (`/buscar`) — avisos necesito / puedo aportar.  
 3. **Quiero ayudar** (`/ayudar`) — lugares + cómo ayudar + Cerca de mí.  
-4. **Oficiales** (`/oficiales`) — SGC, RND, UNGRD, IDIGER (solo enlaces).  
-5. **Publicar punto** — registro de acopio / org.  
-6. **Fuentes** — procedencia e integración.  
-7. **API** — NestJS `/api/v1` + Swagger.
+4. **Publicar lugar** (`/publicar-punto`) — acopios/bodegas/centros (crecimiento).  
+5. **Orígenes** (`/origenes`) — canales oficiales + integraciones.  
+6. **API** — NestJS `/api/v1` + Swagger.
 
 ---
 

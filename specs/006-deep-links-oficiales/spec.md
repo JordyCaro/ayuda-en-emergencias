@@ -60,7 +60,4 @@
 - [x] SGC / UNGRD / IDIGER enlazados  
 - [x] Roadmap Fase 7 + mascotas prioritarias  
 
-## 6. Dependencias
-
-- Source registry Fase 0.  
-- Mascotas perdidas/encontradas → Fase 8 (elevada).
+**Nota UI (post-entrega):** Oficiales + Fuentes se fusionaron en **`/origenes`**. Redirects desde `/oficiales` y `/fuentes*`.

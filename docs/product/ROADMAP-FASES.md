@@ -6,7 +6,8 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–7 hechas**. Siguiente: **Fase 8** (mascotas perdidas/encontradas — prioritaria).
+**Estado:** fases **0–7 hechas**. Siguiente: **Fase 8** (perdidos/encontrados: mascotas + personas vía canal oficial).  
+**Motor de crecimiento:** `/publicar-punto` (acopios/bodegas/centros de la comunidad) + API pública.
 
 ---
 
@@ -35,7 +36,7 @@ El master condensaba:
 | 5 Moderación | **Fase 9** |
 | + Donaciones | **Fase 5** (solo enlaces a terceros) |
 | + Voluntariado | **Fase 4** (encuentro / deep-link, sin matching de nómina) |
-| + Mascotas perdidas/encontradas | **Fase 8** (**prioritaria**, no marketplace) |
+| + Mascotas / personas perdidas-encontradas | **Fase 8** (mascotas = reportes; personas = RND) |
 | + RND / desaparecidos | **Fase 7** (deep-link oficial; nunca autoridad) |
 | + Offline avanzado | **Fase 12** (última, casi opcional) |
 | + API externa amplia | **Fase 10** (producción + ops) |
@@ -55,10 +56,10 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **4** | Quiero ayudar / voluntariado (enlace) | Lugares + cómo ayudar; sin matching laboral | `003` | **Hecha** |
 | **5** | Descubrimiento llevar ayuda (enlace) | Acopio/especie vía terceros; cero pasarela | `004` | **Hecha** |
 | **6** | Densificación territorial | OSM multi-ciudad; cerca de mí | `005` | **Hecha** |
-| **7** | Deep-links oficiales extra | `/oficiales`: SGC, RND, UNGRD, IDIGER… | `006` | **Hecha** |
-| **8** | Mascotas perdidas / encontradas | Reportes UNVERIFIED de mascotas; no marketplace de servicios | `007+` | **Siguiente (prioritaria)** |
-| **9** | Moderación y confianza operativa | Admin; VERIFIED/REJECTED; sin fingir autoridad | `admin` / slice | Pendiente |
-| **10** | Plataforma de producción | Deploy HTTPS, migraciones, OpenAPI, métricas | infra + harden | Pendiente |
+| **7** | Orígenes / deep-links oficiales | Página unificada canales + estado de integración | `006` | **Hecha** |
+| **8** | Perdidos / encontrados (mascotas + personas) | Mascotas: reportes UNVERIFIED. Personas: flujo hacia RND (sin base propia) | `007+` | **Siguiente** |
+| **9** | Moderación y confianza operativa | Admin; VERIFIED/REJECTED; cuidar Publicar | `admin` / slice | Pendiente |
+| **10** | Plataforma de producción | Deploy HTTPS, migraciones, OpenAPI, API pública madura | infra + harden | Pendiente |
 | **11** | Multi-país / expansión | País #2 con discovery propio | opcional | Opcional |
 | **12** | Offline / PWA avanzada | Cache crítico; cola offline | **Última** | **Casi opcional** |
 
@@ -124,19 +125,25 @@ Spec: `specs/004-donacion-descubrimiento-enlace/` (**APROBADA**).
 - Quiero ayudar: **Cerca de mí** (radio + orden por distancia).  
 Spec: `specs/005-densificacion-territorial/` (**APROBADA**).
 
-### Fase 7 — Deep-links oficiales extra *(hecha — 006)*
+### Fase 7 — Orígenes / deep-links *(hecha — 006)*
 
-- UI `/oficiales`: SGC, RND/SIRDEC, UNGRD, IDIGER, Cruz Roja, 123.  
-- **Personas desaparecidas:** solo enlace a Medicina Legal — sin base propia.  
-- Seed sources `rnd`, `ungrd`, `idiger` (+ `sgc` ya existía).  
-Spec: `specs/006-deep-links-oficiales/` (**APROBADA**).
+- Vista unificada **`/origenes`**: canales oficiales del país + estado de lo que integramos.  
+- Redirects: `/oficiales`, `/fuentes`, `/fuentes-detalle` → `/origenes`.  
+- Personas desaparecidas: enlace a RND/SIRDEC (sin base propia).  
+Spec: `specs/006-deep-links-oficiales/` (**APROBADA**; UI fusionada post-entrega).
 
-### Fase 8 — Mascotas perdidas / encontradas *(siguiente — prioritaria)*
+### Fase 8 — Perdidos / encontrados *(siguiente)*
 
-- Reportar mascota perdida o encontrada (señal `UNVERIFIED`, ciudad, foto opcional más adelante).  
-- **No** es marketplace de veterinaria/paseos.  
-- Moderación humana reforzada en Fase 9.  
-- Slice: `007+` (abrir antes de código).
+- **Mascotas:** reportar perdida/encontrada (`UNVERIFIED`), ciudad, contacto seguro.  
+- **Personas:** no CRUD nuestro — flujo claro hacia RND/SIRDEC + líneas de atención (constitution).  
+- No marketplace de servicios.  
+- Slice: `007+`.
+
+### Publicar (transversal, refuerzo continuo)
+
+- `/publicar-punto` es **capacidad estratégica**: bodegas, colegios, orgs habilitan acopio para la zona.  
+- Alimenta el directorio y la **API pública**; crece con uso real.  
+- Cuidado: rate-limit, expiración, copy claro, moderación (Fase 9).
 
 ### Fase 9 — Moderación
 
@@ -178,9 +185,9 @@ Spec: `specs/006-deep-links-oficiales/` (**APROBADA**).
 | Quiero ayudar / voluntariado enlace | 4 |
 | Donar vía terceros (descubrimiento) | 5 |
 | Densidad municipal + OSM | 6 |
-| RND / SGC / UNGRD UX (personas = solo enlace) | 7 |
-| Mascotas perdidas/encontradas | **8 (prioritaria)** |
-| Moderación humana | 9 |
+| RND / SGC / UNGRD / orígenes unificados | 7 |
+| Mascotas + personas (RND) perdidos/encontrados | **8** |
+| Moderación (cuidar Publicar) | 9 |
 | Deploy + API madura | 10 |
 | Multi-país | 11 (opc.) |
 | Offline avanzado | **12 (casi opc.)** |

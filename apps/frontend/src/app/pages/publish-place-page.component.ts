@@ -22,11 +22,17 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
   template: `
     <section class="page-hero-band">
       <div class="page-wrap">
-        <p class="kicker">Lugares · comunidad</p>
-        <h1>Publicar un punto de ayuda</h1>
+        <p class="kicker">Crece con la comunidad</p>
+        <h1>Publica un lugar donde ayudar</h1>
         <p class="lead">
-          Acopio, albergue, voluntariado u ONG. Nosotros <strong>no recibimos donaciones</strong>:
-          solo mostramos el punto y, si pones URL, el canal de la organización.
+          ¿Tu empresa tiene una bodega? ¿Un colegio recibe mercados? ¿Una org abre acopio por unos
+          días? Publícalo aquí: ciudad, qué reciben y su canal. Así la gente cercana sabe
+          <strong>dónde llevar ayuda</strong>. Nosotros no custodiamos donaciones: solo mostramos el
+          punto.
+        </p>
+        <p class="lead soft">
+          Ese registro comunitario es parte fuerte de la plataforma (junto a la API pública): llena
+          el vacío donde no hay catálogo oficial de acopios.
         </p>
       </div>
     </section>
@@ -190,6 +196,11 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
         max-width: 40rem;
         font-weight: 600;
         opacity: 0.95;
+      }
+      .lead.soft {
+        opacity: 0.8;
+        font-size: 0.98rem;
+        font-weight: 500;
       }
       .body {
         background: var(--cream);

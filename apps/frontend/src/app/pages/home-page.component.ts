@@ -73,8 +73,9 @@ import { statusLabel } from '../plain-labels';
         <div class="quick">
           <a routerLink="/buscar">Publicar o leer avisos</a>
           <a routerLink="/ayudar">Quiero ayudar</a>
-          <a routerLink="/oficiales">Canales oficiales</a>
+          <a routerLink="/origenes">Orígenes</a>
           <a routerLink="/ayudar" [queryParams]="{ type: 'DONATION_POINT' }">Llevar ayuda / acopio</a>
+          <a routerLink="/publicar-punto">Publicar un lugar</a>
           <a href="tel:123">Llamar al 123</a>
         </div>
       </div>
@@ -111,8 +112,8 @@ import { statusLabel } from '../plain-labels';
       <div class="wrap wide">
         <div class="intro">
           <div>
-            <p class="kicker">Fuentes</p>
-            <h2>Datos reales, con procedencia.</h2>
+            <p class="kicker">Orígenes</p>
+            <h2>De dónde sale la información.</h2>
           </div>
           <p class="body">
             En la fase de discovery conectamos APIs y catálogos públicos (salud, hidrología, mapas,
@@ -139,7 +140,7 @@ import { statusLabel } from '../plain-labels';
           Última actualización registrada:
           {{ latestFetch() | date: 'd MMM y, HH:mm' }}
         </p>
-        <a class="more" routerLink="/fuentes-detalle">Ver detalle de fuentes →</a>
+        <a class="more" routerLink="/origenes">Ver orígenes y canales →</a>
       </div>
     </section>
   `,

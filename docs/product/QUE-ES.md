@@ -4,32 +4,37 @@ Documento para humanos (y quien reciba el repo). Léelo antes de mirar el códig
 
 ---
 
-## Propósito exacto (una frase)
+## Propósito exacto
 
-Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integrar, avisos de la comunidad, directorio de acopios/orgs, y **enlaces a canales oficiales**.  
-**No** somos la autoridad de emergencias. **No** pedimos ni custodiamos donaciones. **No** somos el registro de desaparecidos.
+Somos una **capa abierta que conecta**: datos oficiales cuando se integran, avisos de la comunidad, directorio de lugares, y **registro comunitario de dónde ayudar** (acopios, bodegas, centros).  
+**No** somos autoridad. **No** custodiamos donaciones. **No** somos el registro de desaparecidos.
 
 ---
 
-## Superficie (fases 0–7)
+## Superficie
 
 | Pieza | Ruta | Qué hace |
 |-------|------|----------|
-| **Inicio** | `/` | Qué es, utilidad, fuentes |
+| **Inicio** | `/` | Qué es, utilidad |
 | **¿Qué necesitas?** | `/buscar` | Foro Necesito / Puedo aportar |
 | **Quiero ayudar** | `/ayudar` | Lugares + cómo ayudar + Cerca de mí |
-| **Oficiales** | `/oficiales` | Deep-links SGC, RND, UNGRD, IDIGER… |
-| **Publicar punto** | `/publicar-punto` | Registro de acopio / org |
-| **Fuentes** | `/fuentes-detalle` | Estado de integración |
+| **Publicar lugar** | `/publicar-punto` | Motor de crecimiento: acopios/bodegas/centros |
+| **Orígenes** | `/origenes` | Canales oficiales + estado de integraciones |
 
 ---
 
-## Personas vs mascotas
+## Personas vs mascotas (Fase 8)
 
 | Tema | Enfoque |
 |------|---------|
-| **Personas desaparecidas** | Solo **enlace** a Medicina Legal / RND (Fase 7). Sin fichas nuestras. |
-| **Mascotas perdidas/encontradas** | **Fase 8 prioritaria**: reportes comunitarios UNVERIFIED (próximo slice). No marketplace. |
+| **Mascotas** | Reportes comunitarios perdida/encontrada (`UNVERIFIED`) |
+| **Personas** | Canal oficial RND/SIRDEC (sin fichas nuestras — constitution) |
+
+---
+
+## Por qué importa Publicar
+
+Las APIs oficiales no cubren bien “dónde dejar mercados esta semana”. Si una empresa abre su bodega como acopio, **publícalo**: la gente cercana lo ve, el directorio crece y la API pública refleja esa realidad.
 
 ---
 
@@ -38,14 +43,8 @@ Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integra
 | Fase | Estado |
 |------|--------|
 | **0–7** | Hechas |
-| **8** | Mascotas perdidas/encontradas — siguiente |
+| **8** | Perdidos/encontrados (mascotas + personas vía oficial) — siguiente |
 | **9–10** | Moderación → producción |
 | **12** | Offline — casi opcional |
 
 Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
-
----
-
-## Docs
-
-Roadmap · Cómo correr · Fuentes · Specs `001`–`006` · Constitution  

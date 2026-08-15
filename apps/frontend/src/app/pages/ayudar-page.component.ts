@@ -198,7 +198,7 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
           </div>
           <p class="sources-note">
             Datos de orgs públicas, comunidad y catálogos abiertos.
-            <a routerLink="/fuentes-detalle">Ver fuentes</a>
+            <a routerLink="/origenes">Ver orígenes</a>
           </p>
         </aside>
       </div>
