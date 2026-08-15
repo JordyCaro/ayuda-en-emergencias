@@ -6,7 +6,7 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–3 hechas**. Siguiente: **Fase 4** (`003+`).
+**Estado:** fases **0–4 hechas**. Siguiente: **Fase 5** (donación solo enlace).
 
 ---
 
@@ -51,7 +51,7 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **1** | Foundation + núcleo accionable | Monorepo, API, PostGIS, PWA, avisos, mapa, Confianza, IDEAM | `001` | **Hecha** |
 | **2** | Connectors oficiales + Places | SISPRO/REPS → Places salud; modelo Place; filtros; sync robusto | post-001 | **Hecha (robusta)** |
 | **3** | Registro fácil de lugares / orgs | Acopio, fundaciones, ONG; filtro ciudad (DIVIPOLA); listado “quién necesita apoyo”; expiración | `002` | **Hecha** |
-| **4** | Quiero ayudar / voluntariado (enlace) | Flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs; sin intermediación laboral | `003+` | Pendiente |
+| **4** | Quiero ayudar / voluntariado (enlace) | Flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs; sin intermediación laboral | `003` | **Hecha** |
 | **5** | Descubrimiento de donación (solo enlace) | Mostrar *dónde* donar en canales de terceros (sitios/orgs verificables); **cero** pasarela ni custodia | `004+` | Pendiente |
 | **6** | Densificación territorial | Connectors municipales (Cali/Medellín/Bogotá…), OSM amenities cacheado, cobertura multi-depto | `005+` | Pendiente |
 | **7** | Deep-links y datos oficiales extra | UX a SGC/RND/UNGRD/IDIGER según registry; connectors solo si dejan de estar `BLOCKED`/`LEGAL_REVIEW` | docs + slice | Pendiente |
@@ -101,13 +101,15 @@ Spec: `specs/002-registro-facil-lugares/` (**APROBADA**).
 
 **UX post-002 (sin cambiar el outcome):** nav centrada en **¿Qué necesitas?** (foro de avisos) + **Ayudar** (directorio) + **Fuentes**; home con utilidad temprana y stats/API reales. El mapa ya no es la puerta principal.
 
-### Fase 4 — Quiero ayudar / voluntariado (enlace) *(siguiente)*
+### Fase 4 — Quiero ayudar / voluntariado (enlace) *(hecha — 003)*
 
-- Formalizar en slice `003+` el flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs.  
-- Hoy hay **CTAs y directorio** que anticipan parte del outcome; falta contrato SDD y cierre explícito (sin matching laboral).  
-- No: bolsa de empleo, nómina, ni “asignamos voluntarios”.
+- Hub `/ayudar` (alias `/quiero-ayudar`): tabs **Avisos** (NEED) + **Lugares**.  
+- Contacto directo: WhatsApp del aviso o canal externo del Place.  
+- CTA “Puedo aportar” → `/buscar?intent=OFFER`.  
+- Copy: no matching laboral; no donaciones nuestras.  
+Spec: `specs/003-quiero-ayudar-enlace/` (**APROBADA**).
 
-### Fase 5 — Donación solo como descubrimiento
+### Fase 5 — Donación solo como descubrimiento *(siguiente)*
 
 - Fichas/listados con `donationUrl` / canales de terceros.  
 - UI que deje explícito: la donación ocurre fuera.  
@@ -190,7 +192,8 @@ Spec: `specs/002-registro-facil-lugares/` (**APROBADA**).
 |-------|-----------------|
 | `001-mvp-mapa-ayuda` | 1 (+ arranque hacia 2) |
 | `002-registro-facil-lugares` | 3 |
-| Futuros `003+` | 4, 5, 6… una capacidad vertical por slice |
+| `003-quiero-ayudar-enlace` | 4 |
+| Futuros `004+` | 5, 6… una capacidad vertical por slice |
 | Docs-only / infra | 0, partes de 7 y 9 |
 
 Si una idea está en este roadmap pero **OUT** del slice activo → no implementar; abrir o avanzar el slice correcto.

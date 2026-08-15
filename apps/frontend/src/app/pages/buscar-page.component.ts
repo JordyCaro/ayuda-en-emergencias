@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import type { CityDto, NeedCategory, NeedDto, NeedIntent } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { CITY_CHIPS, FORUM_CATEGORIES, forumCatLabel } from '../help-categories';
@@ -738,6 +738,7 @@ const DEMO: NeedDto[] = [
 })
 export class BuscarPageComponent implements OnInit {
   private readonly api = inject(ApiService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly cats = FORUM_CATEGORIES;
   readonly cityChips = CITY_CHIPS;
@@ -763,6 +764,12 @@ export class BuscarPageComponent implements OnInit {
     this.api.cities().subscribe({
       next: (res) => this.cities.set(res.data),
       error: () => undefined,
+    });
+    this.route.queryParamMap.subscribe((q) => {
+      const intent = q.get('intent');
+      if (intent === 'OFFER' || intent === 'NEED') {
+        this.setIntent(intent);
+      }
     });
   }
 

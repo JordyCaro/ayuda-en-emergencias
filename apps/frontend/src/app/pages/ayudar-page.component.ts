@@ -12,13 +12,22 @@ import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import type { CityDto, NeedTag, PlaceDto, PlaceType } from '@aee/shared-types';
+import type {
+  CityDto,
+  NeedCategory,
+  NeedDto,
+  NeedTag,
+  PlaceDto,
+  PlaceType,
+} from '@aee/shared-types';
 import maplibregl, { Map, Marker } from 'maplibre-gl';
 import { ApiService } from '../api.service';
 import {
   CITY_CHIPS,
+  FORUM_CATEGORIES,
   HELP_CATEGORIES,
   PLACE_KIND_FILTERS,
+  forumCatLabel,
   needTagLabel,
 } from '../help-categories';
 import { placeTypeLabel } from '../plain-labels';
@@ -36,25 +45,27 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
     <section class="page-hero-band">
       <div class="page-wrap hero-grid">
         <div>
-          <p class="kicker">Ayudar · Colombia</p>
-          <h1>Dónde ayudar ahora</h1>
+          <p class="kicker">Quiero ayudar</p>
+          <h1>Sumarte sin intermediarios</h1>
           <p class="lead">
-            Centros de acopio, Cruz Roja, hospitales, sangre, voluntariado y albergues. Filtra y abre
-            el mapa en el lugar. <strong>No recibimos donaciones</strong>: el enlace es el canal de
-            ellos.
+            Responde avisos de quien necesita o abre el canal de un acopio / org. Nosotros
+            <strong>no asignamos voluntarios</strong> ni recibimos donaciones: el contacto es entre
+            ustedes.
           </p>
           <p class="stamp" *ngIf="updatedHint()">Actualizado: {{ updatedHint() }}</p>
           <div class="toolbar">
-            <a class="cta" routerLink="/buscar">¿Qué necesitas?</a>
+            <a class="cta" routerLink="/buscar" [queryParams]="{ intent: 'OFFER' }"
+              >Puedo aportar</a
+            >
             <a class="ghost" routerLink="/publicar-punto">Publicar un lugar</a>
           </div>
         </div>
         <aside class="hero-side panel-card">
           <p class="side-k">Cómo usarlo</p>
           <ul>
-            <li>Filtra por ciudad y qué se necesita</li>
-            <li>El mapa guía es un complemento</li>
-            <li>“Cómo llegar” abre el mapa aquí mismo</li>
+            <li>Avisos: WhatsApp directo si lo dejaron</li>
+            <li>Lugares: su canal o Cómo llegar</li>
+            <li>No hay matching ni turnos nuestros</li>
           </ul>
         </aside>
       </div>
@@ -63,8 +74,36 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
     <section class="page-body">
       <div class="page-wrap layout">
         <div class="main-col">
+          <div class="tabs" role="tablist" aria-label="Cómo ayudar">
+            <button
+              type="button"
+              role="tab"
+              class="tab"
+              [class.on]="tab === 'needs'"
+              [attr.aria-selected]="tab === 'needs'"
+              (click)="setTab('needs')"
+            >
+              Avisos
+            </button>
+            <button
+              type="button"
+              role="tab"
+              class="tab"
+              [class.on]="tab === 'places'"
+              [attr.aria-selected]="tab === 'places'"
+              (click)="setTab('places')"
+            >
+              Lugares
+            </button>
+          </div>
+          <p class="disclaimer">
+            Conectamos señales y enlaces. No prometemos que alguien responda ni gestionamos turnos o
+            donaciones.
+          </p>
+
           <div class="filters panel-card">
-            <p class="label">Qué se necesita</p>
+            <p class="label" *ngIf="tab === 'places'">Qué se necesita</p>
+            <p class="label" *ngIf="tab === 'needs'">Categoría del aviso</p>
             <div class="chips">
               <button type="button" class="chip" [class.on]="!tag" (click)="setTag('')">Todos</button>
               <button
@@ -78,18 +117,20 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
               </button>
             </div>
 
-            <p class="label">Tipo de lugar</p>
-            <div class="chips">
-              <button
-                type="button"
-                class="chip soft"
-                *ngFor="let k of kinds"
-                [class.on]="placeType === k.id"
-                (click)="setType(k.id)"
-              >
-                {{ k.label }}
-              </button>
-            </div>
+            <ng-container *ngIf="tab === 'places'">
+              <p class="label">Tipo de lugar</p>
+              <div class="chips">
+                <button
+                  type="button"
+                  class="chip soft"
+                  *ngFor="let k of kinds"
+                  [class.on]="placeType === k.id"
+                  (click)="setType(k.id)"
+                >
+                  {{ k.label }}
+                </button>
+              </div>
+            </ng-container>
 
             <p class="label">Ciudad</p>
             <div class="chips">
@@ -115,56 +156,107 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
           </div>
 
           <p class="toast err" *ngIf="error()">{{ error() }}</p>
-          <p class="count" *ngIf="!loading()">
-            {{ places().length }} lugar{{ places().length === 1 ? '' : 'es' }}
-            <span *ngIf="cityLabel()"> · {{ cityLabel() }}</span>
-            <span *ngIf="tag"> · {{ needTagLabel(tag) }}</span>
-          </p>
 
-          <ul class="feed" *ngIf="places().length; else empty">
-            <li *ngFor="let p of places()">
-              <article class="card" (click)="focusPlace(p)">
-                <div class="top">
-                  <div class="who">
-                    <span class="avatar" aria-hidden="true">{{ initials(p.title) }}</span>
-                    <div>
-                      <h2>{{ p.title }}</h2>
-                      <p class="kind">{{ placeTypeLabel(p.type) }}</p>
+          <ng-container *ngIf="tab === 'needs'">
+            <p class="count" *ngIf="!loading()">
+              {{ needs().length }} aviso{{ needs().length === 1 ? '' : 's' }} de necesidad
+              <span *ngIf="cityLabel()"> · {{ cityLabel() }}</span>
+            </p>
+            <ul class="feed" *ngIf="needs().length; else emptyNeeds">
+              <li *ngFor="let n of needs()">
+                <article class="card need">
+                  <div class="top">
+                    <div class="who">
+                      <span class="avatar need-av" aria-hidden="true">{{ needInitials(n) }}</span>
+                      <div>
+                        <h2>{{ needTitle(n) }}</h2>
+                        <p class="kind">{{ forumCatLabel(n.category) }} · sin verificar</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <p class="desc">{{ cleanDesc(p.description) }}</p>
-                <div class="tags" *ngIf="p.needTags?.length">
-                  <span *ngFor="let t of p.needTags">{{ needTagLabel(t) }}</span>
-                </div>
-                <div class="foot">
-                  <span
-                    >{{ p.municipality || 'Colombia'
-                    }}<ng-container *ngIf="p.department"> · {{ p.department }}</ng-container></span
-                  >
-                  <span *ngIf="p.updatedAt">{{ p.updatedAt | date: 'd MMM, HH:mm' }}</span>
-                </div>
-                <div class="actions" (click)="$event.stopPropagation()">
-                  <a
-                    *ngIf="p.externalUrl"
-                    class="btn"
-                    [href]="p.externalUrl"
-                    target="_blank"
-                    rel="noopener"
-                    >Ir a su canal</a
-                  >
-                  <button type="button" class="btn soft" (click)="openDirections(p)">Cómo llegar</button>
-                </div>
-              </article>
-            </li>
-          </ul>
-          <ng-template #empty>
-            <div class="empty panel-card" *ngIf="!loading()">
-              <strong>No hay lugares con esos filtros todavía.</strong>
-              <p>Prueba otra ciudad o publica un punto. Hospitales: ciudad + Medicinas.</p>
-              <a routerLink="/publicar-punto" class="cta">Publicar un lugar</a>
-            </div>
-          </ng-template>
+                  <p class="desc">{{ n.description }}</p>
+                  <div class="foot">
+                    <span>{{ n.municipality || 'Colombia' }}</span>
+                    <span>{{ n.createdAt | date: 'd MMM, HH:mm' }}</span>
+                  </div>
+                  <div class="actions">
+                    <a
+                      *ngIf="n.contactWhatsapp"
+                      class="btn"
+                      [href]="waUrl(n)"
+                      target="_blank"
+                      rel="noopener"
+                      >WhatsApp</a
+                    >
+                    <span class="no-wa" *ngIf="!n.contactWhatsapp">Sin WhatsApp en este aviso</span>
+                  </div>
+                </article>
+              </li>
+            </ul>
+            <ng-template #emptyNeeds>
+              <div class="empty panel-card" *ngIf="!loading()">
+                <strong>No hay avisos de necesidad con esos filtros.</strong>
+                <p>Prueba otra ciudad o publica un aporte si puedes ayudar.</p>
+                <a class="cta" routerLink="/buscar" [queryParams]="{ intent: 'OFFER' }"
+                  >Puedo aportar</a
+                >
+              </div>
+            </ng-template>
+          </ng-container>
+
+          <ng-container *ngIf="tab === 'places'">
+            <p class="count" *ngIf="!loading()">
+              {{ places().length }} lugar{{ places().length === 1 ? '' : 'es' }}
+              <span *ngIf="cityLabel()"> · {{ cityLabel() }}</span>
+              <span *ngIf="tag"> · {{ needTagLabel(tag) }}</span>
+            </p>
+            <ul class="feed" *ngIf="places().length; else empty">
+              <li *ngFor="let p of places()">
+                <article class="card" (click)="focusPlace(p)">
+                  <div class="top">
+                    <div class="who">
+                      <span class="avatar" aria-hidden="true">{{ initials(p.title) }}</span>
+                      <div>
+                        <h2>{{ p.title }}</h2>
+                        <p class="kind">{{ placeTypeLabel(p.type) }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="desc">{{ cleanDesc(p.description) }}</p>
+                  <div class="tags" *ngIf="p.needTags?.length">
+                    <span *ngFor="let t of p.needTags">{{ needTagLabel(t) }}</span>
+                  </div>
+                  <div class="foot">
+                    <span
+                      >{{ p.municipality || 'Colombia'
+                      }}<ng-container *ngIf="p.department"> · {{ p.department }}</ng-container></span
+                    >
+                    <span *ngIf="p.updatedAt">{{ p.updatedAt | date: 'd MMM, HH:mm' }}</span>
+                  </div>
+                  <div class="actions" (click)="$event.stopPropagation()">
+                    <a
+                      *ngIf="p.externalUrl"
+                      class="btn"
+                      [href]="p.externalUrl"
+                      target="_blank"
+                      rel="noopener"
+                      >Ir a su canal</a
+                    >
+                    <button type="button" class="btn soft" (click)="openDirections(p)">
+                      Cómo llegar
+                    </button>
+                  </div>
+                </article>
+              </li>
+            </ul>
+            <ng-template #empty>
+              <div class="empty panel-card" *ngIf="!loading()">
+                <strong>No hay lugares con esos filtros todavía.</strong>
+                <p>Prueba otra ciudad o publica un punto.</p>
+                <a routerLink="/publicar-punto" class="cta">Publicar un lugar</a>
+              </div>
+            </ng-template>
+          </ng-container>
         </div>
 
         <aside class="side-col">
@@ -296,6 +388,41 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
           position: sticky;
           top: calc(var(--nav-h) + 0.75rem);
         }
+      }
+      .tabs {
+        display: flex;
+        gap: 0.35rem;
+        margin-bottom: 0.65rem;
+      }
+      .tab {
+        flex: 1;
+        min-height: 44px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--white);
+        font-weight: 800;
+        cursor: pointer;
+        color: var(--ink-soft);
+      }
+      .tab.on {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .disclaimer {
+        margin: 0 0 0.85rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .no-wa {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .avatar.need-av {
+        background: #e4574c;
       }
       .filters {
         margin-bottom: 0.85rem;
@@ -594,17 +721,20 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cityChips = CITY_CHIPS;
   readonly cities = signal<CityDto[]>([]);
   readonly places = signal<PlaceDto[]>([]);
+  readonly needs = signal<NeedDto[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly updatedHint = signal<string | null>(null);
   readonly directions = signal<PlaceDto | null>(null);
 
+  tab: 'needs' | 'places' = 'needs';
   tag: NeedTag | '' = '';
   placeType: PlaceType | '' = '';
   cityCode = '';
 
   readonly placeTypeLabel = placeTypeLabel;
   readonly needTagLabel = needTagLabel;
+  readonly forumCatLabel = forumCatLabel;
 
   ngOnInit(): void {
     this.api.cities().subscribe({
@@ -612,10 +742,12 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
       error: () => undefined,
     });
     this.route.queryParamMap.subscribe((q) => {
+      const tab = q.get('tab');
+      this.tab = tab === 'places' ? 'places' : tab === 'needs' ? 'needs' : this.tab;
       const tag = q.get('tag') as NeedTag | null;
       const city = q.get('city');
       this.tag = tag && HELP_CATEGORIES.some((c) => c.id === tag) ? tag : '';
-      this.cityCode = city && /^\d{5}$/.test(city) ? city : '';
+      this.cityCode = city && /^\d{5}$/.test(city) ? city : this.cityCode;
       this.reload();
     });
   }
@@ -629,6 +761,11 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.clearMarkers();
     this.map?.remove();
     this.map = null;
+  }
+
+  setTab(t: 'needs' | 'places'): void {
+    this.tab = t;
+    this.reload();
   }
 
   setTag(t: NeedTag | ''): void {
@@ -646,6 +783,32 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reload();
   }
 
+  needTitle(n: NeedDto): string {
+    const cat = forumCatLabel(n.category);
+    return n.municipality ? `${cat} · ${n.municipality}` : cat;
+  }
+
+  needInitials(n: NeedDto): string {
+    return (forumCatLabel(n.category)[0] ?? '?').toUpperCase();
+  }
+
+  waUrl(n: NeedDto): string {
+    const phone = (n.contactWhatsapp ?? '').replace(/\D/g, '');
+    const text = encodeURIComponent(
+      `Hola, vi tu aviso en Ayuda en Emergencias (${forumCatLabel(n.category)}). ¿Sigues necesitando ayuda?`,
+    );
+    return `https://wa.me/${phone}?text=${text}`;
+  }
+
+  private needCategoryFromTag(tag: NeedTag | ''): NeedCategory | undefined {
+    if (!tag) return undefined;
+    if (tag === 'MEDICINE') return 'MEDICAL';
+    if (FORUM_CATEGORIES.some((c) => c.id === (tag as NeedCategory))) {
+      return tag as NeedCategory;
+    }
+    return 'OTHER';
+  }
+
   cityLabel(): string | null {
     if (!this.cityCode) return 'Todo el país';
     const chip = CITY_CHIPS.find((c) => c.code === this.cityCode);
@@ -661,7 +824,7 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   cleanDesc(description: string | null | undefined): string {
     const raw = (description ?? '').trim();
-    if (!raw) return 'Toca “Cómo llegar” o “Street View” para ubicarlo. Si hay canal, abre su sitio.';
+    if (!raw) return 'Abre su canal o usa Cómo llegar para ubicarlo.';
     return raw
       .replace(/\bOpenStreetMap\b/gi, '')
       .replace(/\bOSM\b/g, '')
@@ -713,6 +876,31 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
   reload(): void {
     this.loading.set(true);
     this.error.set(null);
+    this.updatedHint.set(
+      new Date().toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }),
+    );
+
+    if (this.tab === 'needs') {
+      this.api
+        .needs({
+          intent: 'NEED',
+          category: this.needCategoryFromTag(this.tag),
+          cityCode: this.cityCode || undefined,
+        })
+        .subscribe({
+          next: (res) => {
+            this.needs.set(res.data.filter((n) => n.intent !== 'OFFER'));
+            this.loading.set(false);
+          },
+          error: () => {
+            this.loading.set(false);
+            this.needs.set([]);
+            this.error.set('No pudimos cargar los avisos. ¿Está el API en :3000?');
+          },
+        });
+      return;
+    }
+
     const params: {
       origin: 'all';
       helpOnly: boolean;
@@ -742,13 +930,9 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         }
         data = data.filter((p) => !isLowSignalPlace(p));
-        // Priorizar puntos útiles de ayuda sobre ruido genérico
         data = [...data].sort((a, b) => scorePlace(b) - scorePlace(a));
         this.places.set(data);
         this.loading.set(false);
-        this.updatedHint.set(
-          new Date().toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }),
-        );
         queueMicrotask(() => this.syncMarkers());
       },
       error: () => {

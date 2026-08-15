@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: 'buscar', component: BuscarPageComponent },
   { path: 'necesito-ayuda', redirectTo: 'buscar', pathMatch: 'full' },
   { path: 'ayudar', component: AyudarPageComponent },
+  { path: 'quiero-ayudar', redirectTo: 'ayudar', pathMatch: 'full' },
   { path: 'fuentes', redirectTo: 'fuentes-detalle', pathMatch: 'full' },
   { path: 'confianza', redirectTo: 'fuentes-detalle', pathMatch: 'full' },
   { path: 'mapa', redirectTo: 'ayudar', pathMatch: 'full' },

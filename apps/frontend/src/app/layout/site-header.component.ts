@@ -31,7 +31,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
             Inicio
           </a>
           <a routerLink="/buscar" routerLinkActive="on" (click)="close()">¿Qué necesitas?</a>
-          <a routerLink="/ayudar" routerLinkActive="on" (click)="close()">Ayudar</a>
+          <a routerLink="/ayudar" routerLinkActive="on" (click)="close()">Quiero ayudar</a>
           <a routerLink="/publicar-punto" routerLinkActive="on" (click)="close()">Publicar</a>
           <a routerLink="/fuentes-detalle" routerLinkActive="on" (click)="close()">Fuentes</a>
         </nav>
