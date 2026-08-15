@@ -8,7 +8,9 @@
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "node --test test/geo.test.cjs"
+    "test": "node --test test/geo.test.cjs",
+    "migration:run": "node dist/database/run-migrations.js",
+    "migration:run:dev": "pnpm build && node dist/database/run-migrations.js"
   },
   "dependencies": {
     "@aee/shared-types": "workspace:*",

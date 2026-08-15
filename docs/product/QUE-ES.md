@@ -43,8 +43,8 @@ Las APIs oficiales no cubren bien “dónde dejar mercados esta semana”. Si un
 
 | Fase | Estado |
 |------|--------|
-| **0–9** | Hechas |
-| **10** | Producción — siguiente |
+| **0–10** | Hechas (deploy cloud = checklist operador) |
+| **11** | Multi-país — opcional |
 | **12** | Offline — casi opcional |
 
 Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)

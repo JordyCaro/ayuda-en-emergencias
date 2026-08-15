@@ -30,12 +30,22 @@ export interface NationalSyncResult {
   skipped: boolean;
 }
 
+export interface ConnectorStatusSnapshot {
+  running: { ideam: boolean; sispro: boolean; national: boolean };
+  last: {
+    ideam?: { at: string; ok: boolean; detail?: string };
+    sispro?: { at: string; ok: boolean; detail?: string };
+    national?: { at: string; ok: boolean; detail?: string };
+  };
+}
+
 @Injectable()
 export class ConnectorRunnerService {
   private readonly logger = new Logger(ConnectorRunnerService.name);
   private ideamRunning = false;
   private sisproRunning = false;
   private nationalRunning = false;
+  private readonly last: ConnectorStatusSnapshot['last'] = {};
 
   constructor(
     private readonly ideam: IdeamConnector,
@@ -87,6 +97,17 @@ export class ConnectorRunnerService {
     if (n > 0) this.logger.log(`Expired ${n} stale places`);
   }
 
+  getStatus(): ConnectorStatusSnapshot {
+    return {
+      running: {
+        ideam: this.ideamRunning,
+        sispro: this.sisproRunning,
+        national: this.nationalRunning,
+      },
+      last: { ...this.last },
+    };
+  }
+
   async runIdeam(): Promise<{ eventsUpserted: number; skipped: boolean }> {
     if (this.ideamRunning) {
       this.logger.warn('IDEAM fetch already running — skip');
@@ -116,11 +137,17 @@ export class ConnectorRunnerService {
 
       await this.sources.markFetchSuccess('ideam');
       this.logger.log(`IDEAM OK — ${normalized.length} events upserted`);
+      this.last.ideam = {
+        at: new Date().toISOString(),
+        ok: true,
+        detail: `eventsUpserted=${normalized.length}`,
+      };
       return { eventsUpserted: normalized.length, skipped: false };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.error(`IDEAM fetch failed: ${message}`);
       await this.sources.markFetchError('ideam', message);
+      this.last.ideam = { at: new Date().toISOString(), ok: false, detail: message };
       throw err;
     } finally {
       this.ideamRunning = false;
@@ -186,6 +213,11 @@ export class ConnectorRunnerService {
         `SISPRO OK — ${placesUpserted} places upserted` +
           (truncated ? ' (truncated: hit page cap)' : ''),
       );
+      this.last.sispro = {
+        at: new Date().toISOString(),
+        ok: true,
+        detail: `placesUpserted=${placesUpserted};truncated=${truncated}`,
+      };
       return {
         placesUpserted,
         skipped: false,
@@ -196,6 +228,7 @@ export class ConnectorRunnerService {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.error(`SISPRO fetch failed: ${message}`);
       await this.sources.markFetchError('sispro', message);
+      this.last.sispro = { at: new Date().toISOString(), ok: false, detail: message };
       throw err;
     } finally {
       this.sisproRunning = false;
@@ -284,6 +317,11 @@ export class ConnectorRunnerService {
       this.logger.log(
         `National sync done — SISPRO cities=${sisproCities} places=${sisproPlaces}; OSM cities=${osmCities} places=${osmPlaces}`,
       );
+      this.last.national = {
+        at: new Date().toISOString(),
+        ok: true,
+        detail: `sisproPlaces=${sisproPlaces};osmPlaces=${osmPlaces}`,
+      };
       return {
         sispro: { cities: sisproCities, placesUpserted: sisproPlaces },
         osm: { cities: osmCities, placesUpserted: osmPlaces },

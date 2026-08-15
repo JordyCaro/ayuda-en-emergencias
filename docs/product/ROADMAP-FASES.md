@@ -6,7 +6,7 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–9 hechas**. Siguiente: **Fase 10** (producción y API madura).  
+**Estado:** fases **0–10 hechas** (deploy cloud = checklist del operador). Siguiente opcional: **Fase 11** (multi-país) o **12** (offline).  
 **Motor de crecimiento:** `/publicar-punto` (acopios/bodegas/centros de la comunidad) + API pública.
 
 ---
@@ -57,9 +57,9 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **5** | Descubrimiento llevar ayuda (enlace) | Acopio/especie vía terceros; cero pasarela | `004` | **Hecha** |
 | **6** | Densificación territorial | OSM multi-ciudad; cerca de mí | `005` | **Hecha** |
 | **7** | Orígenes / deep-links oficiales | Página unificada canales + estado de integración | `006` | **Hecha** |
-| **8** | Perdidos / encontrados (mascotas + personas) | Mascotas: reportes UNVERIFIED. Personas: flujo hacia RND (sin base propia) | `007+` | **Siguiente** |
-| **9** | Moderación y confianza operativa | Admin; VERIFIED/REJECTED; cuidar Publicar | `admin` / slice | Pendiente |
-| **10** | Plataforma de producción | Deploy HTTPS, migraciones, OpenAPI, API pública madura | infra + harden | Pendiente |
+| **8** | Perdidos / encontrados | Mascotas UNVERIFIED; personas → RND | `007` | **Hecha** |
+| **9** | Cierre comunitario (sin moderador) | Enlace secreto `/cerrar`; sin panel admin | `008` | **Hecha** |
+| **10** | Plataforma de producción | Migraciones, Docker prod, health, connectors status, OpenAPI, checklist deploy | `009` | **Hecha** (hosting = operador) |
 | **11** | Multi-país / expansión | País #2 con discovery propio | opcional | Opcional |
 | **12** | Offline / PWA avanzada | Cache crítico; cola offline | **Última** | **Casi opcional** |
 
@@ -151,14 +151,15 @@ Spec: `specs/006-deep-links-oficiales/` (**APROBADA**; UI fusionada post-entrega
 - Sin panel de moderación en el producto público.  
 - Spec: `specs/008-moderacion/` (**APROBADA**, pivote self-close).
 
-### Fase 10 — Producción y API madura *(siguiente)*
+### Fase 10 — Producción y API madura ✅
 
-- Deploy real (HTTPS, backups, secretos).  
-- Migraciones TypeORM (sin `synchronize` en prod).  
-- Observabilidad de connectors.  
-- OpenAPI = contrato real.
+- Migraciones TypeORM baseline + `synchronize` off en prod.  
+- Docker prod (`Dockerfile.backend`, `docker-compose.prod.yml`).  
+- Health `live` / `ready`; `GET /connectors/status`; `OPS_TOKEN` en connectors.  
+- Checklist deploy: `infra/deploy/README.md` (HTTPS/secretos/backups = operador).  
+- Spec: `specs/009-produccion/` (**APROBADA**).
 
-### Fase 11 — Multi-país
+### Fase 11 — Multi-país *(opcional)*
 
 - Reusar modelo `country` + discovery Fase 0 por país.
 

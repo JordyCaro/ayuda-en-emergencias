@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { mkdirSync, writeFileSync } from 'fs';
+import { dirname, join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -18,10 +20,23 @@ async function bootstrap() {
 
   const swagger = new DocumentBuilder()
     .setTitle('Ayuda en Emergencias API')
-    .setDescription('API pública v1 — MVP 001 + Fase 2 (Places / SISPRO)')
-    .setVersion('0.2.0')
+    .setDescription(
+      'API pública v1 — capas de emergencia (avisos, lugares, mascotas, connectors).',
+    )
+    .setVersion('1.0.0')
     .build();
-  SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, swagger));
+  const document = SwaggerModule.createDocument(app, swagger);
+  SwaggerModule.setup('api/docs', app, document);
+
+  if (process.env.OPENAPI_EXPORT === 'true') {
+    const out =
+      process.env.OPENAPI_EXPORT_PATH ??
+      join(process.cwd(), '../../specs/009-produccion/contracts/openapi-v1.json');
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, JSON.stringify(document, null, 2), 'utf8');
+    // eslint-disable-next-line no-console
+    console.log(`OpenAPI exported → ${out}`);
+  }
 
   const port = Number(process.env.API_PORT ?? 3000);
   await app.listen(port);

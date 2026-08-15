@@ -1,0 +1,45 @@
+# Producción local / VPS: PostGIS + API
+# Uso: docker compose -f infra/docker/docker-compose.prod.yml up -d --build
+# Requiere .env en la raíz del monorepo.
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: aee-postgis-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aee}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-ayuda_emergencias}
+    volumes:
+      - aee_pgdata_prod:/var/lib/postgresql/data
+      - ./init-postgis.sql:/docker-entrypoint-initdb.d/01-postgis.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aee} -d ${POSTGRES_DB:-ayuda_emergencias}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.backend
+    container_name: aee-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      API_PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-aee}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ayuda_emergencias}
+      API_CORS_ORIGIN: ${API_CORS_ORIGIN:-*}
+      OPS_TOKEN: ${OPS_TOKEN:-}
+      MODERATION_TOKEN: ${MODERATION_TOKEN:-}
+      TYPEORM_MIGRATIONS_RUN: "true"
+      TYPEORM_SYNCHRONIZE: "false"
+    ports:
+      - "${API_PORT:-3000}:3000"
+
+volumes:
+  aee_pgdata_prod:

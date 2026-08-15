@@ -7,7 +7,7 @@
 
 | | |
 |---|---|
-| **Estado** | Fases **0–9** hechas. Siguiente: **Fase 10** (producción). |
+| **Estado** | Fases **0–10** hechas. Opcional: **11** multi-país · **12** offline. |
 | **Metodología** | Spec-Driven Development (SDD) — lean |
 | **Forma** | Monorepo pnpm (`apps/frontend`, `apps/backend`, …) |
 
@@ -22,7 +22,7 @@
 | **Roadmap** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
 | **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
 | **Agente de IA** | [`AGENTS.md`](AGENTS.md) |
-| **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`008`](specs/008-moderacion/) |
+| **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`009`](specs/009-produccion/) |
 | **Reglas** | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) |
 
 ---

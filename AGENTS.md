@@ -18,13 +18,13 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 ## Antes de escribir código de producto
 
 1. Leer `.specify/memory/constitution.md`  
-2. Slice activo: `001`–`008` hechos; siguiente **Fase 10** (producción) → `specs/009+`  
+2. Slice activo: `001`–`009` hechos; siguientes opcionales **11** (multi-país) / **12** (offline).  
    - Personas: **nunca** base propia de desaparecidos (constitution).  
    - Publicar lugar = capacidad estratégica de crecimiento.  
 3. Leer `spec.md` → `plan.md` → `tasks.md`  
 4. Si el pedido contradice OUT del spec o la constitution → **parar y preguntar**  
 5. No implementar OUT del slice activo  
-6. Roadmap: `docs/product/ROADMAP-FASES.md` — **offline = fase 12, casi opcional**  
+6. Roadmap: `docs/product/ROADMAP-FASES.md` — **offline = fase 12, casi opcional**
 
 ## Mapa mental del monorepo
 
@@ -65,7 +65,7 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 
 ## Estado del proyecto
 
-Fases **0–9** hechas. Siguiente: **Fase 10** (producción).  
-Superficie: `/` · `/buscar` · `/ayudar` · `/perdidos` · `/publicar-punto` · `/origenes` · `/cerrar` (enlace privado).  
+Fases **0–10** hechas. Opcional: **11** multi-país · **12** offline.  
+Superficie: `/` · `/buscar` · `/ayudar` · `/perdidos` · `/publicar-punto` · `/origenes` · `/cerrar`.  
 Publicar lugar = motor de crecimiento (acopios comunitarios + API).  
 Offline = **12**.

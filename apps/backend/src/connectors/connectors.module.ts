@@ -9,6 +9,7 @@ import { EventsModule } from '../events/events.module';
 import { SourcesModule } from '../sources/sources.module';
 import { PlacesModule } from '../places/places.module';
 import { RawRecordEntity } from '../events/raw-record.entity';
+import { OpsTokenGuard } from '../common/ops-token.guard';
 
 @Module({
   imports: [
@@ -18,7 +19,13 @@ import { RawRecordEntity } from '../events/raw-record.entity';
     TypeOrmModule.forFeature([RawRecordEntity]),
   ],
   controllers: [ConnectorsController],
-  providers: [IdeamConnector, SisproConnector, OsmHelpConnector, ConnectorRunnerService],
+  providers: [
+    IdeamConnector,
+    SisproConnector,
+    OsmHelpConnector,
+    ConnectorRunnerService,
+    OpsTokenGuard,
+  ],
 })
 export class ConnectorsModule implements OnModuleInit {
   constructor(private readonly runner: ConnectorRunnerService) {}
