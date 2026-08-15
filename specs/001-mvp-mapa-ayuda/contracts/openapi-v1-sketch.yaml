@@ -231,6 +231,20 @@ paths:
           description: Invalid bbox
         '429':
           description: Rate limited
+  /geo/cities:
+    get:
+      summary: DIVIPOLA city catalog (curated subset)
+      operationId: listCities
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Cities
 components:
   parameters:
     id:
@@ -406,11 +420,11 @@ components:
               maxItems: 2
     CreatePlaceRequest:
       type: object
-      required: [type, title, geometry]
+      required: [type, title, geometry, cityCode]
       properties:
         type:
           type: string
-          enum: [HELP_CENTER, DONATION_POINT, SHELTER, VOLUNTEER_POINT, MEDICAL, MEETING_POINT, OTHER]
+          enum: [HELP_CENTER, DONATION_POINT, SHELTER, VOLUNTEER_POINT, MEETING_POINT, OTHER]
         title:
           type: string
           maxLength: 512
@@ -420,6 +434,10 @@ components:
         geometry:
           type: object
           description: GeoJSON Point
+        cityCode:
+          type: string
+          pattern: '^[0-9]{5}$'
+          description: DIVIPOLA 5-digit code
         externalUrl:
           type: string
           format: uri

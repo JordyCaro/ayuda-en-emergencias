@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # version comes from package.json "packageManager" (avoid dual-version error)
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @aee/shared-types build
       - run: pnpm --filter @aee/backend build
-      - run: pnpm --filter @aee/frontend build -- --configuration=development
+      - run: pnpm --filter @aee/backend test
+      - run: pnpm --filter @aee/frontend build

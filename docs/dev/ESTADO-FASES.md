@@ -15,7 +15,7 @@ Este archivo es el **tablero de estado** corto. No redefine el orden: solo resum
 | **0** | Discovery de fuentes | **Hecha** |
 | **1** | Foundation + núcleo (001) | **Hecha** |
 | **2** | Connectors oficiales + Places base | **Hecha (robusta)** |
-| **3** | Lugares / orgs (002) | **Siguiente** (spec DRAFT) |
+| **3** | Lugares / orgs (002) | **Hecha** (spec APROBADA) |
 | **4** | Quiero ayudar / voluntariado (enlace) | Pendiente |
 | **5** | Donación solo descubrimiento (enlace terceros) | Pendiente |
 | **6** | Densificación territorial | Pendiente |
@@ -44,6 +44,17 @@ Backend / APIs: [`FASES-Y-BACKEND.md`](FASES-Y-BACKEND.md)
 | 4 Avisos | Hecha |
 | 5 Fuentes UI | Hecha |
 | 6 Polish | Parcial |
+
+---
+
+## Qué entrega la Fase 3 (producto) — hecha
+
+1. Spec **002** APROBADA + UI `/publicar-punto`  
+2. `GET /api/v1/geo/cities` (DIVIPOLA curado) + `cityCode` en Places  
+3. Comunidad: filtro **Puntos** + selector de ciudad  
+4. Copy: sin donaciones vía nosotros; UNVERIFIED por defecto  
+
+Siguiente producto: **Fase 4** (quiero ayudar / voluntariado por enlace).
 
 ---
 

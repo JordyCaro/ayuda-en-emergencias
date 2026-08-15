@@ -13,6 +13,7 @@ import {
   clampOffset,
   isValidLatLng,
 } from '../common/geo';
+import { findCityByCode } from '../geo/cities.seed';
 
 export interface ListPlacesQuery {
   lat?: number;
@@ -25,6 +26,8 @@ export interface ListPlacesQuery {
   north?: number;
   limit?: number;
   offset?: number;
+  cityCode?: string;
+  origin?: 'community' | 'official' | 'all';
 }
 
 export interface ListPlacesResult {
@@ -53,6 +56,14 @@ export class PlacesService {
 
     if (query.type) {
       qb.andWhere('p.type = :type', { type: query.type });
+    }
+    if (query.cityCode) {
+      qb.andWhere('p.city_code = :cityCode', { cityCode: query.cityCode });
+    }
+    if (query.origin === 'community') {
+      qb.andWhere('p.source_id = :sid', { sid: 'community' });
+    } else if (query.origin === 'official') {
+      qb.andWhere('p.source_id != :sid', { sid: 'community' });
     }
 
     const hasBbox =
@@ -131,6 +142,15 @@ export class PlacesService {
     const title = dto.title?.trim();
     if (!title) throw new BadRequestException('title required');
 
+    const cityCode = dto.cityCode?.trim();
+    if (!cityCode) throw new BadRequestException('cityCode required');
+    const city = findCityByCode(cityCode);
+    if (!city) {
+      throw new BadRequestException(
+        'cityCode desconocido (usa GET /geo/cities con un código DIVIPOLA del catálogo)',
+      );
+    }
+
     const row = await this.repo.save(
       this.repo.create({
         type: dto.type,
@@ -144,10 +164,13 @@ export class PlacesService {
         verification: 'UNVERIFIED',
         status: 'ACTIVE',
         country: 'CO',
+        cityCode: city.code,
+        municipality: city.name,
+        department: city.department,
         externalUrl: dto.externalUrl?.trim() || null,
         retrievedAt: new Date(),
         expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
-        properties: { origin: 'USER_FORM' },
+        properties: { origin: 'USER_FORM', divipola: city.code },
       }),
     );
     return this.toDto(row);
@@ -165,6 +188,7 @@ export class PlacesService {
     address?: string | null;
     municipality?: string | null;
     department?: string | null;
+    cityCode?: string | null;
     externalUrl?: string | null;
     retrievedAt: Date;
     properties?: Record<string, unknown>;
@@ -183,6 +207,7 @@ export class PlacesService {
       },
       status: 'ACTIVE' as const,
       country: 'CO',
+      cityCode: input.cityCode ?? null,
       properties: input.properties ?? {},
     };
     if (!row) {
@@ -193,7 +218,6 @@ export class PlacesService {
     return this.repo.save(row);
   }
 
-  /** Upsert en lotes para sync SISPRO (menos round-trips). */
   async upsertOfficialBatch(
     inputs: Array<Parameters<PlacesService['upsertOfficial']>[0]>,
   ): Promise<number> {
@@ -207,7 +231,6 @@ export class PlacesService {
     return count;
   }
 
-  /** Marca places comunitarios vencidos. */
   async expireStale(): Promise<number> {
     const result = await this.repo.update(
       {
@@ -238,8 +261,10 @@ export class PlacesService {
       address: p.address,
       municipality: p.municipality,
       department: p.department,
+      cityCode: p.cityCode,
       externalUrl: p.externalUrl,
       retrievedAt: p.retrievedAt?.toISOString() ?? null,
+      updatedAt: p.updatedAt?.toISOString() ?? null,
     };
   }
 }

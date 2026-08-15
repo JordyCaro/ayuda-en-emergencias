@@ -10,6 +10,7 @@ import { EventsModule } from './events/events.module';
 import { NeedsModule } from './needs/needs.module';
 import { ConnectorsModule } from './connectors/connectors.module';
 import { PlacesModule } from './places/places.module';
+import { GeoModule } from './geo/geo.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PlacesModule } from './places/places.module';
     NeedsModule,
     PlacesModule,
     ConnectorsModule,
+    GeoModule,
   ],
   providers: [
     {

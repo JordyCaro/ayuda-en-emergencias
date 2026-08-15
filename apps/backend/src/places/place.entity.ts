@@ -14,6 +14,7 @@ import type { PlaceStatus, PlaceType, Verification } from '@aee/shared-types';
 @Index(['type'])
 @Index(['status'])
 @Index(['lat', 'lng'])
+@Index(['cityCode'])
 export class PlaceEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -50,6 +51,9 @@ export class PlaceEntity {
 
   @Column({ type: 'varchar', length: 8, default: 'CO' })
   country!: string;
+
+  @Column({ name: 'city_code', type: 'varchar', length: 8, nullable: true })
+  cityCode!: string | null;
 
   @Column({ type: 'text', nullable: true })
   address!: string | null;

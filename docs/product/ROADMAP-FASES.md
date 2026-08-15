@@ -48,7 +48,7 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **0** | Discovery de fuentes | Inventario legal/técnico, pruebas de endpoints, OSS, contexto | docs `sources/` | **Hecha** |
 | **1** | Foundation + núcleo accionable | Monorepo, API, PostGIS, PWA, avisos, mapa, Confianza, IDEAM | `001` | **Hecha** |
 | **2** | Connectors oficiales + Places | SISPRO/REPS → Places salud; modelo Place; filtros; sync robusto | post-001 | **Hecha (robusta)** |
-| **3** | Registro fácil de lugares / orgs | Acopio, fundaciones, ONG; filtro ciudad (DIVIPOLA); listado “quién necesita apoyo”; expiración | `002` (DRAFT) | **Siguiente** |
+| **3** | Registro fácil de lugares / orgs | Acopio, fundaciones, ONG; filtro ciudad (DIVIPOLA); listado “quién necesita apoyo”; expiración | `002` | **Hecha** |
 | **4** | Quiero ayudar / voluntariado (enlace) | Flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs; sin intermediación laboral | `003+` | Pendiente |
 | **5** | Descubrimiento de donación (solo enlace) | Mostrar *dónde* donar en canales de terceros (sitios/orgs verificables); **cero** pasarela ni custodia | `004+` | Pendiente |
 | **6** | Densificación territorial | Connectors municipales (Cali/Medellín/Bogotá…), OSM amenities cacheado, cobertura multi-depto | `005+` | Pendiente |

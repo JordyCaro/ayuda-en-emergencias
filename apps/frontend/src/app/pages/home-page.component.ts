@@ -25,6 +25,7 @@ import { ApiService } from '../api.service';
           </p>
           <div class="hero-actions">
             <a class="btn coral" routerLink="/necesito-ayuda">Dejar un aviso</a>
+            <a class="btn ghost" routerLink="/publicar-punto">Publicar punto</a>
             <a class="btn ghost" routerLink="/mapa">Ver la comunidad</a>
           </div>
           <a class="sos" href="tel:123">Si es grave ahora mismo → llama al 123</a>
@@ -118,10 +119,16 @@ import { ApiService } from '../api.service';
             <p>Un comentario geolocalizado. Sin garantía de respuesta — solo visibilidad.</p>
             <span class="go">Escribir →</span>
           </a>
+          <a class="path" routerLink="/publicar-punto">
+            <span class="label">Lugar</span>
+            <strong>Publicar punto</strong>
+            <p>Acopio, albergue u ONG. Sin donaciones a nosotros — solo el mapa y su enlace.</p>
+            <span class="go">Publicar →</span>
+          </a>
           <a class="path alt" routerLink="/mapa">
             <span class="label">Mapa</span>
             <strong>Ver la comunidad</strong>
-            <p>Alertas oficiales y avisos de personas. Lista primero; mapa para ubicar.</p>
+            <p>Alertas, avisos, salud y puntos. Filtra por ciudad en Puntos.</p>
             <span class="go">Abrir →</span>
           </a>
         </div>
@@ -408,9 +415,9 @@ import { ApiService } from '../api.service';
         gap: 0.9rem;
         margin-top: 1.5rem;
       }
-      @media (min-width: 800px) {
+      @media (min-width: 900px) {
         .paths {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr 1fr 1fr;
         }
       }
       .path {

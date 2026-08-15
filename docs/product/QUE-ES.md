@@ -85,7 +85,7 @@ La lista es para leer; el mapa es para ver **dónde**.
 | **0** | Discovery de fuentes |
 | **1 / 001** | Alertas + avisos + fuentes + API |
 | **2** | SISPRO salud + Places (validación, sync paginado, expiración) |
-| **3 / 002** | Orgs/acopio, filtro ciudad, “quién necesita apoyo” (sin donar nosotros) |
+| **3 / 002** | Orgs/acopio, filtro ciudad DIVIPOLA, publicar punto, capa Puntos |
 | **4–5** | Quiero ayudar + donación solo por enlace a terceros |
 | **6–8** | Densidad territorial → deep-links oficiales → moderación |
 | **9** | Producción + API madura |

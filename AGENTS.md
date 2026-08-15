@@ -61,7 +61,7 @@ Prioridad de lectura:
 
 ## Estado del proyecto
 
-Fases **0–2** hechas (001 + Places/SISPRO **robusta**). Siguiente: **Fase 3 / 002**.  
+Fases **0–3** hechas (001 + Places/SISPRO + registro lugares **002**). Siguiente: **Fase 4** (quiero ayudar / voluntariado enlace).  
 Producto = **capa que conecta** (no intermedia donaciones).  
 Avisos = comentarios geolocalizados, no tickets.  
 Cumplimiento master = fases **0–9**; **offline = 12 (casi opcional)**.  

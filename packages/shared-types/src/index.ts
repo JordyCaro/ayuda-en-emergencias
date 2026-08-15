@@ -129,8 +129,10 @@ export interface PlaceDto {
   address?: string | null;
   municipality?: string | null;
   department?: string | null;
+  cityCode?: string | null;
   externalUrl?: string | null;
   retrievedAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export interface CreatePlaceRequest {
@@ -138,5 +140,13 @@ export interface CreatePlaceRequest {
   title: string;
   description?: string;
   geometry: GeoJsonPoint;
+  cityCode: string;
   externalUrl?: string;
+}
+
+export interface CityDto {
+  code: string;
+  name: string;
+  department: string;
+  departmentCode: string;
 }

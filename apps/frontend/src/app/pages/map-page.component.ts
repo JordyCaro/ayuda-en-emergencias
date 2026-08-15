@@ -9,36 +9,40 @@ import {
 } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import maplibregl, { Map, Marker } from 'maplibre-gl';
-import type { EventDto, NeedDto, PlaceDto } from '@aee/shared-types';
+import type { CityDto, EventDto, NeedDto, PlaceDto } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { NEED_CATS, eventPlainTitle } from '../plain-labels';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
-type LayerFilter = 'all' | 'alerta' | 'aviso' | 'salud';
+type LayerFilter = 'all' | 'alerta' | 'aviso' | 'salud' | 'punto';
 
 type NearItem = {
   id: string;
-  kind: 'alerta' | 'aviso' | 'salud';
+  kind: 'alerta' | 'aviso' | 'salud' | 'punto';
   title: string;
   detail: string;
   trust: string;
   lng: number;
   lat: number;
+  cityCode?: string | null;
 };
 
 @Component({
   selector: 'aee-map-page',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, FormsModule, RouterLink],
   template: `
     <section class="page-hero">
       <div class="wrap">
-        <p class="kicker">Acompañar · Fase 2</p>
+        <p class="kicker">Acompañar · Fase 3</p>
         <h1>Comunidad</h1>
         <p class="lead">
-          Alertas (IDEAM), <strong>avisos</strong> de personas y puntos de
-          <strong>salud</strong> (SISPRO/REPS). Filtra lo que quieres ver. No operamos donaciones.
+          Alertas (IDEAM), avisos, salud (SISPRO) y <strong>puntos</strong> de acopio/ONG
+          publicados por la comunidad. No operamos donaciones.
         </p>
         <div class="toolbar">
+          <a class="cta linkish" routerLink="/publicar-punto">Publicar punto</a>
           <button type="button" class="ghost" (click)="locateMe()" [disabled]="locating()">
             {{ locating() ? 'Buscando…' : 'Mi ubicación' }}
           </button>
@@ -63,7 +67,20 @@ type NearItem = {
             <button type="button" [class.on]="filter() === 'salud'" (click)="setFilter('salud')">
               Salud
             </button>
+            <button type="button" [class.on]="filter() === 'punto'" (click)="setFilter('punto')">
+              Puntos
+            </button>
           </div>
+
+          <label class="city-filter" *ngIf="filter() === 'punto' || filter() === 'all'">
+            Ciudad (puntos)
+            <select [(ngModel)]="cityCode" (ngModelChange)="onCityChange()">
+              <option value="">Todas (zona del mapa)</option>
+              <option *ngFor="let c of cities()" [value]="c.code">
+                {{ c.name }} — {{ c.department }}
+              </option>
+            </select>
+          </label>
 
           <p class="toast" *ngIf="status()">{{ status() }}</p>
           <p class="toast err" *ngIf="error()">{{ error() }}</p>
@@ -75,6 +92,7 @@ type NearItem = {
                 class="item"
                 [class.alerta]="item.kind === 'alerta'"
                 [class.salud]="item.kind === 'salud'"
+                [class.punto]="item.kind === 'punto'"
                 (click)="focus(item)"
               >
                 <span class="tag">{{ tagLabel(item.kind) }}</span>
@@ -86,7 +104,9 @@ type NearItem = {
           </ul>
           <ng-template #empty>
             <p class="empty" *ngIf="!loading()">
-              Nada en este filtro. Pulsa <strong>Actualizar zona</strong> (trae IDEAM + salud cerca).
+              Nada en este filtro.
+              <a routerLink="/publicar-punto">Publica un punto</a>
+              o pulsa <strong>Actualizar zona</strong>.
             </p>
           </ng-template>
         </div>
@@ -99,7 +119,7 @@ type NearItem = {
             <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener"
               >OpenStreetMap</a
             >
-            · Salud: SISPRO / MinSalud
+            · Salud: SISPRO / MinSalud · Puntos: comunidad
           </p>
         </details>
       </div>
@@ -149,6 +169,30 @@ type NearItem = {
         font-weight: 800;
         cursor: pointer;
         padding: 0 1.15rem;
+      }
+      a.cta.linkish {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        border: 0;
+        background: #fff;
+        color: var(--teal-deep);
+      }
+      .city-filter {
+        display: grid;
+        gap: 0.35rem;
+        margin: 0 0 0.75rem;
+        font-weight: 800;
+        font-size: 0.82rem;
+      }
+      .city-filter select {
+        min-height: 44px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        padding: 0.45rem 0.7rem;
+        font: inherit;
+        font-weight: 600;
+        background: var(--white);
       }
       .cta {
         border: 0;
@@ -235,6 +279,9 @@ type NearItem = {
       .item.salud {
         border-color: rgba(28, 100, 160, 0.4);
       }
+      .item.punto {
+        border-color: rgba(180, 120, 40, 0.45);
+      }
       .tag {
         font-size: 0.7rem;
         font-weight: 800;
@@ -242,11 +289,14 @@ type NearItem = {
         text-transform: uppercase;
         color: var(--teal);
       }
-      .item:not(.alerta):not(.salud) .tag {
+      .item:not(.alerta):not(.salud):not(.punto) .tag {
         color: var(--coral);
       }
       .item.salud .tag {
         color: #1c64a0;
+      }
+      .item.punto .tag {
+        color: #9a6b1f;
       }
       .item strong {
         font-family: var(--font-display);
@@ -310,8 +360,14 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
   readonly error = signal<string | null>(null);
   readonly filter = signal<LayerFilter>('all');
   readonly visibleItems = signal<NearItem[]>([]);
+  readonly cities = signal<CityDto[]>([]);
+  cityCode = '';
 
   ngAfterViewInit(): void {
+    this.api.cities().subscribe({
+      next: (res) => this.cities.set(res.data),
+      error: () => undefined,
+    });
     setTimeout(() => this.initMap(), 0);
   }
 
@@ -326,9 +382,14 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     this.applyFilter();
   }
 
+  onCityChange(): void {
+    this.loadLists(this.currentBBox());
+  }
+
   tagLabel(kind: NearItem['kind']): string {
     if (kind === 'alerta') return 'Alerta';
     if (kind === 'salud') return 'Salud';
+    if (kind === 'punto') return 'Punto';
     return 'Aviso';
   }
 
@@ -455,16 +516,17 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     this.loading.set(true);
     let events: EventDto[] = [];
     let needs: NeedDto[] = [];
-    let places: PlaceDto[] = [];
-    let pending = 3;
+    let medical: PlaceDto[] = [];
+    let community: PlaceDto[] = [];
+    let pending = 4;
     const loadErrs: string[] = [];
     const done = () => {
       pending -= 1;
       if (pending > 0) return;
       this.loading.set(false);
-      this.buildItems(events, needs, places);
+      this.buildItems(events, needs, medical, community);
       this.status.set(
-        `${events.length} alertas · ${needs.length} avisos · ${places.length} salud (zona)`,
+        `${events.length} alertas · ${needs.length} avisos · ${medical.length} salud · ${community.length} puntos`,
       );
       if (loadErrs.length && !this.error()) {
         this.error.set(loadErrs.join(' · '));
@@ -490,13 +552,40 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         done();
       },
     });
-    this.api.places({ type: 'MEDICAL', limit: 400, ...bbox }).subscribe({
+    this.api.places({ type: 'MEDICAL', origin: 'official', limit: 400, ...bbox }).subscribe({
       next: (res) => {
-        places = res.data;
+        medical = res.data;
         done();
       },
       error: () => {
         loadErrs.push('No cargaron puntos de salud');
+        done();
+      },
+    });
+    const communityParams: {
+      origin: 'community';
+      limit: number;
+      cityCode?: string;
+      west?: number;
+      south?: number;
+      east?: number;
+      north?: number;
+    } = { origin: 'community', limit: 400 };
+    if (this.cityCode) {
+      communityParams.cityCode = this.cityCode;
+    } else {
+      communityParams.west = bbox.west;
+      communityParams.south = bbox.south;
+      communityParams.east = bbox.east;
+      communityParams.north = bbox.north;
+    }
+    this.api.places(communityParams).subscribe({
+      next: (res) => {
+        community = res.data;
+        done();
+      },
+      error: () => {
+        loadErrs.push('No cargaron puntos comunitarios');
         done();
       },
     });
@@ -510,7 +599,12 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     return fallback;
   }
 
-  private buildItems(events: EventDto[], needs: NeedDto[], places: PlaceDto[]): void {
+  private buildItems(
+    events: EventDto[],
+    needs: NeedDto[],
+    medical: PlaceDto[],
+    community: PlaceDto[],
+  ): void {
     const list: NearItem[] = [];
     for (const e of events) {
       const coords = this.point(e.geometry);
@@ -539,7 +633,7 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         lat: coords[1],
       });
     }
-    for (const p of places) {
+    for (const p of medical) {
       const coords = this.point(p.geometry);
       if (!coords) continue;
       list.push({
@@ -550,6 +644,24 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
         trust: `${p.sourceName ?? 'SISPRO'} · oficial`,
         lng: coords[0],
         lat: coords[1],
+      });
+    }
+    for (const p of community) {
+      const coords = this.point(p.geometry);
+      if (!coords) continue;
+      const when = p.updatedAt ? ` · act. ${p.updatedAt.slice(0, 10)}` : '';
+      list.push({
+        id: p.id,
+        kind: 'punto',
+        title: p.title,
+        detail:
+          [p.description, p.municipality, p.externalUrl ? 'tiene enlace' : null]
+            .filter(Boolean)
+            .join(' · ') || 'Punto comunitario',
+        trust: `Comunidad · sin verificar${when}`,
+        lng: coords[0],
+        lat: coords[1],
+        cityCode: p.cityCode,
       });
     }
     this.allItems = list;
@@ -569,7 +681,13 @@ export class MapPageComponent implements AfterViewInit, OnDestroy {
     if (!this.map) return;
     for (const item of items.slice(0, 200)) {
       const color =
-        item.kind === 'alerta' ? '#0f6e6a' : item.kind === 'salud' ? '#1c64a0' : '#e4574c';
+        item.kind === 'alerta'
+          ? '#0f6e6a'
+          : item.kind === 'salud'
+            ? '#1c64a0'
+            : item.kind === 'punto'
+              ? '#b47828'
+              : '#e4574c';
       const round = item.kind !== 'aviso';
       const el = this.dot(color, round);
       this.markers.push(

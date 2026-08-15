@@ -7,18 +7,19 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Matches,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import type { PlaceType } from '@aee/shared-types';
 
-const PLACE_TYPES = [
+/** Tipos publicables por comunidad (MEDICAL queda para connectors oficiales). */
+export const COMMUNITY_PLACE_TYPES = [
   'HELP_CENTER',
   'DONATION_POINT',
   'SHELTER',
   'VOLUNTEER_POINT',
-  'MEDICAL',
   'MEETING_POINT',
   'OTHER',
 ] as const;
@@ -35,7 +36,7 @@ class GeoPointDto {
 }
 
 export class CreatePlaceDto {
-  @IsIn(PLACE_TYPES)
+  @IsIn(COMMUNITY_PLACE_TYPES)
   type!: PlaceType;
 
   @IsString()
@@ -50,6 +51,10 @@ export class CreatePlaceDto {
   @ValidateNested()
   @Type(() => GeoPointDto)
   geometry!: GeoPointDto;
+
+  @IsString()
+  @Matches(/^\d{5}$/, { message: 'cityCode must be a 5-digit DIVIPOLA code' })
+  cityCode!: string;
 
   @IsOptional()
   @IsUrl({ require_protocol: true })

@@ -1,29 +1,20 @@
-# Plan 002 (borrador corto) — Registro fácil de lugares
+# Plan 002 — Registro fácil de lugares
 
-**Spec:** `spec.md` (DRAFT)  
-**Constitution Check (preliminar):** PASS si trust/expiración/rate-limit se respetan
+**Spec:** `spec.md` (APROBADA)  
+**Constitution Check:** PASS (trust, expiración, rate-limit, no donaciones)
 
-## Enfoque
+## Enfoque técnico
 
-Reutilizar `Place` del data-model 001. Endpoint `POST/GET /api/v1/places`.  
-Frontend: un flujo hermano de “Necesito ayuda”.  
-Default `verification=UNVERIFIED`, `source=USER` o `ORGANIZATION`.  
-Job/cron marca EXPIRED.
+1. Catálogo DIVIPOLA curado en backend (`GET /geo/cities`).  
+2. Extender `Place` con `cityCode` (+ municipio/depto ya existentes).  
+3. Validar `CreatePlaceDto` con ciudad + tipos comunitarios.  
+4. UI `/publicar-punto` + capa **Puntos** y filtro ciudad en Comunidad.  
+5. OpenAPI + docs de fase.
 
-## No bloquea
+## Ya reutilizado de Fase 2
 
-Connectors SISPRO/REPS y Cali/Medellín siguen en paralelo (capa A/B).
+- Entity/API Places, throttle POST, cron expire, Confianza.
 
-## Tasks (alto nivel, cuando se apruebe)
+## Tasks
 
-1. Migración Place + índices geo  
-2. API places + rate limit  
-3. UI publicar punto  
-4. Capa mapa Places  
-5. Expiración + copy trust  
-6. (Opcional) cola moderación mínima  
-
-## Aprobación
-
-Pendiente gate humano formal.  
-**Nota 2026-08-14:** el modelo `Place` + `GET/POST /api/v1/places` y el connector SISPRO (MEDICAL oficial) ya arrancaron en **Fase 2 de producto**. El 002 completa el flujo “Publicar punto de acopio/ONG” en UI y expiración.
+Ver `tasks.md`.

@@ -16,7 +16,7 @@ Principio: **primero integrar** (APIs públicas / open data / OSS) → **despué
 | **0** | Discovery | Inventario de fuentes, licencias, pruebas | **Hecha** |
 | **1** | MVP 001 | Monorepo, PWA, avisos, IDEAM, Confianza, API Nest | **Hecha** |
 | **2** | Connectors + Places | SISPRO/REPS, modelo Place, filtros Comunidad, validación, paginación sync | **Hecha (robusta)** |
-| **3** | Lugares / orgs (**002**) | Acopio/ONG, filtro ciudad, “quién necesita apoyo” | **Spec DRAFT — siguiente** |
+| **3** | Lugares / orgs (**002**) | Acopio/ONG, filtro ciudad, “quién necesita apoyo” | **Hecha** |
 | **4** | Quiero ayudar | Voluntariado / ayuda sin dinero: encuentro + enlaces | Pendiente |
 | **5** | Donación (enlace) | Descubrir canales de terceros; cero custodia | Pendiente |
 | **6** | Densificar territorio | Municipales + OSM cache | Pendiente |

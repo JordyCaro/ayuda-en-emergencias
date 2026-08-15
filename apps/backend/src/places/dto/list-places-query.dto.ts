@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import type { PlaceType } from '@aee/shared-types';
 
@@ -70,4 +70,13 @@ export class ListPlacesQueryDto {
   @IsNumber()
   @Min(0)
   offset?: number;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^\d{5}$/)
+  cityCode?: string;
+
+  @IsOptional()
+  @IsIn(['community', 'official', 'all'])
+  origin?: 'community' | 'official' | 'all';
 }

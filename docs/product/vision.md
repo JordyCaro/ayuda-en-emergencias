@@ -47,7 +47,7 @@ Web/PWA + API que:
 | 0 | Discovery de fuentes | Hecha |
 | 1 | Foundation + núcleo (slice **001**) | Hecha |
 | 2 | Connectors oficiales + Places base | Hecha (robusta) |
-| 3 | Registro lugares/orgs (**002**) | Siguiente |
+| 3 | Registro lugares/orgs (**002**) | Hecha |
 | 4 | Quiero ayudar / voluntariado (enlace) | Pendiente |
 | 5 | Donación solo descubrimiento | Pendiente |
 | 6 | Densificación territorial | Pendiente |
