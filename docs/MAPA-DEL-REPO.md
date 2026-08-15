@@ -16,10 +16,14 @@ Somos un **monorepo**: una sola carpeta del proyecto que contiene **frontend**, 
 |---------|-----|---------------------|-----------------------------|
 | **`apps/frontend`** | Interfaz del ciudadano (pantallas, mapa, formularios, PWA) | Angular | Sí — en el navegador |
 | **`apps/backend`** | API REST, validación, PostgreSQL/PostGIS, jobs de connectors | NestJS | Sí — servidor |
-| **`apps/admin`** | Moderación (más adelante) | TBD | Sí — después del MVP |
+| **`apps/admin`** | Reservada (cierre = `/cerrar` sin panel) | — | Futuro |
 | **`connectors/`** | “Adaptadores” que traen datos de IDEAM, SGC, etc. | TypeScript | No solos — los dispara el backend |
 | **`packages/`** | Librerías internas compartidas (tipos, geo…) | TypeScript | No — se importan |
-| **`infra/`** | Cómo **montar** backend+DB(+frontend) en Docker/servidor | YAML/scripts | No es lógica de negocio |
+| **`infra/`** | Docker + **deploy** (`infra/deploy/README.md`) | YAML/docs | Cómo encender / publicar |
+
+Local: front `:4200` · API `:3000` · PostGIS `:5432`.  
+Deploy gratis y capacidad: [`infra/deploy/README.md`](../infra/deploy/README.md).  
+Mejoras por fase: [`product/ROADMAP-FASES.md`](product/ROADMAP-FASES.md).
 
 ```text
         Ciudadano

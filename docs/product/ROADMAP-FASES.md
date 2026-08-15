@@ -205,10 +205,36 @@ Spec: `specs/006-deep-links-oficiales/` (**APROBADA**; UI fusionada post-entrega
 | `004-donacion-descubrimiento-enlace` | 5 |
 | `005-densificacion-territorial` | 6 |
 | `006-deep-links-oficiales` | 7 |
-| Futuros `007+` | 8 (mascotas), 9… |
-| Docs-only / infra | 0, partes de 10 |
+| `007-perdidos-encontrados` | 8 |
+| `008-moderacion` (cierre comunitario) | 9 |
+| `009-produccion` | 10 |
+| Docs-only / infra | 0, partes de 10–12 |
 
 Si una idea está en este roadmap pero **OUT** del slice activo → no implementar; abrir o avanzar el slice correcto.
+
+---
+
+## Mejoras posibles por fase (backlog honesto)
+
+No son deuda bloqueante. Priorizar solo si hay uso real.
+
+| Fase | Mejoras posibles |
+|------|------------------|
+| **0** | Re-discovery anual; más datasets territoriales; marcar fuentes muertas |
+| **1** | Mapa MapLibre más usable; tests E2E; i18n EN |
+| **2** | Menos ruido IPS; sync incremental; métricas exportables |
+| **3** | Fotos de lugar; horarios; verificación ligera de URL |
+| **4** | Orden por cercanía + frescura; filtros guardados |
+| **5** | Más acopios curados; copy más claro “enlace a tercero” |
+| **6** | Más ciudades OSM; cola de sync; cache Overpass |
+| **7** | Badges de frescura; más líneas regionales; deep-links SGC/UNGRD vivos |
+| **8** | Fotos de mascota; “ya apareció” más visible; filtros especie/zona |
+| **9** | Recordar enlace de cierre (copiar + QR); “mis avisos” en localStorage |
+| **10** | Hosting real + CDN; backups automáticos; observabilidad (logs/métricas); cola Redis |
+| **11** | Segundo país solo con discovery + constitution check |
+| **12** | SW de lectura offline; cola de avisos al volver la red |
+
+Deploy gratis / capacidad: [`infra/deploy/README.md`](../../infra/deploy/README.md).
 
 ---
 
@@ -218,4 +244,5 @@ Si una idea está en este roadmap pero **OUT** del slice activo → no implement
 |-----|-----|
 | [`QUE-ES.md`](QUE-ES.md) | Propósito del producto |
 | [`../sources/source-registry.md`](../sources/source-registry.md) | Inventario de fuentes |
+| [`../../infra/deploy/README.md`](../../infra/deploy/README.md) | Deploy gratis, capacidad, checklist |
 | Constitution | Invariantes que ninguna fase puede romper |

@@ -18,6 +18,7 @@ import type {
   PlaceDto,
   SourceDto,
 } from '@aee/shared-types';
+import { environment } from '../environments/environment';
 
 export interface SisproRunResponse {
   ok: boolean;
@@ -31,7 +32,7 @@ export interface SisproRunResponse {
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly base = '/api/v1';
+  private readonly base = environment.apiBase;
 
   health(): Observable<{ status: string; database: string }> {
     return this.http.get<{ status: string; database: string }>(`${this.base}/health`);

@@ -19,11 +19,20 @@
 |----------|-----------|
 | **Propósito** | [`docs/product/QUE-ES.md`](docs/product/QUE-ES.md) |
 | **Correr en local** | [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md) |
-| **Roadmap** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
+| **Roadmap + mejoras** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
+| **Deploy gratis / capacidad** | [`infra/deploy/README.md`](infra/deploy/README.md) |
 | **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
 | **Agente de IA** | [`AGENTS.md`](AGENTS.md) |
 | **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`009`](specs/009-produccion/) |
 | **Reglas** | [`.specify/memory/constitution.md`](.specify/memory/constitution.md) |
+
+### Dónde está cada pieza
+
+| | Path | Local |
+|---|------|-------|
+| Front | `apps/frontend` | `:4200` |
+| API | `apps/backend` | `:3000` + `/api/docs` |
+| DB | `infra/docker` | PostGIS `:5432` |
 
 ---
 
@@ -50,7 +59,8 @@ pnpm dev:backend     # :3000  Swagger → /api/docs
 pnpm dev:frontend    # :4200
 ```
 
-Detalle: [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md)
+Detalle: [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md)  
+Deploy: [`infra/deploy/README.md`](infra/deploy/README.md)
 
 ---
 
