@@ -68,27 +68,37 @@ export class IdeamConnector implements SourceConnector {
         const attrs = feature.attributes ?? {};
         const objectId =
           attrs.OBJECTID ?? attrs.objectid ?? attrs.FID ?? attrs.fid;
-        const name =
+        const station =
           (attrs.NOMBRE as string) ||
           (attrs.Nombre as string) ||
           (attrs.ESTACION as string) ||
+          (attrs.Estacion as string) ||
           (attrs.name as string) ||
-          'Alerta hidrológica IDEAM';
+          null;
         const nivel =
           attrs.NIVEL ?? attrs.Nivel ?? attrs.ALERTA ?? attrs.estado ?? null;
         const { lat, lng, geometry } = this.extractGeometry(feature);
         const sourceRecordId = `${layerKey}:${String(objectId ?? this.hashFeature(feature))}`;
+
+        const stationClean =
+          station &&
+          !/^(NivelAlerta|ALERTA|null)$/i.test(String(station).trim()) &&
+          String(station).trim().length > 2
+            ? String(station).trim()
+            : null;
 
         out.push({
           type: 'HYDRO_ALERT',
           originalType: String(nivel ?? layerKey),
           sourceId: this.sourceId,
           sourceRecordId,
-          title: String(name).slice(0, 512),
+          title: stationClean
+            ? `Estación ${stationClean}`
+            : 'Alerta de ríos o niveles (IDEAM)',
           summary:
             nivel != null
-              ? `Nivel/alerta: ${String(nivel)} (${layerKey})`
-              : `Registro hidrológico IDEAM (${layerKey})`,
+              ? `Nivel o estado reportado: ${String(nivel)} · IDEAM`
+              : 'Dato hidrológico oficial · IDEAM',
           geometry,
           lat,
           lng,

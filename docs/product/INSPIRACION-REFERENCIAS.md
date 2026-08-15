@@ -16,8 +16,8 @@
 |----------------|------------|--------------|---------------|
 | Banner de emergencia + contexto | Enmarca el “por qué” | Parcial (copy home) | **1** polish OK |
 | Stats / última verificación | Sensación de “casi en tiempo real” | Parcial (`lastSuccessfulFetch`, timestamps) | **1–2** mejorar UI |
-| **Organizaciones que necesitan ayuda** | Lista accionable de orgs | **No** como listado dedicado | **3 (spec 002)** |
-| **Filtro por ciudad** | Encontrar cerca sin pelear con el mapa | Solo geo/bbox en mapa | **3** (+ DIVIPOLA) |
+| **Organizaciones que necesitan ayuda** | Lista accionable de orgs | **Sí** (pestaña “Lugares que piden apoyo”) | **3** |
+| **Filtro por ciudad** | Encontrar cerca sin pelear con el mapa | **Sí** (selector ciudad + “todo el país”) | **3** |
 | Estoy en CO / abroad | Segmentación | No | **4+** opcional |
 | No operar donaciones nosotros | Alineado con nuestra visión | Sí (constitution) | Ya |
 
