@@ -13,20 +13,19 @@ import { ApiService } from '../api.service';
         <div class="hero-copy fade-up">
           <p class="eyebrow">Colombia · capa que conecta</p>
           <h1>
-            Información clara.
-            <span>Avisos en el mapa.</span>
+            ¿Dónde ayudar
+            <span>en Colombia?</span>
             Sin intermediarnos en donaciones.
           </h1>
           <p class="lead">
-            Integramos alertas oficiales cuando se puede, y dejamos que la comunidad escriba
-            <strong>avisos</strong> (“aquí se necesita agua / ayuda con escombros…”).
-            Nosotros <strong>no pedimos ni manejamos donaciones</strong>: solo conectamos datos y
-            personas. Un aviso es una señal, no una promesa de que alguien responda.
+            Encuentra <strong>lugares y organizaciones</strong> que piden apoyo, filtra por ciudad y
+            categoría. Nosotros <strong>no pedimos ni manejamos donaciones</strong>: solo conectamos
+            información. Si hay enlace, donas o ayudas en su canal.
           </p>
           <div class="hero-actions">
-            <a class="btn coral" routerLink="/necesito-ayuda">Dejar un aviso</a>
-            <a class="btn ghost" routerLink="/publicar-punto">Publicar punto</a>
-            <a class="btn ghost" routerLink="/mapa">Ver la comunidad</a>
+            <a class="btn coral" routerLink="/buscar">¿Qué necesitas?</a>
+            <a class="btn ghost" routerLink="/ayudar">Ver lugares</a>
+            <a class="btn ghost" routerLink="/publicar-punto">Publicar un lugar</a>
           </div>
           <a class="sos" href="tel:123">Si es grave ahora mismo → llama al 123</a>
         </div>
@@ -35,18 +34,18 @@ import { ApiService } from '../api.service';
           <div class="panel-head">Ahora mismo</div>
           <div class="stats" *ngIf="loaded(); else loadingStats">
             <div>
-              <strong>{{ needs() }}</strong>
-              <span>Avisos en el mapa</span>
+              <strong>{{ places() }}</strong>
+              <span>Lugares publicados</span>
             </div>
             <div>
-              <strong>{{ alerts() }}</strong>
-              <span>Alertas oficiales</span>
+              <strong>{{ needs() }}</strong>
+              <span>Avisos abiertos</span>
             </div>
           </div>
           <ng-template #loadingStats>
             <p class="loading">Cargando actividad…</p>
           </ng-template>
-          <p class="panel-note">Los avisos de personas aparecen como “sin verificar”.</p>
+          <p class="panel-note">Directorio nacional · sin verificar hasta moderación.</p>
           <div class="geo" aria-hidden="true">
             <span class="bar"></span>
             <span class="bar short"></span>
@@ -110,26 +109,26 @@ import { ApiService } from '../api.service';
 
     <section class="band sky" id="caminos">
       <div class="wrap">
-        <p class="section-kicker">Dos caminos</p>
-        <h2 class="dark">Avisar o mirar. Tú eliges.</h2>
+        <p class="section-kicker">Tres caminos</p>
+        <h2 class="dark">Buscar, ayudar o publicar.</h2>
         <div class="paths">
-          <a class="path" routerLink="/necesito-ayuda">
-            <span class="label">Señal</span>
-            <strong>Dejar un aviso</strong>
-            <p>Un comentario geolocalizado. Sin garantía de respuesta — solo visibilidad.</p>
-            <span class="go">Escribir →</span>
+          <a class="path" routerLink="/buscar">
+            <span class="label">Buscar</span>
+            <strong>¿Qué necesitas?</strong>
+            <p>Categorías claras + ciudad. Luego ves lugares en lista (cards), no un mapa lleno.</p>
+            <span class="go">Empezar →</span>
+          </a>
+          <a class="path alt" routerLink="/ayudar">
+            <span class="label">Directorio</span>
+            <strong>Dónde ayudar</strong>
+            <p>Organizaciones y puntos en todo el país. Filtra y abre su canal.</p>
+            <span class="go">Ver lista →</span>
           </a>
           <a class="path" routerLink="/publicar-punto">
-            <span class="label">Lugar</span>
-            <strong>Publicar punto</strong>
-            <p>Acopio, albergue u ONG. Sin donaciones a nosotros — solo el mapa y su enlace.</p>
+            <span class="label">Aportar</span>
+            <strong>Publicar un lugar</strong>
+            <p>Si tu acopio u ONG necesita apoyo, publícalo con ciudad y enlace.</p>
             <span class="go">Publicar →</span>
-          </a>
-          <a class="path alt" routerLink="/mapa">
-            <span class="label">Mapa</span>
-            <strong>Ver la comunidad</strong>
-            <p>Alertas, avisos, salud y puntos. Filtra por ciudad en Puntos.</p>
-            <span class="go">Abrir →</span>
           </a>
         </div>
         <a class="trust-link" routerLink="/fuentes">¿De dónde sale la información? Ver Confianza →</a>
@@ -483,7 +482,7 @@ import { ApiService } from '../api.service';
 })
 export class HomePageComponent implements OnInit {
   private readonly api = inject(ApiService);
-  readonly alerts = signal(0);
+  readonly places = signal(0);
   readonly needs = signal(0);
   readonly loaded = signal(false);
 
@@ -493,9 +492,9 @@ export class HomePageComponent implements OnInit {
       left -= 1;
       if (left <= 0) this.loaded.set(true);
     };
-    this.api.events().subscribe({
+    this.api.places({ origin: 'community', limit: 200 }).subscribe({
       next: (r) => {
-        this.alerts.set(r.data.length);
+        this.places.set(r.data.length);
         done();
       },
       error: () => done(),

@@ -59,6 +59,7 @@ export class ApiService {
     limit?: number;
     cityCode?: string;
     origin?: 'community' | 'official' | 'all';
+    tag?: string;
   }): Observable<{ data: PlaceDto[]; meta?: { limit: number; offset: number; count: number } }> {
     const q = new URLSearchParams();
     if (params?.type) q.set('type', params.type);
@@ -69,6 +70,7 @@ export class ApiService {
     if (params?.limit != null) q.set('limit', String(params.limit));
     if (params?.cityCode) q.set('cityCode', params.cityCode);
     if (params?.origin) q.set('origin', params.origin);
+    if (params?.tag) q.set('tag', params.tag);
     const qs = q.toString();
     return this.http.get<{
       data: PlaceDto[];

@@ -16,9 +16,9 @@ import { RouterLink } from '@angular/router';
           </p>
         </div>
         <div class="cols">
-          <a routerLink="/necesito-ayuda">Dejar aviso</a>
-          <a routerLink="/publicar-punto">Publicar punto</a>
-          <a routerLink="/mapa">Comunidad</a>
+          <a routerLink="/buscar">¿Qué necesitas?</a>
+          <a routerLink="/ayudar">Dónde ayudar</a>
+          <a routerLink="/publicar-punto">Publicar lugar</a>
           <a routerLink="/fuentes">Confianza</a>
           <a href="tel:123">Urgencia 123</a>
         </div>

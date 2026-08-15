@@ -79,4 +79,8 @@ export class ListPlacesQueryDto {
   @IsOptional()
   @IsIn(['community', 'official', 'all'])
   origin?: 'community' | 'official' | 'all';
+
+  @IsOptional()
+  @IsIn(['FOOD', 'WATER', 'MEDICINE', 'CLOTHING', 'SHELTER', 'VOLUNTEER', 'BLOOD', 'OTHER'])
+  tag?: string;
 }

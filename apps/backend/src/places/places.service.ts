@@ -28,6 +28,7 @@ export interface ListPlacesQuery {
   offset?: number;
   cityCode?: string;
   origin?: 'community' | 'official' | 'all';
+  tag?: string;
 }
 
 export interface ListPlacesResult {
@@ -64,6 +65,11 @@ export class PlacesService {
       qb.andWhere('p.source_id = :sid', { sid: 'community' });
     } else if (query.origin === 'official') {
       qb.andWhere('p.source_id != :sid', { sid: 'community' });
+    }
+    if (query.tag) {
+      qb.andWhere(`p.need_tags @> :tagJson`, {
+        tagJson: JSON.stringify([query.tag]),
+      });
     }
 
     const hasBbox =
@@ -168,6 +174,9 @@ export class PlacesService {
         municipality: city.name,
         department: city.department,
         externalUrl: dto.externalUrl?.trim() || null,
+        needTags: Array.isArray(dto.needTags)
+          ? dto.needTags.map((t) => String(t)).slice(0, 8)
+          : [],
         retrievedAt: new Date(),
         expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
         properties: { origin: 'USER_FORM', divipola: city.code },
@@ -263,6 +272,7 @@ export class PlacesService {
       department: p.department,
       cityCode: p.cityCode,
       externalUrl: p.externalUrl,
+      needTags: (p.needTags ?? []) as PlaceDto['needTags'],
       retrievedAt: p.retrievedAt?.toISOString() ?? null,
       updatedAt: p.updatedAt?.toISOString() ?? null,
     };

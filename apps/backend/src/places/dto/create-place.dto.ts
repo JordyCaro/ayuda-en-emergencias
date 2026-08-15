@@ -12,7 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { PlaceType } from '@aee/shared-types';
+import type { NeedTag, PlaceType } from '@aee/shared-types';
 
 /** Tipos publicables por comunidad (MEDICAL queda para connectors oficiales). */
 export const COMMUNITY_PLACE_TYPES = [
@@ -21,6 +21,17 @@ export const COMMUNITY_PLACE_TYPES = [
   'SHELTER',
   'VOLUNTEER_POINT',
   'MEETING_POINT',
+  'OTHER',
+] as const;
+
+const NEED_TAGS = [
+  'FOOD',
+  'WATER',
+  'MEDICINE',
+  'CLOTHING',
+  'SHELTER',
+  'VOLUNTEER',
+  'BLOOD',
   'OTHER',
 ] as const;
 
@@ -60,4 +71,10 @@ export class CreatePlaceDto {
   @IsUrl({ require_protocol: true })
   @MaxLength(2000)
   externalUrl?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(8)
+  @IsIn(NEED_TAGS, { each: true })
+  needTags?: NeedTag[];
 }

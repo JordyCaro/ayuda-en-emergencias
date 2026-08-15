@@ -67,6 +67,9 @@ export class PlaceEntity {
   @Column({ name: 'external_url', type: 'text', nullable: true })
   externalUrl!: string | null;
 
+  @Column({ name: 'need_tags', type: 'jsonb', default: [] })
+  needTags!: string[];
+
   @Column({ type: 'jsonb', default: {} })
   properties!: Record<string, unknown>;
 

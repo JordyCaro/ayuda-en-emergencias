@@ -2,8 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import type { CityDto, PlaceType } from '@aee/shared-types';
+import type { CityDto, NeedTag, PlaceType } from '@aee/shared-types';
 import { ApiService } from '../api.service';
+import { HELP_CATEGORIES } from '../help-categories';
 
 const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
   { id: 'DONATION_POINT', label: 'Acopio / donaciones', hint: 'Reciben especie en un punto' },
@@ -59,8 +60,8 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
         </div>
 
         <div class="card" *ngIf="step() === 2">
-          <h2>Nombre y qué necesitan / ofrecen</h2>
-          <p class="hint">Evita inventar cantidades (“500 kits”). Describe con fuente o en general.</p>
+          <h2>Nombre, qué necesitan y etiquetas</h2>
+          <p class="hint">Evita inventar cantidades (“500 kits”). Marca qué reciben o necesitan.</p>
           <label>
             Título
             <input [(ngModel)]="title" maxlength="512" placeholder="Ej. Acopio barrio El Prado" />
@@ -74,6 +75,17 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
               placeholder="Qué reciben o necesitan, horarios, notas útiles…"
             ></textarea>
           </label>
+          <div class="chips">
+            <button
+              type="button"
+              class="chip"
+              *ngFor="let t of tagOptions"
+              [class.on]="selectedTags.has(t.id)"
+              (click)="toggleTag(t.id)"
+            >
+              {{ t.title }}
+            </button>
+          </div>
           <label>
             Enlace (opcional)
             <input
@@ -124,7 +136,7 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
           <p class="err" *ngIf="error()">{{ error() }}</p>
           <p class="ok" *ngIf="okId()">
             Punto publicado (sin verificar).
-            <a routerLink="/mapa">Ver en Comunidad → Puntos</a>
+            <a routerLink="/ayudar">Ver en Dónde ayudar</a>
           </p>
           <div class="row">
             <button type="button" class="ghost" (click)="step.set(2)" [disabled]="sending()">
@@ -333,6 +345,8 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
 export class PublishPlacePageComponent implements OnInit {
   private readonly api = inject(ApiService);
   readonly types = PLACE_TYPES;
+  readonly tagOptions = HELP_CATEGORIES;
+  readonly selectedTags = new Set<NeedTag>();
   readonly step = signal(1);
   readonly cities = signal<CityDto[]>([]);
   readonly locating = signal(false);
@@ -362,6 +376,11 @@ export class PublishPlacePageComponent implements OnInit {
   pickCity(c: CityDto): void {
     this.cityCode = c.code;
     this.cityLabel = `${c.name} (${c.department})`;
+  }
+
+  toggleTag(id: NeedTag): void {
+    if (this.selectedTags.has(id)) this.selectedTags.delete(id);
+    else this.selectedTags.add(id);
   }
 
   private loadCities(q: string): void {
@@ -409,6 +428,7 @@ export class PublishPlacePageComponent implements OnInit {
         description: this.description.trim() || undefined,
         cityCode: this.cityCode,
         externalUrl: url || undefined,
+        needTags: [...this.selectedTags],
         geometry: { type: 'Point', coordinates: [this.lng, this.lat] },
       })
       .subscribe({

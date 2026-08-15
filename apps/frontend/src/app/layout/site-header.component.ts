@@ -31,11 +31,11 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <a routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }" (click)="close()">
             Inicio
           </a>
-          <a routerLink="/necesito-ayuda" routerLinkActive="on" (click)="close()">Dejar aviso</a>
-          <a routerLink="/publicar-punto" routerLinkActive="on" (click)="close()">Publicar punto</a>
-          <a routerLink="/mapa" routerLinkActive="on" (click)="close()">Comunidad</a>
+          <a routerLink="/buscar" routerLinkActive="on" (click)="close()">¿Qué necesitas?</a>
+          <a routerLink="/ayudar" routerLinkActive="on" (click)="close()">Dónde ayudar</a>
+          <a routerLink="/publicar-punto" routerLinkActive="on" (click)="close()">Publicar</a>
           <a routerLink="/fuentes" routerLinkActive="on" (click)="close()">Confianza</a>
-          <a class="cta" routerLink="/publicar-punto" (click)="close()">Publicar punto</a>
+          <a class="cta" routerLink="/ayudar" (click)="close()">Ver lugares</a>
         </nav>
       </div>
     </header>

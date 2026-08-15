@@ -64,6 +64,17 @@ export type PlaceType =
 
 export type PlaceStatus = 'ACTIVE' | 'EXPIRED' | 'HIDDEN';
 
+/** Etiquetas de qué se necesita / recibe (emergencia — no marketplace). */
+export type NeedTag =
+  | 'FOOD'
+  | 'WATER'
+  | 'MEDICINE'
+  | 'CLOTHING'
+  | 'SHELTER'
+  | 'VOLUNTEER'
+  | 'BLOOD'
+  | 'OTHER';
+
 export interface GeoJsonPoint {
   type: 'Point';
   coordinates: [number, number];
@@ -131,6 +142,7 @@ export interface PlaceDto {
   department?: string | null;
   cityCode?: string | null;
   externalUrl?: string | null;
+  needTags?: NeedTag[];
   retrievedAt?: string | null;
   updatedAt?: string | null;
 }
@@ -142,6 +154,7 @@ export interface CreatePlaceRequest {
   geometry: GeoJsonPoint;
   cityCode: string;
   externalUrl?: string;
+  needTags?: NeedTag[];
 }
 
 export interface CityDto {
