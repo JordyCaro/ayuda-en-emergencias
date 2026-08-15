@@ -83,7 +83,7 @@ const LINKS: OfficialLink[] = [
 @Component({
   selector: 'aee-oficiales-page',
   standalone: true,
-  imports: [NgFor, RouterLink],
+  imports: [NgFor, NgIf, RouterLink],
   template: `
     <section class="page-hero-band">
       <div class="page-wrap">
