@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { BBox } from '../common/geo';
 import type { CityBBox } from '../geo/city-bboxes';
 
 interface OverpassElement {
@@ -7,6 +6,7 @@ interface OverpassElement {
   id: number;
   lat?: number;
   lon?: number;
+  center?: { lat: number; lon: number };
   tags?: Record<string, string>;
 }
 
@@ -43,16 +43,21 @@ export class OsmHelpConnector {
   async fetchCity(city: CityBBox): Promise<{ rows: OsmHelpPlaceRow[]; fetchedAt: Date }> {
     const fetchedAt = new Date();
     const { west, south, east, north } = city.bbox;
+    const bb = `${south},${west},${north},${east}`;
+    // Nodos + ways (out center). Sin bbox país-entero.
     const query =
-      `[out:json][timeout:40];` +
-      `(node["amenity"="social_facility"](${south},${west},${north},${east});` +
-      `node["amenity"="shelter"](${south},${west},${north},${east});` +
-      `node["office"="ngo"](${south},${west},${north},${east});` +
-      `node["amenity"="blood_bank"](${south},${west},${north},${east});` +
-      `node["healthcare"="blood_donation"](${south},${west},${north},${east});` +
-      `node["amenity"="fire_station"](${south},${west},${north},${east});` +
-      `node["amenity"="hospital"](${south},${west},${north},${east});` +
-      `);out body 50;`;
+      `[out:json][timeout:45];` +
+      `(` +
+      `nwr["amenity"="social_facility"](${bb});` +
+      `nwr["amenity"="shelter"](${bb});` +
+      `nwr["amenity"="community_centre"](${bb});` +
+      `nwr["amenity"="food_bank"](${bb});` +
+      `nwr["office"="ngo"](${bb});` +
+      `nwr["amenity"="blood_bank"](${bb});` +
+      `nwr["healthcare"="blood_donation"](${bb});` +
+      `nwr["amenity"="fire_station"](${bb});` +
+      `node["amenity"="hospital"](${bb});` +
+      `);out center 80;`;
 
     const elements = await this.queryOverpass(query);
     const rows = elements
@@ -71,9 +76,9 @@ export class OsmHelpConnector {
         const res = await fetch(url, {
           headers: {
             Accept: 'application/json',
-            'User-Agent': 'AyudaEnEmergencias/0.3 (national help directory; contact via repo)',
+            'User-Agent': 'AyudaEnEmergencias/0.4 (national help densify; contact via repo)',
           },
-          signal: AbortSignal.timeout(50_000),
+          signal: AbortSignal.timeout(55_000),
         });
         if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
         const json = (await res.json()) as OverpassResponse;
@@ -93,8 +98,8 @@ export class OsmHelpConnector {
     city: CityBBox,
     fetchedAt: Date,
   ): OsmHelpPlaceRow | null {
-    const lat = el.lat;
-    const lng = el.lon;
+    const lat = el.lat ?? el.center?.lat;
+    const lng = el.lon ?? el.center?.lon;
     if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
       return null;
     }
@@ -102,7 +107,7 @@ export class OsmHelpConnector {
     const name = (tags.name || tags['name:es'] || '').trim();
     if (!name) return null;
 
-    const amenity = tags.amenity || tags.office || '';
+    const amenity = tags.amenity || tags.office || tags.healthcare || '';
     const type = this.mapType(amenity, tags);
     const needTags = this.guessTags(tags);
     const website = tags.website || tags['contact:website'] || '';
@@ -124,6 +129,7 @@ export class OsmHelpConnector {
       properties: {
         amenity,
         osmId: el.id,
+        osmType: el.type,
         socialFacility: tags.social_facility ?? null,
       },
     };
@@ -137,9 +143,12 @@ export class OsmHelpConnector {
     if (amenity === 'shelter' || tags.shelter_type) return 'SHELTER';
     if (amenity === 'blood_bank' || tags.healthcare === 'blood_donation') return 'HELP_CENTER';
     if (amenity === 'fire_station') return 'VOLUNTEER_POINT';
+    if (amenity === 'food_bank') return 'DONATION_POINT';
+    if (amenity === 'community_centre') return 'HELP_CENTER';
     if (amenity === 'social_facility') {
       const kind = (tags.social_facility || '').toLowerCase();
       if (kind.includes('food') || kind.includes('soup')) return 'DONATION_POINT';
+      if (kind.includes('shelter')) return 'SHELTER';
       return 'HELP_CENTER';
     }
     if (amenity === 'ngo') return 'VOLUNTEER_POINT';
@@ -150,11 +159,13 @@ export class OsmHelpConnector {
     const blob =
       `${tags.social_facility ?? ''} ${tags.description ?? ''} ${tags.amenity ?? ''} ${tags.healthcare ?? ''}`.toLowerCase();
     const out: string[] = [];
-    if (/food|comida|soup|banco/.test(blob)) out.push('FOOD');
+    if (/food|comida|soup|banco|food_bank/.test(blob)) out.push('FOOD');
     if (/water|agua/.test(blob)) out.push('WATER');
     if (/shelter|albergue|refugio/.test(blob)) out.push('SHELTER');
     if (/blood|sangre|hemocentro/.test(blob)) out.push('BLOOD');
-    if (/volunteer|volunt|fire_station|bombero/.test(blob)) out.push('VOLUNTEER');
+    if (/volunteer|volunt|fire_station|bombero|community_centre/.test(blob)) {
+      out.push('VOLUNTEER');
+    }
     if (/hospital|clinic|medicine|farmac/.test(blob)) out.push('MEDICINE');
     if (out.length === 0) out.push('OTHER');
     return out;
@@ -164,17 +175,21 @@ export class OsmHelpConnector {
     const bits = [
       amenity === 'social_facility'
         ? 'Centro social / ayuda comunitaria'
-        : amenity === 'shelter'
-          ? 'Albergue o refugio'
-          : amenity === 'ngo'
-            ? 'Organización / ONG'
-            : amenity === 'blood_bank' || tags.healthcare === 'blood_donation'
-              ? 'Donación de sangre'
-              : amenity === 'fire_station'
-                ? 'Estación de bomberos — posible punto de voluntariado'
-                : amenity === 'hospital'
-                  ? 'Hospital / atención en salud'
-                  : 'Punto de ayuda',
+        : amenity === 'community_centre'
+          ? 'Centro comunitario'
+          : amenity === 'food_bank'
+            ? 'Banco de alimentos / acopio (mapa abierto)'
+            : amenity === 'shelter'
+              ? 'Albergue o refugio'
+              : amenity === 'ngo'
+                ? 'Organización / ONG'
+                : amenity === 'blood_bank' || tags.healthcare === 'blood_donation'
+                  ? 'Punto / campaña de sangre'
+                  : amenity === 'fire_station'
+                    ? 'Estación de bomberos — posible punto de voluntariado'
+                    : amenity === 'hospital'
+                      ? 'Hospital / atención en salud'
+                      : 'Punto de ayuda',
       tags.opening_hours ? `Horario: ${tags.opening_hours}` : null,
     ].filter(Boolean);
     return bits.join(' · ');

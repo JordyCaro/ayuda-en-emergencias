@@ -45,16 +45,23 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
           </p>
           <p class="stamp" *ngIf="updatedHint()">Actualizado: {{ updatedHint() }}</p>
           <div class="toolbar">
-            <a class="cta" routerLink="/publicar-punto">Publicar un lugar</a>
-            <a class="ghost" routerLink="/buscar">¿Qué necesitas?</a>
+            <button type="button" class="cta" (click)="useNearMe()" [disabled]="locating()">
+              {{ locating() ? 'Ubicando…' : nearMe() ? 'Actualizar cerca de mí' : 'Cerca de mí' }}
+            </button>
+            <a class="ghost" routerLink="/publicar-punto">Publicar un lugar</a>
           </div>
+          <p class="near-hint" *ngIf="nearMe()">
+            Mostrando lugares a ~{{ nearKm }} km de tu ubicación.
+            <button type="button" class="linkish" (click)="clearNearMe()">Ver todo el país</button>
+          </p>
+          <p class="toast err" *ngIf="geoError()">{{ geoError() }}</p>
         </div>
         <aside class="hero-side panel-card">
           <p class="side-k">Cómo ayudar</p>
           <ul>
-            <li>Elige qué puedes llevar o el tipo de lugar</li>
-            <li>Abre el canal de la org (todo ocurre allá)</li>
-            <li>O usa Cómo llegar si hay punto en mapa</li>
+            <li>Filtra por qué puedes llevar o tipo de lugar</li>
+            <li>Usa Cerca de mí para tu zona</li>
+            <li>Abre el canal de la org o Cómo llegar</li>
           </ul>
         </aside>
       </div>
@@ -123,7 +130,8 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
           <p class="toast err" *ngIf="error()">{{ error() }}</p>
           <p class="count" *ngIf="!loading()">
             {{ places().length }} lugar{{ places().length === 1 ? '' : 'es' }}
-            <span *ngIf="cityLabel()"> · {{ cityLabel() }}</span>
+            <span *ngIf="nearMe()"> · cerca de ti</span>
+            <span *ngIf="!nearMe() && cityLabel()"> · {{ cityLabel() }}</span>
             <span *ngIf="tag"> · {{ needTagLabel(tag) }}</span>
             <span *ngIf="placeType"> · {{ placeTypeLabel(placeType) }}</span>
           </p>
@@ -145,13 +153,16 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
                 <div class="tags" *ngIf="p.needTags?.length">
                   <span *ngFor="let t of p.needTags">{{ needTagLabel(t) }}</span>
                 </div>
-                <div class="foot">
-                  <span
-                    >{{ p.municipality || 'Colombia'
-                    }}<ng-container *ngIf="p.department"> · {{ p.department }}</ng-container></span
-                  >
-                  <span *ngIf="p.updatedAt">{{ p.updatedAt | date: 'd MMM, HH:mm' }}</span>
-                </div>
+                  <div class="foot">
+                    <span
+                      >{{ p.municipality || 'Colombia'
+                      }}<ng-container *ngIf="p.department"> · {{ p.department }}</ng-container
+                      ><ng-container *ngIf="nearMe() && distanceLabel(p)">
+                        · {{ distanceLabel(p) }}</ng-container
+                      ></span
+                    >
+                    <span *ngIf="p.updatedAt">{{ p.updatedAt | date: 'd MMM, HH:mm' }}</span>
+                  </div>
                 <div class="actions" (click)="$event.stopPropagation()">
                   <a
                     *ngIf="p.externalUrl"
@@ -244,11 +255,32 @@ const CO_BOUNDS: [[number, number], [number, number]] = [
         font-weight: 700;
         opacity: 0.75;
       }
+      .near-hint {
+        margin: 0.75rem 0 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: rgba(247, 243, 236, 0.85);
+      }
+      .linkish {
+        border: 0;
+        background: transparent;
+        color: #f0c84a;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        margin-left: 0.35rem;
+      }
       .toolbar {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-top: 1.1rem;
+      }
+      button.cta:disabled {
+        opacity: 0.65;
+        cursor: wait;
       }
       .cta,
       .ghost,
@@ -619,13 +651,19 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly cities = signal<CityDto[]>([]);
   readonly places = signal<PlaceDto[]>([]);
   readonly loading = signal(false);
+  readonly locating = signal(false);
   readonly error = signal<string | null>(null);
+  readonly geoError = signal<string | null>(null);
   readonly updatedHint = signal<string | null>(null);
   readonly directions = signal<PlaceDto | null>(null);
+  readonly nearMe = signal(false);
 
   tag: NeedTag | '' = '';
   placeType: PlaceType | '' = '';
   cityCode = '';
+  nearLat: number | null = null;
+  nearLng: number | null = null;
+  readonly nearKm = 40;
 
   readonly placeTypeLabel = placeTypeLabel;
   readonly needTagLabel = needTagLabel;
@@ -670,7 +708,52 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setCity(code: string): void {
     this.cityCode = code;
+    this.nearMe.set(false);
+    this.nearLat = null;
+    this.nearLng = null;
+    this.geoError.set(null);
     this.reload();
+  }
+
+  useNearMe(): void {
+    this.geoError.set(null);
+    if (!navigator.geolocation) {
+      this.geoError.set('Tu navegador no permite ubicación. Elige una ciudad.');
+      return;
+    }
+    this.locating.set(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.nearLat = pos.coords.latitude;
+        this.nearLng = pos.coords.longitude;
+        this.nearMe.set(true);
+        this.cityCode = '';
+        this.locating.set(false);
+        this.reload();
+      },
+      () => {
+        this.locating.set(false);
+        this.geoError.set('No pudimos obtener tu ubicación. Elige una ciudad o revisa permisos.');
+      },
+      { enableHighAccuracy: false, timeout: 12_000, maximumAge: 120_000 },
+    );
+  }
+
+  clearNearMe(): void {
+    this.nearMe.set(false);
+    this.nearLat = null;
+    this.nearLng = null;
+    this.geoError.set(null);
+    this.reload();
+  }
+
+  distanceLabel(p: PlaceDto): string | null {
+    if (!this.nearMe() || this.nearLat == null || this.nearLng == null) return null;
+    const c = this.coords(p);
+    if (!c) return null;
+    const km = haversineKm(this.nearLat, this.nearLng, c[1], c[0]);
+    if (km < 1) return `${Math.round(km * 1000)} m`;
+    return `${km.toFixed(km < 10 ? 1 : 0)} km`;
   }
 
   howToHelp(p: PlaceDto): string {
@@ -774,8 +857,17 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
       cityCode?: string;
       type?: string;
       tag?: string;
+      lat?: number;
+      lng?: number;
+      radius?: number;
     } = { origin: 'all', helpOnly: true, limit: 200 };
-    if (this.cityCode) params.cityCode = this.cityCode;
+    if (this.nearMe() && this.nearLat != null && this.nearLng != null) {
+      params.lat = this.nearLat;
+      params.lng = this.nearLng;
+      params.radius = this.nearKm * 1000;
+    } else if (this.cityCode) {
+      params.cityCode = this.cityCode;
+    }
     if (this.placeType) {
       params.type = this.placeType;
       params.helpOnly = this.placeType !== 'MEDICAL';
@@ -796,7 +888,9 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         }
         data = data.filter((p) => !isLowSignalPlace(p));
-        data = [...data].sort((a, b) => scorePlace(b) - scorePlace(a));
+        if (!this.nearMe()) {
+          data = [...data].sort((a, b) => scorePlace(b) - scorePlace(a));
+        }
         this.places.set(data);
         this.loading.set(false);
         queueMicrotask(() => this.syncMarkers());
@@ -917,4 +1011,14 @@ function esc(v: string): string {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
+}
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }

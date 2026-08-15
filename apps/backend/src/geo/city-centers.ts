@@ -20,6 +20,9 @@ export const CITY_CENTERS: Record<string, { lat: number; lng: number; name: stri
   '68001': { lat: 7.1193, lng: -73.1227, name: 'Bucaramanga' },
   '73001': { lat: 4.4389, lng: -75.2322, name: 'Ibagué' },
   '76001': { lat: 3.4516, lng: -76.532, name: 'Cali' },
+  '70001': { lat: 9.3047, lng: -75.3978, name: 'Sincelejo' },
+  '44001': { lat: 11.5444, lng: -72.9072, name: 'Riohacha' },
+  '18001': { lat: 1.6144, lng: -75.6062, name: 'Florencia' },
 };
 
 export function cityCenter(code: string): { lat: number; lng: number; name: string } | null {

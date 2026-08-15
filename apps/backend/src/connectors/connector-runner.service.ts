@@ -276,6 +276,8 @@ export class ConnectorRunnerService {
             this.logger.warn(`OSM help ${city.name} failed: ${message}`);
             await this.sources.markFetchError('osm', message);
           }
+          // Evitar martillar Overpass entre ciudades
+          await sleep(1500);
         }
       }
 
@@ -334,4 +336,8 @@ export class ConnectorRunnerService {
       contentHash,
     });
   }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

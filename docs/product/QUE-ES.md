@@ -48,8 +48,8 @@ Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integra
 
 | Fase | Estado |
 |------|--------|
-| **0–5** | Hechas |
-| **6** | Densificación territorial — siguiente |
+| **0–6** | Discovery → … → densificación territorial | Hechas |
+| **7** | Deep-links oficiales extra | Pendiente — siguiente |
 | **7–9** | Deep-links → moderación → prod |
 | **12** | Offline — casi opcional |
 

@@ -18,7 +18,7 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 ## Antes de escribir código de producto
 
 1. Leer `.specify/memory/constitution.md`  
-2. Slice activo: `001`–`004` hechos; siguiente **Fase 6** → abrir `specs/005+` antes de implementar  
+2. Slice activo: `001`–`005` hechos; siguiente **Fase 7** → abrir `specs/006+` antes de implementar  
 3. Leer `spec.md` → `plan.md` → `tasks.md`  
 4. Si el pedido contradice OUT del spec o la constitution → **parar y preguntar**  
 5. No implementar OUT del slice activo  
@@ -63,6 +63,6 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 
 ## Estado del proyecto
 
-Fases **0–5** hechas (`001`–`004`). Siguiente: **Fase 6** (densificación) — abrir slice antes.  
-Superficie: `/` · `/buscar` · `/ayudar` (solo lugares) · `/publicar-punto` · `/fuentes-detalle`.  
+Fases **0–6** hechas (`001`–`005`). Siguiente: **Fase 7** (deep-links) — abrir slice antes.  
+Superficie: `/` · `/buscar` · `/ayudar` (lugares + cerca de mí) · `/publicar-punto` · `/fuentes-detalle`.  
 Producto = **capa que conecta**. Cumplimiento master = **0–9**; offline = **12**.

@@ -32,4 +32,7 @@ export const NATIONAL_SYNC_CITIES: CityBBox[] = [
   { code: '23001', name: 'Montería', bbox: { west: -75.95, south: 8.7, east: -75.8, north: 8.85 } },
   { code: '20001', name: 'Valledupar', bbox: { west: -73.3, south: 10.42, east: -73.2, north: 10.52 } },
   { code: '15001', name: 'Tunja', bbox: { west: -73.4, south: 5.5, east: -73.3, north: 5.6 } },
+  { code: '70001', name: 'Sincelejo', bbox: { west: -75.45, south: 9.25, east: -75.35, north: 9.35 } },
+  { code: '44001', name: 'Riohacha', bbox: { west: -73.0, south: 11.5, east: -72.88, north: 11.58 } },
+  { code: '18001', name: 'Florencia', bbox: { west: -75.65, south: 1.58, east: -75.55, north: 1.68 } },
 ];

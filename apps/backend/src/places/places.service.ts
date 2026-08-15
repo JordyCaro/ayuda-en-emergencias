@@ -53,9 +53,34 @@ export class PlacesService {
       .createQueryBuilder('p')
       .where('p.status = :status', { status: 'ACTIVE' })
       .andWhere('(p.expires_at IS NULL OR p.expires_at > NOW())')
-      .orderBy('p.updated_at', 'DESC')
       .take(limit)
       .skip(offset);
+
+    const near =
+      query.lat != null &&
+      query.lng != null &&
+      query.radius != null &&
+      query.radius > 0;
+
+    if (near) {
+      qb.addSelect(
+        `(
+          6371000 * acos(
+            least(1, greatest(-1,
+              cos(radians(:nearLat)) * cos(radians(p.lat)) *
+              cos(radians(p.lng) - radians(:nearLng)) +
+              sin(radians(:nearLat)) * sin(radians(p.lat))
+            ))
+          )
+        )`,
+        'distance_m',
+      );
+      qb.setParameter('nearLat', query.lat);
+      qb.setParameter('nearLng', query.lng);
+      qb.orderBy('distance_m', 'ASC');
+    } else {
+      qb.orderBy('p.updated_at', 'DESC');
+    }
 
     if (query.type) {
       qb.andWhere('p.type = :type', { type: query.type });
@@ -112,13 +137,8 @@ export class PlacesService {
         south: query.south,
         north: query.north,
       });
-    } else if (
-      query.lat != null &&
-      query.lng != null &&
-      query.radius != null &&
-      query.radius > 0
-    ) {
-      if (!isValidLatLng(query.lat, query.lng)) {
+    } else if (near) {
+      if (!isValidLatLng(query.lat!, query.lng!)) {
         throw new BadRequestException('lat/lng inválidos');
       }
       qb.andWhere(

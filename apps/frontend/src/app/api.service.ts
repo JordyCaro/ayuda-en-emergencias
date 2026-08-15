@@ -65,6 +65,9 @@ export class ApiService {
     south?: number;
     east?: number;
     north?: number;
+    lat?: number;
+    lng?: number;
+    radius?: number;
     limit?: number;
     cityCode?: string;
     origin?: 'community' | 'official' | 'all';
@@ -77,6 +80,9 @@ export class ApiService {
     if (params?.south != null) q.set('south', String(params.south));
     if (params?.east != null) q.set('east', String(params.east));
     if (params?.north != null) q.set('north', String(params.north));
+    if (params?.lat != null) q.set('lat', String(params.lat));
+    if (params?.lng != null) q.set('lng', String(params.lng));
+    if (params?.radius != null) q.set('radius', String(params.radius));
     if (params?.limit != null) q.set('limit', String(params.limit));
     if (params?.cityCode) q.set('cityCode', params.cityCode);
     if (params?.origin) q.set('origin', params.origin);

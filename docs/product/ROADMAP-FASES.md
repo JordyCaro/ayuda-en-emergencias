@@ -6,7 +6,7 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–5 hechas**. Siguiente: **Fase 6** (densificación territorial).
+**Estado:** fases **0–6 hechas**. Siguiente: **Fase 7** (deep-links oficiales extra).
 
 ---
 
@@ -53,7 +53,7 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **3** | Registro fácil de lugares / orgs | Acopio, fundaciones, ONG; filtro ciudad (DIVIPOLA); listado “quién necesita apoyo”; expiración | `002` | **Hecha** |
 | **4** | Quiero ayudar / voluntariado (enlace) | Flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs; sin intermediación laboral | `003` | **Hecha** |
 | **5** | Descubrimiento de donación (solo enlace) | Mostrar *dónde* llevar ayuda / canal de orgs; **cero** pasarela ni custodia; sin enfatizar dinero | `004` | **Hecha** |
-| **6** | Densificación territorial | Connectors municipales (Cali/Medellín/Bogotá…), OSM amenities cacheado, cobertura multi-depto | `005+` | Pendiente |
+| **6** | Densificación territorial | Connectors municipales/OSM cacheado, cobertura multi-ciudad, cerca de mí | `005` | **Hecha** |
 | **7** | Deep-links y datos oficiales extra | UX a SGC/RND/UNGRD/IDIGER según registry; connectors solo si dejan de estar `BLOCKED`/`LEGAL_REVIEW` | docs + slice | Pendiente |
 | **8** | Moderación y confianza operativa | Admin mínimo; cola VERIFIED/REJECTED; sin fingir autoridad nacional | `admin` / slice | Pendiente |
 | **9** | Plataforma de producción | Deploy HTTPS, migraciones formales, jobs robustos, rate limits, OpenAPI alineado, métricas, API pública madura, push opcional | infra + harden | Pendiente |
@@ -115,13 +115,14 @@ Spec: `specs/003-quiero-ayudar-enlace/` (**APROBADA**).
 - Sin checkout, wallets ni campañas de dinero como producto.  
 Spec: `specs/004-donacion-descubrimiento-enlace/` (**APROBADA**).
 
-### Fase 6 — Densificar territorio *(siguiente)*
+### Fase 6 — Densificar territorio *(hecha — 005)*
 
-- Connectors ciudad / CDGRD oportunistas (registry).  
-- OSM Overpass cacheado por depto (amenities útiles).  
-- Mejor “cerca de mí” a escala nacional.
+- Sync nacional por capitales: SISPRO + OSM help (amenities ampliados, nodos/ways).  
+- Más ciudades ancla; pausa entre Overpass.  
+- Quiero ayudar: **Cerca de mí** (radio + orden por distancia).  
+Spec: `specs/005-densificacion-territorial/` (**APROBADA**).
 
-### Fase 7 — Deep-links oficiales extra
+### Fase 7 — Deep-links oficiales extra *(siguiente)*
 
 - RND / desaparecidos → solo derivación oficial.  
 - SGC mientras esté `BLOCKED` → visor oficial.  
@@ -194,7 +195,8 @@ Spec: `specs/004-donacion-descubrimiento-enlace/` (**APROBADA**).
 | `002-registro-facil-lugares` | 3 |
 | `003-quiero-ayudar-enlace` | 4 |
 | `004-donacion-descubrimiento-enlace` | 5 |
-| Futuros `005+` | 6… una capacidad vertical por slice |
+| `005-densificacion-territorial` | 6 |
+| Futuros `006+` | 7… |
 | Docs-only / infra | 0, partes de 7 y 9 |
 
 Si una idea está en este roadmap pero **OUT** del slice activo → no implementar; abrir o avanzar el slice correcto.
