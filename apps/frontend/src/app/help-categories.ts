@@ -14,7 +14,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
   { id: 'CLOTHING', title: 'Ropa / cobijas', hint: 'Abrigo y vestuario' },
   { id: 'SHELTER', title: 'Techo / albergue', hint: 'Dónde dormir o refugiarse' },
   { id: 'VOLUNTEER', title: 'Voluntariado', hint: 'Manos, turnos, logística' },
-  { id: 'BLOOD', title: 'Sangre / donación', hint: 'Campañas y bancos (enlace)' },
+  { id: 'BLOOD', title: 'Sangre', hint: 'Campañas / bancos (enlace a ellos)' },
   { id: 'OTHER', title: 'Otra ayuda', hint: 'Algo distinto de emergencia' },
 ];
 
@@ -85,7 +85,7 @@ export const FORUM_CATEGORIES: ForumCat[] = [
 
 export const PLACE_KIND_FILTERS: Array<{ id: PlaceType | ''; label: string }> = [
   { id: '', label: 'Todos' },
-  { id: 'DONATION_POINT', label: 'Llevar donación' },
+  { id: 'DONATION_POINT', label: 'Llevar ayuda / acopio' },
   { id: 'HELP_CENTER', label: 'Centro de ayuda' },
   { id: 'SHELTER', label: 'Albergue' },
   { id: 'VOLUNTEER_POINT', label: 'Voluntariado' },

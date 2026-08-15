@@ -13,64 +13,50 @@ Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integra
 
 ## Para qué existe
 
-Después de una emergencia la información se parte: un lado tiene alertas, otro tiene puntos de acopio, otro publica “hacen falta agua”.  
-La gente no sabe **qué es oficial**, **qué es un comentario de alguien**, ni **adónde ir**.
-
-Esta plataforma:
-
-1. Trae **alertas / datos oficiales** cuando hay API legal y viable (IDEAM, SISPRO/REPS, etc.).  
-2. Deja publicar **avisos** de necesidad u oferta (WhatsApp opcional): son **señales**, no tickets.  
-3. **Quiero ayudar**: ver avisos NEED y lugares/orgs con canal externo (sin matching laboral).  
-4. Muestra **de dónde sale cada dato** (Fuentes).  
-5. Más adelante: donación **solo como enlace** a terceros (Fase 5).
+1. **Alertas / datos oficiales** cuando hay API legal y viable.  
+2. **Avisos** de necesidad u oferta en `/buscar` (señales, no tickets).  
+3. **Quiero ayudar**: lugares (acopio, albergue, centro…) y **cómo ayudar** en el canal de la org.  
+4. **Fuentes** con procedencia.  
+5. Llevar ayuda / acopio = discovery de terceros **sin** pasar dinero por nosotros.
 
 ---
 
-## Qué no hacemos (importante)
+## Qué no hacemos
 
 | No hacemos | Por qué |
 |------------|---------|
-| Cobrar / recibir donaciones | No somos intermediarios financieros ni de especie |
-| Asignar voluntarios / turnos | Solo enlazamos; el contacto es entre personas/orgs |
-| Prometer que “la ayuda llega” | Un aviso no es un ticket de servicio |
+| Cobrar / custodiar donaciones o dinero | No somos intermediarios |
+| Asignar voluntarios / turnos | Solo enlazamos |
+| Prometer que “la ayuda llega” | Un aviso no es un ticket |
 | Inventar emergencias ni cifras | Solo datos con fuente o avisos no verificados |
-| Reemplazar al 123 / UNGRD / Cruz Roja | Derivamos a canales oficiales |
 
 ---
 
-## Superficie actual (fases 0–4)
+## Superficie (fases 0–5)
 
 | Pieza | Ruta | Qué hace |
 |-------|------|----------|
-| **Inicio** | `/` | Qué es, utilidad, conteos reales, fuentes |
+| **Inicio** | `/` | Qué es, utilidad, fuentes |
 | **¿Qué necesitas?** | `/buscar` | Foro Necesito / Puedo aportar |
-| **Quiero ayudar** | `/ayudar` | Avisos NEED + directorio de lugares |
+| **Quiero ayudar** | `/ayudar` | Solo lugares + cómo ayudar / acopio |
 | **Publicar punto** | `/publicar-punto` | Registro de acopio / org |
-| **Fuentes** | `/fuentes-detalle` | Registry de fuentes |
-| **API** | `:3000/api/v1` | NestJS + Swagger |
-
-Nav: **¿Qué necesitas? · Quiero ayudar · Publicar · Fuentes**.
+| **Fuentes** | `/fuentes-detalle` | Registry |
 
 ---
 
 ## Roadmap corto
 
-| Fase | Idea | Estado |
-|------|------|--------|
-| **0–3** | Discovery → Places → registro lugares | Hechas |
-| **4 / 003** | Quiero ayudar (enlace) | Hecha |
-| **5** | Donación solo enlace a terceros | Pendiente |
-| **6–9** | Densidad → deep-links → moderación → prod | Pendiente |
-| **12** | Offline avanzado | Última, casi opcional |
+| Fase | Estado |
+|------|--------|
+| **0–5** | Hechas |
+| **6** | Densificación territorial — siguiente |
+| **7–9** | Deep-links → moderación → prod |
+| **12** | Offline — casi opcional |
 
 Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
 
 ---
 
-## Documentos relacionados
+## Docs
 
-- Roadmap: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)  
-- Cómo correr: [`../dev/COMO-CORRER.md`](../dev/COMO-CORRER.md)  
-- Fuentes: [`../sources/source-registry.md`](../sources/source-registry.md)  
-- Specs: `specs/001` · `002` · `003`  
-- Constitution: [`.specify/memory/constitution.md`](../../.specify/memory/constitution.md)  
+- Roadmap · Cómo correr · Fuentes · Specs `001`–`004` · Constitution  

@@ -82,7 +82,7 @@ export function eventPlainDetail(summary?: string | null): string {
 export function placeTypeLabel(type: string): string {
   switch (type) {
     case 'DONATION_POINT':
-      return 'Llevar donación / acopio';
+      return 'Llevar ayuda / acopio';
     case 'HELP_CENTER':
       return 'Centro de ayuda';
     case 'SHELTER':

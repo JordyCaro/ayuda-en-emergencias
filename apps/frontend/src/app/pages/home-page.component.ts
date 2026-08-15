@@ -73,7 +73,7 @@ import { statusLabel } from '../plain-labels';
         <div class="quick">
           <a routerLink="/buscar">Publicar o leer avisos</a>
           <a routerLink="/ayudar">Quiero ayudar</a>
-          <a routerLink="/buscar" [queryParams]="{ intent: 'OFFER' }">Puedo aportar</a>
+          <a routerLink="/ayudar" [queryParams]="{ type: 'DONATION_POINT' }">Llevar ayuda / acopio</a>
           <a href="tel:123">Llamar al 123</a>
         </div>
       </div>
@@ -95,12 +95,12 @@ import { statusLabel } from '../plain-labels';
           </a>
           <a class="way alt" routerLink="/ayudar">
             <span class="way-label">Quiero ayudar</span>
-            <strong>Avisos y lugares</strong>
+            <strong>Dónde y cómo ayudar</strong>
             <p>
-              Responde necesidades de la comunidad o abre el canal de un acopio / org. Sin matching
-              nuestro.
+              Acopios, albergues y centros. Filtra qué puedes llevar y abre el canal de la org — sin
+              pasar por nosotros.
             </p>
-            <span class="way-go">Sumarme →</span>
+            <span class="way-go">Ver lugares →</span>
           </a>
         </div>
       </div>

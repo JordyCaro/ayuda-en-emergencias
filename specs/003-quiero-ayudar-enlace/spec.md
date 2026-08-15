@@ -80,4 +80,6 @@
 ## 7. Dependencias
 
 - Fases 1–3 hechas.  
-- Donación discovery → Fase 5.
+- Donación discovery → Fase 5.  
+
+**Ajuste producto (004):** Quiero ayudar queda **solo lugares**; avisos NEED/OFFER viven en `/buscar`.

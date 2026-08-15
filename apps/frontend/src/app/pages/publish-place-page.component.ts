@@ -7,7 +7,7 @@ import { ApiService } from '../api.service';
 import { HELP_CATEGORIES } from '../help-categories';
 
 const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
-  { id: 'DONATION_POINT', label: 'Acopio / donaciones', hint: 'Reciben especie en un punto' },
+  { id: 'DONATION_POINT', label: 'Acopio / llevar ayuda', hint: 'Reciben especie en un punto' },
   { id: 'HELP_CENTER', label: 'Centro de ayuda', hint: 'Atienden o coordinan ayuda' },
   { id: 'SHELTER', label: 'Albergue', hint: 'Alojamiento temporal' },
   { id: 'VOLUNTEER_POINT', label: 'Voluntariado', hint: 'Necesitan manos / turno' },

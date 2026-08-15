@@ -6,7 +6,7 @@
 Fuente de intención: master de emergencias + constitution + registries.  
 Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs` (SDD). Este roadmap ordena el *qué* y el *cuándo relativo*; no autoriza código sin slice.
 
-**Estado:** fases **0–4 hechas**. Siguiente: **Fase 5** (donación solo enlace).
+**Estado:** fases **0–5 hechas**. Siguiente: **Fase 6** (densificación territorial).
 
 ---
 
@@ -52,7 +52,7 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **2** | Connectors oficiales + Places | SISPRO/REPS → Places salud; modelo Place; filtros; sync robusto | post-001 | **Hecha (robusta)** |
 | **3** | Registro fácil de lugares / orgs | Acopio, fundaciones, ONG; filtro ciudad (DIVIPOLA); listado “quién necesita apoyo”; expiración | `002` | **Hecha** |
 | **4** | Quiero ayudar / voluntariado (enlace) | Flujo “quiero ayudar” sin dinero: ver avisos/puntos + enlaces a canales de orgs; sin intermediación laboral | `003` | **Hecha** |
-| **5** | Descubrimiento de donación (solo enlace) | Mostrar *dónde* donar en canales de terceros (sitios/orgs verificables); **cero** pasarela ni custodia | `004+` | Pendiente |
+| **5** | Descubrimiento de donación (solo enlace) | Mostrar *dónde* llevar ayuda / canal de orgs; **cero** pasarela ni custodia; sin enfatizar dinero | `004` | **Hecha** |
 | **6** | Densificación territorial | Connectors municipales (Cali/Medellín/Bogotá…), OSM amenities cacheado, cobertura multi-depto | `005+` | Pendiente |
 | **7** | Deep-links y datos oficiales extra | UX a SGC/RND/UNGRD/IDIGER según registry; connectors solo si dejan de estar `BLOCKED`/`LEGAL_REVIEW` | docs + slice | Pendiente |
 | **8** | Moderación y confianza operativa | Admin mínimo; cola VERIFIED/REJECTED; sin fingir autoridad nacional | `admin` / slice | Pendiente |
@@ -103,19 +103,19 @@ Spec: `specs/002-registro-facil-lugares/` (**APROBADA**).
 
 ### Fase 4 — Quiero ayudar / voluntariado (enlace) *(hecha — 003)*
 
-- Hub `/ayudar` (alias `/quiero-ayudar`): tabs **Avisos** (NEED) + **Lugares**.  
-- Contacto directo: WhatsApp del aviso o canal externo del Place.  
-- CTA “Puedo aportar” → `/buscar?intent=OFFER`.  
-- Copy: no matching laboral; no donaciones nuestras.  
+- Hub `/ayudar` (alias `/quiero-ayudar`): **lugares** + cómo ayudar (ajuste 004: sin tab avisos).  
+- Contacto: canal externo del Place o Cómo llegar.  
+- Avisos de comunidad → `/buscar`.  
 Spec: `specs/003-quiero-ayudar-enlace/` (**APROBADA**).
 
-### Fase 5 — Donación solo como descubrimiento *(siguiente)*
+### Fase 5 — Donación solo como descubrimiento *(hecha — 004)*
 
-- Fichas/listados con `donationUrl` / canales de terceros.  
-- UI que deje explícito: la donación ocurre fuera.  
-- Prohibido: checkout, wallets, inventario de especie nuestro.
+- En Quiero ayudar: filtros “qué puedes llevar” + tipo **Llevar ayuda / acopio**.  
+- Deep-links a orgs curadas (Cruz Roja, ABACO, bancos de alimentos…); acción **fuera**.  
+- Sin checkout, wallets ni campañas de dinero como producto.  
+Spec: `specs/004-donacion-descubrimiento-enlace/` (**APROBADA**).
 
-### Fase 6 — Densificar territorio
+### Fase 6 — Densificar territorio *(siguiente)*
 
 - Connectors ciudad / CDGRD oportunistas (registry).  
 - OSM Overpass cacheado por depto (amenities útiles).  
@@ -193,7 +193,8 @@ Spec: `specs/003-quiero-ayudar-enlace/` (**APROBADA**).
 | `001-mvp-mapa-ayuda` | 1 (+ arranque hacia 2) |
 | `002-registro-facil-lugares` | 3 |
 | `003-quiero-ayudar-enlace` | 4 |
-| Futuros `004+` | 5, 6… una capacidad vertical por slice |
+| `004-donacion-descubrimiento-enlace` | 5 |
+| Futuros `005+` | 6… una capacidad vertical por slice |
 | Docs-only / infra | 0, partes de 7 y 9 |
 
 Si una idea está en este roadmap pero **OUT** del slice activo → no implementar; abrir o avanzar el slice correcto.
