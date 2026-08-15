@@ -48,9 +48,9 @@ Somos una **capa abierta que conecta**: datos oficiales cuando se pueden integra
 
 | Fase | Estado |
 |------|--------|
-| **0–6** | Discovery → … → densificación territorial | Hechas |
-| **7** | Deep-links oficiales extra | Pendiente — siguiente |
-| **7–9** | Deep-links → moderación → prod |
+| **0–6** | Hechas |
+| **7** | Deep-links oficiales — siguiente |
+| **8–9** | Moderación → producción |
 | **12** | Offline — casi opcional |
 
 Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
@@ -59,4 +59,4 @@ Detalle: [`ROADMAP-FASES.md`](ROADMAP-FASES.md)
 
 ## Docs
 
-- Roadmap · Cómo correr · Fuentes · Specs `001`–`004` · Constitution  
+- Roadmap · Cómo correr · Fuentes · Specs `001`–`005` · Constitution  
