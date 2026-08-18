@@ -1,0 +1,3 @@
+# Cloudflare Workers: no parsear _redirects de Netlify (rompe el deploy).
+# El SPA lo cubre wrangler.toml → not_found_handling = single-page-application
+_redirects
