@@ -19,10 +19,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           type="button"
           class="burger"
           [attr.aria-expanded]="menuOpen()"
+          [attr.aria-label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
           aria-controls="site-menu"
           (click)="menuOpen.set(!menuOpen())"
         >
-          <span></span><span></span>
+          <span class="bars" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
           {{ menuOpen() ? 'Cerrar' : 'Menú' }}
         </button>
 
@@ -103,15 +106,19 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         font-size: 0.85rem;
         cursor: pointer;
       }
-      .burger span {
+      .burger .bars {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 3px;
+        width: 16px;
+      }
+      .burger .bars span {
         display: block;
-        width: 14px;
+        width: 16px;
         height: 2px;
         background: var(--ink);
-      }
-      .burger span + span {
-        margin-top: -6px;
-        width: 10px;
+        border-radius: 1px;
       }
       .links {
         display: none;

@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import type { CityDto, NeedCategory, NeedDto, NeedIntent } from '@aee/shared-types';
+import type { NeedCategory, NeedDto, NeedIntent } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { CITY_CHIPS, FORUM_CATEGORIES, forumCatLabel } from '../help-categories';
 
@@ -220,8 +220,11 @@ const DEMO: NeedDto[] = [
         <p class="prompt" *ngIf="!intent">Elige si necesitas ayuda o si puedes aportar.</p>
 
         <ng-container *ngIf="intent">
-          <p class="label">Categoría</p>
+          <p class="label">Categoría (filtra el muro)</p>
           <div class="cats" role="list">
+            <button type="button" class="cat" [class.on]="!category" (click)="setCategory(null)">
+              Todas
+            </button>
             <button
               type="button"
               class="cat"
@@ -233,49 +236,68 @@ const DEMO: NeedDto[] = [
             </button>
           </div>
 
-          <p class="prompt soft" *ngIf="!category">
-            Elige una categoría para ver el muro
-            {{ intent === 'NEED' ? 'de quien necesita' : 'de quien puede aportar' }}.
-          </p>
-        </ng-container>
+          <p class="label">Zona (filtra el muro)</p>
+          <div class="city-row">
+            <button
+              type="button"
+              class="chip"
+              *ngFor="let c of cityChips"
+              [class.on]="filterCity === c.code"
+              (click)="setFilterCity(c.code)"
+            >
+              {{ c.label }}
+            </button>
+          </div>
 
-        <ng-container *ngIf="intent && category">
           <div class="toolbar">
             <div>
-              <h2>{{ forumCatLabel(category) }}</h2>
+              <h2>{{ category ? forumCatLabel(category) : (intent === 'NEED' ? 'Quien necesita ayuda' : 'Quien puede aportar') }}</h2>
               <p class="sub">
-                {{ intent === 'NEED' ? 'Quien necesita ayuda' : 'Quien puede aportar' }}
-                · {{ posts().length }} aviso{{ posts().length === 1 ? '' : 's' }}
+                {{ posts().length }} aviso{{ posts().length === 1 ? '' : 's' }}
                 <span class="demo-note" *ngIf="hasDemo()"> · incluye ejemplos</span>
               </p>
             </div>
-            <button type="button" class="pub" (click)="showForm.set(!showForm())">
+            <button type="button" class="pub" (click)="toggleComposer()">
               {{ showForm() ? 'Cerrar' : intent === 'NEED' ? 'Publicar necesidad' : 'Publicar aporte' }}
             </button>
           </div>
 
           <div class="composer" *ngIf="showForm()">
+            <p class="label">1. ¿Qué?</p>
+            <div class="cats">
+              <button
+                type="button"
+                class="cat"
+                *ngFor="let c of cats"
+                [class.on]="formCategory === c.id"
+                (click)="formCategory = c.id"
+              >
+                {{ c.title }}
+              </button>
+            </div>
+            <p class="label">2. ¿Dónde?</p>
+            <div class="city-row">
+              <button
+                type="button"
+                class="chip"
+                *ngFor="let c of postCities"
+                [class.on]="cityCode === c.code"
+                (click)="cityCode = c.code"
+              >
+                {{ c.label }}
+              </button>
+            </div>
             <div class="composer-grid">
-              <label class="field">
-                Ciudad
-                <select [(ngModel)]="cityCode">
-                  <option value="">Elige ciudad</option>
-                  <option *ngFor="let c of postCities" [value]="c.code">{{ c.label }}</option>
-                  <option *ngFor="let c of extraCities()" [value]="c.code">
-                    {{ c.name }} — {{ c.department }}
-                  </option>
-                </select>
-              </label>
               <label class="field">
                 WhatsApp (opcional)
                 <input [(ngModel)]="whatsapp" inputmode="tel" placeholder="300 123 4567" />
               </label>
             </div>
             <label class="field">
-              Tu mensaje
+              Mensaje (opcional — si lo dejas vacío usamos la categoría)
               <textarea
                 [(ngModel)]="description"
-                rows="3"
+                rows="2"
                 maxlength="2000"
                 [placeholder]="
                   intent === 'NEED'
@@ -284,7 +306,7 @@ const DEMO: NeedDto[] = [
                 "
               ></textarea>
             </label>
-            <p class="fine">No verificamos contactos. Urgencias graves: 123.</p>
+            <p class="fine">Tres toques: categoría, ciudad, publicar. Urgencias graves: 123.</p>
             <button type="button" class="send" [disabled]="posting()" (click)="publish()">
               {{ posting() ? 'Publicando…' : 'Publicar en el muro' }}
             </button>
@@ -300,18 +322,6 @@ const DEMO: NeedDto[] = [
             <p class="toast err" *ngIf="formError()">{{ formError() }}</p>
           </div>
 
-          <div class="city-row">
-            <button
-              type="button"
-              class="chip"
-              *ngFor="let c of cityChips"
-              [class.on]="filterCity === c.code"
-              (click)="setFilterCity(c.code)"
-            >
-              {{ c.label }}
-            </button>
-          </div>
-
           <ul class="feed" *ngIf="posts().length; else empty">
             <li *ngFor="let n of posts()">
               <article class="card" [class.demo]="isDemo(n)">
@@ -324,6 +334,7 @@ const DEMO: NeedDto[] = [
                     <span class="tag" [class.offer]="n.intent === 'OFFER'">
                       {{ n.intent === 'OFFER' ? 'Puede aportar' : 'Necesita ayuda' }}
                     </span>
+                    <span class="ex">{{ forumCatLabel(n.category) }}</span>
                     <span class="ex" *ngIf="isDemo(n)">Ejemplo</span>
                   </div>
                 </div>
@@ -355,9 +366,10 @@ const DEMO: NeedDto[] = [
           </ul>
           <ng-template #empty>
             <div class="empty" *ngIf="!loading()">
-              <strong>Aún no hay avisos en esta categoría.</strong>
+              <strong>Aún no hay avisos con esos filtros.</strong>
               <p>Sé el primero en publicar con el botón de arriba.</p>
             </div>
+            <p class="prompt soft" *ngIf="loading()">Cargando avisos…</p>
           </ng-template>
         </ng-container>
 
@@ -775,7 +787,6 @@ export class BuscarPageComponent implements OnInit {
   readonly cats = FORUM_CATEGORIES;
   readonly cityChips = CITY_CHIPS;
   readonly postCities = CITY_CHIPS.filter((c) => Boolean(c.code));
-  readonly cities = signal<CityDto[]>([]);
   readonly posts = signal<NeedDto[]>([]);
   readonly loading = signal(false);
   readonly posting = signal(false);
@@ -786,6 +797,7 @@ export class BuscarPageComponent implements OnInit {
 
   intent: NeedIntent | null = null;
   category: NeedCategory | null = null;
+  formCategory: NeedCategory | null = null;
   cityCode = '';
   description = '';
   whatsapp = '';
@@ -794,10 +806,6 @@ export class BuscarPageComponent implements OnInit {
   readonly forumCatLabel = forumCatLabel;
 
   ngOnInit(): void {
-    this.api.cities().subscribe({
-      next: (res) => this.cities.set(res.data),
-      error: () => undefined,
-    });
     this.route.queryParamMap.subscribe((q) => {
       const intent = q.get('intent');
       if (intent === 'OFFER' || intent === 'NEED') {
@@ -806,32 +814,31 @@ export class BuscarPageComponent implements OnInit {
     });
   }
 
-  extraCities(): CityDto[] {
-    const chipCodes = new Set(CITY_CHIPS.map((c) => c.code).filter(Boolean));
-    return this.cities()
-      .filter((c) => !chipCodes.has(c.code))
-      .slice(0, 30);
-  }
-
   setIntent(intent: NeedIntent): void {
     this.intent = intent;
-    this.category = null;
-    this.posts.set([]);
     this.showForm.set(false);
     this.ok.set(null);
     this.formError.set(null);
+    this.reload();
   }
 
-  setCategory(id: NeedCategory): void {
-    this.category = this.category === id ? null : id;
-    this.showForm.set(false);
-    if (this.category) this.reload();
-    else this.posts.set([]);
+  setCategory(id: NeedCategory | null): void {
+    this.category = id;
+    this.reload();
   }
 
   setFilterCity(code: string): void {
     this.filterCity = code;
     this.reload();
+  }
+
+  toggleComposer(): void {
+    const next = !this.showForm();
+    this.showForm.set(next);
+    if (next) {
+      if (!this.formCategory && this.category) this.formCategory = this.category;
+      if (!this.cityCode && this.filterCity) this.cityCode = this.filterCity;
+    }
   }
 
   isDemo(n: NeedDto): boolean {
@@ -843,7 +850,7 @@ export class BuscarPageComponent implements OnInit {
   }
 
   reload(): void {
-    if (!this.intent || !this.category) return;
+    if (!this.intent) return;
     this.loading.set(true);
     const intent = this.intent;
     const category = this.category;
@@ -852,14 +859,14 @@ export class BuscarPageComponent implements OnInit {
     const demos = DEMO.filter(
       (d) =>
         d.intent === intent &&
-        d.category === category &&
+        (!category || d.category === category) &&
         (!city || d.cityCode === city),
     );
 
     this.api
       .needs({
         intent,
-        category,
+        category: category || undefined,
         cityCode: city || undefined,
       })
       .subscribe({
@@ -879,21 +886,27 @@ export class BuscarPageComponent implements OnInit {
     this.ok.set(null);
     this.manageLink.set(null);
     this.formError.set(null);
-    if (!this.intent || !this.category) return;
+    if (!this.intent) return;
+    const cat = this.formCategory || this.category;
+    if (!cat) {
+      this.formError.set('Elige una categoría (Agua, mercado…).');
+      return;
+    }
     if (!this.cityCode) {
       this.formError.set('Elige una ciudad.');
       return;
     }
-    if (this.description.trim().length < 8) {
-      this.formError.set('Escribe un mensaje un poco más largo.');
-      return;
-    }
+    const fallback =
+      this.intent === 'NEED'
+        ? `Necesito: ${forumCatLabel(cat)}.`
+        : `Puedo aportar: ${forumCatLabel(cat)}.`;
+    const description = this.description.trim() || fallback;
     this.posting.set(true);
     this.api
       .createNeed({
         intent: this.intent,
-        category: this.category,
-        description: this.description.trim(),
+        category: cat,
+        description,
         cityCode: this.cityCode,
         contactWhatsapp: this.whatsapp.trim() || undefined,
       })

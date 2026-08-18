@@ -23,36 +23,47 @@ import { statusLabel } from '../plain-labels';
           <a class="btn primary" routerLink="/buscar">¿Qué necesitas?</a>
           <a class="btn secondary" routerLink="/ayudar">Quiero ayudar</a>
         </div>
-        <a class="sos" href="tel:123">Urgencia grave → 123</a>
+        <div class="sos-row">
+          <a class="sos" href="tel:123">SOS · Llamar al 123</a>
+          <button type="button" class="share-loc" (click)="shareLocation()">
+            Compartir mi ubicación por WhatsApp
+          </button>
+        </div>
+        <p class="sos-note">El 123 es la línea de urgencias. Nosotros no despachamos rescate.</p>
+        <p class="geo-err" *ngIf="geoError()">{{ geoError() }}</p>
+        <button type="button" class="install" *ngIf="installReady()" (click)="installApp()">
+          Añadir a la pantalla de inicio
+        </button>
       </div>
     </section>
 
     <section class="pulse" aria-label="Actividad en vivo">
       <div class="wrap wide">
-        <p class="pulse-kicker">Lo que ya está en movimiento</p>
+        <p class="pulse-kicker">Ahora mismo en la plataforma</p>
         <div class="stats" *ngIf="loaded(); else loadingPulse">
           <div>
             <strong>{{ needs() }}</strong>
-            <span>Avisos de la comunidad</span>
+            <span>Avisos abiertos (necesito / puedo aportar)</span>
           </div>
           <div>
             <strong>{{ places() }}</strong>
-            <span>Lugares en el directorio</span>
+            <span>Puntos para ayudar o pedir</span>
           </div>
           <div>
             <strong>{{ events() }}</strong>
-            <span>Alertas oficiales cargadas</span>
+            <span>Alertas oficiales en el mapa</span>
           </div>
           <div>
             <strong>{{ sourcesLive() }}</strong>
-            <span>Fuentes activas o en prueba</span>
+            <span>Fuentes de datos conectadas</span>
           </div>
         </div>
         <ng-template #loadingPulse>
           <p class="pulse-loading">Cargando actividad…</p>
         </ng-template>
         <p class="pulse-note">
-          Cada publicación acerca a alguien a una respuesta. Tú también puedes sumarte ahora.
+          Cifras de lo publicado aquí. No es un reporte de la UNGRD. Los avisos de personas no están
+          verificados.
         </p>
       </div>
     </section>
@@ -233,12 +244,58 @@ import { statusLabel } from '../plain-labels';
         border: 1.5px solid rgba(255, 255, 255, 0.45);
         color: #fff;
       }
+      .sos-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        margin-top: 1.15rem;
+        align-items: center;
+      }
       .sos {
-        display: inline-block;
-        margin-top: 1.1rem;
-        color: rgba(247, 243, 236, 0.72);
-        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: var(--tap);
+        padding: 0 1.15rem;
+        border-radius: 999px;
+        background: #fff;
+        color: var(--coral-deep);
+        font-weight: 800;
         font-size: 0.95rem;
+        text-decoration: none;
+      }
+      .share-loc {
+        border: 1.5px solid rgba(255, 255, 255, 0.45);
+        background: transparent;
+        color: #fff;
+        border-radius: 999px;
+        min-height: var(--tap);
+        padding: 0 1rem;
+        font-weight: 700;
+        font-size: 0.88rem;
+        cursor: pointer;
+      }
+      .sos-note,
+      .geo-err {
+        margin: 0.55rem 0 0;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: rgba(247, 243, 236, 0.7);
+        max-width: 36rem;
+      }
+      .geo-err {
+        color: #ffb4ad;
+      }
+      .install {
+        margin-top: 0.75rem;
+        border: 0;
+        border-radius: 999px;
+        min-height: 2.5rem;
+        padding: 0 1rem;
+        background: var(--teal);
+        color: #fff;
+        font-weight: 800;
+        cursor: pointer;
       }
       .pulse {
         background: var(--ink);
@@ -503,8 +560,16 @@ export class HomePageComponent implements OnInit {
   readonly sources = signal<SourceDto[]>([]);
   readonly loaded = signal(false);
   readonly statusLabel = statusLabel;
+  readonly geoError = signal<string | null>(null);
+  readonly installReady = signal(false);
+  private deferredInstall: { prompt: () => Promise<void> } | null = null;
 
   ngOnInit(): void {
+    window.addEventListener('beforeinstallprompt', (e: Event) => {
+      e.preventDefault();
+      this.deferredInstall = e as unknown as { prompt: () => Promise<void> };
+      this.installReady.set(true);
+    });
     let left = 4;
     const done = () => {
       left -= 1;
@@ -540,6 +605,34 @@ export class HomePageComponent implements OnInit {
       },
       error: () => done(),
     });
+  }
+
+  shareLocation(): void {
+    this.geoError.set(null);
+    if (!navigator.geolocation) {
+      this.geoError.set('Este navegador no comparte ubicación.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lng = pos.coords.longitude.toFixed(5);
+        const text = `Estoy aquí: https://maps.google.com/?q=${lat},${lng}\n(Ayuda en Emergencias — esto no llama al 123.)`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+      },
+      () => {
+        this.geoError.set('No pudimos leer la ubicación. Revisa el permiso del navegador.');
+      },
+      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60_000 },
+    );
+  }
+
+  async installApp(): Promise<void> {
+    const ev = this.deferredInstall;
+    if (!ev) return;
+    await ev.prompt();
+    this.installReady.set(false);
+    this.deferredInstall = null;
   }
 
   sourcesLive(): number {

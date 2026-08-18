@@ -1,10 +1,23 @@
 {
   "name": "Ayuda en Emergencias",
   "short_name": "AyudaEmerg",
-  "description": "Capa de integración de emergencias — Colombia",
+  "description": "Pide o ofrece ayuda en una emergencia. Conectamos; no intermediamos donaciones.",
   "theme_color": "#10233f",
   "background_color": "#f6f1e9",
   "display": "standalone",
   "start_url": "/",
-  "icons": []
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }

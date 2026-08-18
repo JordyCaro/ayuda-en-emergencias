@@ -218,6 +218,8 @@ Si una idea está en este roadmap pero **OUT** del slice activo → no implement
 
 No son deuda bloqueante. Priorizar solo si hay uso real.
 
+Feedback de gente que ya usó el deploy (menú móvil, muro `/buscar` como `/perdidos`, stats de home, SOS = 123, PWA): [`MEJORAS-LANZAMIENTO.md`](MEJORAS-LANZAMIENTO.md). **No implementar** ese doc hasta aprobar el orden P0–P2.
+
 | Fase | Mejoras posibles |
 |------|------------------|
 | **0** | Re-discovery anual; más datasets territoriales; marcar fuentes muertas |
