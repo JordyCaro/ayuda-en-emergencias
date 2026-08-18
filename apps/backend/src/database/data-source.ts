@@ -7,11 +7,12 @@ import { PlaceEntity } from '../places/place.entity';
 import { PetReportEntity } from '../pets/pet-report.entity';
 import { ModerationAuditEntity } from '../moderation/moderation-audit.entity';
 import { Phase10Baseline1734220000000 } from './migrations/1734220000000-Phase10Baseline';
-import { postgresSslFromUrl } from '../common/postgres-ssl';
+import { postgresSslFromUrl, postgresUrlForTypeOrm } from '../common/postgres-ssl';
 
-const url =
+const rawUrl =
   process.env.DATABASE_URL ??
   'postgresql://aee:aee@localhost:5432/ayuda_emergencias';
+const url = postgresUrlForTypeOrm(rawUrl);
 
 /**
  * CLI / migraciones. No usar como único arranque Nest.
@@ -20,7 +21,7 @@ const url =
 export default new DataSource({
   type: 'postgres',
   url,
-  ssl: postgresSslFromUrl(url),
+  ssl: postgresSslFromUrl(rawUrl),
   entities: [
     SourceEntity,
     RawRecordEntity,

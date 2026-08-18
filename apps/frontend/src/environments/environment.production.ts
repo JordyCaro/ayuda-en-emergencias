@@ -6,5 +6,5 @@ export const environment = {
    *   set AEE_API_BASE=https://tu-api.onrender.com/api/v1
    * (ver scripts/set-api-base o editar este archivo antes del build)
    */
-  apiBase: '/api/v1',
+  apiBase: 'https://ayuda-en-emergencias.onrender.com/api/v1',
 };

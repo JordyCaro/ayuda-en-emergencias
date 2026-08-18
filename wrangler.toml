@@ -1,0 +1,9 @@
+# Front Angular en Cloudflare Workers (archivos estáticos).
+# El dashboard "Create a Worker" + GitHub usa este archivo.
+name = "ayuda-en-emergencias"
+compatibility_date = "2026-08-18"
+workers_dev = true
+
+[assets]
+directory = "apps/frontend/dist/frontend/browser"
+not_found_handling = "single-page-application"
