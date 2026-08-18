@@ -38,7 +38,7 @@ async function bootstrap() {
     console.log(`OpenAPI exported → ${out}`);
   }
 
-  const port = Number(process.env.API_PORT ?? 3000);
+  const port = Number(process.env.PORT ?? process.env.API_PORT ?? 3000);
   await app.listen(port);
   // eslint-disable-next-line no-console
   console.log(`API http://localhost:${port}/api/v1  · Swagger http://localhost:${port}/api/docs`);

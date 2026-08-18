@@ -9,6 +9,7 @@ import { PlaceEntity } from '../places/place.entity';
 import { PetReportEntity } from '../pets/pet-report.entity';
 import { ModerationAuditEntity } from '../moderation/moderation-audit.entity';
 import { Phase10Baseline1734220000000 } from './migrations/1734220000000-Phase10Baseline';
+import { postgresSslFromUrl } from '../common/postgres-ssl';
 
 @Module({
   imports: [
@@ -19,11 +20,13 @@ import { Phase10Baseline1734220000000 } from './migrations/1734220000000-Phase10
         const syncFlag = config.get<string>('TYPEORM_SYNCHRONIZE');
         const synchronize =
           syncFlag === 'true' ? true : syncFlag === 'false' ? false : !isProd;
+        const url =
+          config.get<string>('DATABASE_URL') ??
+          'postgresql://aee:aee@localhost:5432/ayuda_emergencias';
         return {
           type: 'postgres' as const,
-          url:
-            config.get<string>('DATABASE_URL') ??
-            'postgresql://aee:aee@localhost:5432/ayuda_emergencias',
+          url,
+          ssl: postgresSslFromUrl(url),
           entities: [
             SourceEntity,
             RawRecordEntity,

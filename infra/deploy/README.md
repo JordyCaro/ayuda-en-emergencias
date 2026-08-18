@@ -2,6 +2,9 @@
 
 Checklist Fase 10 + guía práctica. **No** pedimos ni custodiamos donaciones; solo conectamos señales y lugares.
 
+**Despliegue con Supabase (paso a paso):** [`SUPABASE.md`](SUPABASE.md).
+
+
 ## Dónde está el código
 
 | Pieza | Path | Tecnología | Local |

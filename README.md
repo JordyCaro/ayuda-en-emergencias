@@ -21,6 +21,7 @@
 | **Correr en local (guía base)** | [`docs/dev/COMO-CORRER.md`](docs/dev/COMO-CORRER.md) |
 | **Roadmap + mejoras** | [`docs/product/ROADMAP-FASES.md`](docs/product/ROADMAP-FASES.md) |
 | **Deploy gratis / capacidad** | [`infra/deploy/README.md`](infra/deploy/README.md) |
+| **Deploy con Supabase (paso a paso)** | [`infra/deploy/SUPABASE.md`](infra/deploy/SUPABASE.md) |
 | **Mapa del repo** | [`docs/MAPA-DEL-REPO.md`](docs/MAPA-DEL-REPO.md) |
 | **Agente de IA** | [`AGENTS.md`](AGENTS.md) |
 | **Contratos** | [`001`](specs/001-mvp-mapa-ayuda/) … [`009`](specs/009-produccion/) |
