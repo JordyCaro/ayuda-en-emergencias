@@ -10,6 +10,7 @@ import type {
 import { PlaceEntity } from '../places/place.entity';
 import { NeedEntity } from '../needs/need.entity';
 import { PetReportEntity } from '../pets/pet-report.entity';
+import { PersonReportEntity } from '../people/person-report.entity';
 import { ModerationAuditEntity } from './moderation-audit.entity';
 
 @Injectable()
@@ -21,6 +22,8 @@ export class ModerationService {
     private readonly needs: Repository<NeedEntity>,
     @InjectRepository(PetReportEntity)
     private readonly pets: Repository<PetReportEntity>,
+    @InjectRepository(PersonReportEntity)
+    private readonly people: Repository<PersonReportEntity>,
     @InjectRepository(ModerationAuditEntity)
     private readonly audits: Repository<ModerationAuditEntity>,
   ) {}
@@ -88,6 +91,27 @@ export class ModerationService {
           id: p.id,
           title: p.description.slice(0, 120),
           detail: `${p.kind} · ${p.species}`,
+          municipality: p.municipality,
+          cityCode: p.cityCode,
+          verification: p.verification,
+          status: p.status,
+          createdAt: p.createdAt.toISOString(),
+        });
+      }
+    }
+
+    if (!kind || kind === 'person') {
+      const rows = await this.people.find({
+        where: { verification: 'UNVERIFIED', status: 'OPEN' },
+        order: { createdAt: 'DESC' },
+        take,
+      });
+      for (const p of rows) {
+        items.push({
+          kind: 'person',
+          id: p.id,
+          title: p.description.slice(0, 120),
+          detail: p.kind,
           municipality: p.municipality,
           cityCode: p.cityCode,
           verification: p.verification,
@@ -183,7 +207,7 @@ export class ModerationService {
         status: n.status,
         createdAt: n.createdAt.toISOString(),
       };
-    } else {
+    } else if (kind === 'pet') {
       const p = await this.pets.findOne({ where: { id } });
       if (!p) throw new NotFoundException(`Pet ${id} not found`);
       if (action === 'VERIFY') {
@@ -198,6 +222,27 @@ export class ModerationService {
         id: p.id,
         title: p.description.slice(0, 120),
         detail: `${p.kind} · ${p.species}`,
+        municipality: p.municipality,
+        cityCode: p.cityCode,
+        verification: p.verification,
+        status: p.status,
+        createdAt: p.createdAt.toISOString(),
+      };
+    } else {
+      const p = await this.people.findOne({ where: { id } });
+      if (!p) throw new NotFoundException(`Person ${id} not found`);
+      if (action === 'VERIFY') {
+        p.verification = 'VERIFIED';
+      } else {
+        p.verification = 'REJECTED';
+        p.status = 'CLOSED';
+      }
+      await this.people.save(p);
+      item = {
+        kind: 'person',
+        id: p.id,
+        title: p.description.slice(0, 120),
+        detail: p.kind,
         municipality: p.municipality,
         cityCode: p.cityCode,
         verification: p.verification,

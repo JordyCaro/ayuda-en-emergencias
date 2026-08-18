@@ -112,7 +112,7 @@ export class CerrarPageComponent implements OnInit {
     const kind = q.get('kind');
     this.id = q.get('id') ?? '';
     this.token = q.get('token') ?? '';
-    if (kind !== 'need' && kind !== 'pet' && kind !== 'place') {
+    if (kind !== 'need' && kind !== 'pet' && kind !== 'place' && kind !== 'person') {
       this.error.set('Enlace incompleto. Usa el que te mostramos al publicar.');
       return;
     }
@@ -130,6 +130,7 @@ export class CerrarPageComponent implements OnInit {
   label(k: ManageTargetKind): string {
     if (k === 'need') return 'Aviso';
     if (k === 'pet') return 'Mascota';
+    if (k === 'person') return 'Persona';
     return 'Lugar';
   }
 

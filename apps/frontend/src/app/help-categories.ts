@@ -28,6 +28,12 @@ export type ForumCat = {
 
 export const FORUM_CATEGORIES: ForumCat[] = [
   {
+    id: 'SOS',
+    title: 'Estoy en peligro',
+    needHint: 'Necesito que me encuentren ahora',
+    offerHint: 'Puedo ir a un llamado urgente (con cuidado)',
+  },
+  {
     id: 'WATER',
     title: 'Agua',
     needHint: 'Necesito agua o filtros',

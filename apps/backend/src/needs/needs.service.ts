@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import type { NeedCategory, NeedCreateResponse, NeedDto, NeedIntent } from '@aee/shared-types';
 import { NeedEntity } from './need.entity';
 import { CreateNeedDto } from './dto/create-need.dto';
 import { cityCenter } from '../geo/city-centers';
 import { findCityByCode } from '../geo/cities.seed';
+import { resolvePlaceFromPoint } from '../geo/resolve-location';
 import { hashManageToken, issueManageToken } from '../common/manage-token';
+import { NEED_TTL_MS } from '../common/ttl';
 
 export interface ListNeedsQuery {
   country?: string;
@@ -62,6 +64,10 @@ export class NeedsService {
       const city = findCityByCode(cityCode);
       if (!city) throw new BadRequestException('cityCode desconocido');
       municipality = city.name;
+    } else if (dto.geometry?.coordinates) {
+      const resolved = await resolvePlaceFromPoint(lat, lng);
+      cityCode = resolved.cityCode;
+      municipality = resolved.municipality;
     }
 
     const whatsapp = normalizeWhatsapp(dto.contactWhatsapp);
@@ -87,7 +93,7 @@ export class NeedsService {
         municipality,
         contactWhatsapp: whatsapp,
         manageTokenHash: token.hash,
-        expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+        expiresAt: new Date(Date.now() + NEED_TTL_MS),
       }),
     );
     return { ...this.toDto(row), manageToken: token.plain };
@@ -165,6 +171,14 @@ export class NeedsService {
     n.status = 'CLOSED';
     await this.repo.save(n);
     return this.toDto(n);
+  }
+
+  /** Borra avisos ya caducados (limpieza de DB + WhatsApp). */
+  async purgeExpired(): Promise<number> {
+    const result = await this.repo.delete({
+      expiresAt: LessThan(new Date()),
+    });
+    return result.affected ?? 0;
   }
 
   private toDto(n: NeedEntity): NeedDto {

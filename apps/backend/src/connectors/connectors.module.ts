@@ -8,6 +8,9 @@ import { ConnectorsController } from './connectors.controller';
 import { EventsModule } from '../events/events.module';
 import { SourcesModule } from '../sources/sources.module';
 import { PlacesModule } from '../places/places.module';
+import { NeedsModule } from '../needs/needs.module';
+import { PetsModule } from '../pets/pets.module';
+import { PeopleModule } from '../people/people.module';
 import { RawRecordEntity } from '../events/raw-record.entity';
 import { OpsTokenGuard } from '../common/ops-token.guard';
 
@@ -16,6 +19,9 @@ import { OpsTokenGuard } from '../common/ops-token.guard';
     EventsModule,
     SourcesModule,
     PlacesModule,
+    NeedsModule,
+    PetsModule,
+    PeopleModule,
     TypeOrmModule.forFeature([RawRecordEntity]),
   ],
   controllers: [ConnectorsController],
@@ -32,5 +38,6 @@ export class ConnectorsModule implements OnModuleInit {
 
   onModuleInit(): void {
     void this.runner.warmOsmHelp();
+    void this.runner.scheduledExpirePlaces();
   }
 }

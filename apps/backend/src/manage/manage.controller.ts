@@ -12,6 +12,7 @@ import type { ManageTargetKind } from '@aee/shared-types';
 import { NeedsService } from '../needs/needs.service';
 import { PlacesService } from '../places/places.service';
 import { PetsService } from '../pets/pets.service';
+import { PeopleService } from '../people/people.service';
 import { ManageCloseDto } from './dto/manage-close.dto';
 
 @ApiTags('manage')
@@ -21,6 +22,7 @@ export class ManageController {
     private readonly needs: NeedsService,
     private readonly places: PlacesService,
     private readonly pets: PetsService,
+    private readonly people: PeopleService,
   ) {}
 
   @Get('preview')
@@ -35,6 +37,7 @@ export class ManageController {
     }
     if (k === 'need') return this.needs.previewForManage(id, token);
     if (k === 'pet') return this.pets.previewForManage(id, token);
+    if (k === 'person') return this.people.previewForManage(id, token);
     return this.places.previewForManage(id, token);
   }
 
@@ -47,12 +50,15 @@ export class ManageController {
     if (dto.kind === 'pet') {
       return this.pets.closeWithToken(dto.id, dto.manageToken);
     }
+    if (dto.kind === 'person') {
+      return this.people.closeWithToken(dto.id, dto.manageToken);
+    }
     return this.places.closeWithToken(dto.id, dto.manageToken);
   }
 
   private parseKind(kind?: string): ManageTargetKind {
-    if (kind !== 'need' && kind !== 'pet' && kind !== 'place') {
-      throw new BadRequestException('kind must be need|pet|place');
+    if (kind !== 'need' && kind !== 'pet' && kind !== 'place' && kind !== 'person') {
+      throw new BadRequestException('kind must be need|pet|place|person');
     }
     return kind;
   }

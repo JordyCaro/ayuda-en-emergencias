@@ -19,7 +19,7 @@ Producto: **Ayuda en Emergencias** — capa abierta que **conecta** (no intermed
 
 1. Leer `.specify/memory/constitution.md`  
 2. Slice activo: `001`–`009` hechos; siguientes opcionales **11** (multi-país) / **12** (offline).  
-   - Personas: **nunca** base propia de desaparecidos (constitution).  
+   - Personas: RND/SIRDEC primero; avisos comunitarios UNVERIFIED (7 días, sin cédulas) no reemplazan el canal oficial.  
    - Publicar lugar = capacidad estratégica de crecimiento.  
 3. Leer `spec.md` → `plan.md` → `tasks.md`  
 4. Si el pedido contradice OUT del spec o la constitution → **parar y preguntar**  

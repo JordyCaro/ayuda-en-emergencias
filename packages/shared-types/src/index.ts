@@ -17,6 +17,7 @@ export type Verification =
   | 'REJECTED';
 
 export type NeedCategory =
+  | 'SOS'
   | 'HELP'
   | 'WATER'
   | 'FOOD'
@@ -206,13 +207,15 @@ export interface PetReportDto {
   cityCode?: string | null;
   municipality?: string | null;
   contactWhatsapp?: string | null;
+  /** True si hay JPEG; la imagen está en GET /pets/:id/photo */
+  hasPhoto?: boolean;
 }
 
 export interface PetReportCreateResponse extends PetReportDto {
   manageToken: string;
 }
 
-export type ManageTargetKind = 'place' | 'need' | 'pet';
+export type ManageTargetKind = 'place' | 'need' | 'pet' | 'person';
 
 export interface ManagePreviewDto {
   kind: ManageTargetKind;
@@ -235,10 +238,45 @@ export interface CreatePetReportRequest {
   geometry?: GeoJsonPoint;
   cityCode?: string;
   contactWhatsapp?: string;
+  /** JPEG en data URL o base64 (máx. ~180 KB). */
+  photoBase64?: string;
+}
+
+/** Persona: aviso comunitario (no reemplaza RND/SIRDEC). */
+export type PersonReportKind = 'LOOKING' | 'SEEN' | 'FOUND';
+
+export type PersonReportStatus = 'OPEN' | 'CLOSED' | 'EXPIRED';
+
+export interface PersonReportDto {
+  id: string;
+  kind: PersonReportKind;
+  description: string;
+  geometry: GeoJsonPoint;
+  verification: Verification;
+  status: PersonReportStatus;
+  createdAt: string;
+  source: 'USER';
+  cityCode?: string | null;
+  municipality?: string | null;
+  contactWhatsapp?: string | null;
+  hasPhoto?: boolean;
+}
+
+export interface PersonReportCreateResponse extends PersonReportDto {
+  manageToken: string;
+}
+
+export interface CreatePersonReportRequest {
+  kind: PersonReportKind;
+  description: string;
+  geometry?: GeoJsonPoint;
+  cityCode?: string;
+  contactWhatsapp?: string;
+  photoBase64?: string;
 }
 
 /** Moderación (Fase 9) — no es autoridad estatal. */
-export type ModerationTargetKind = 'place' | 'need' | 'pet';
+export type ModerationTargetKind = 'place' | 'need' | 'pet' | 'person';
 
 export type ModerationAction = 'VERIFY' | 'HIDE';
 

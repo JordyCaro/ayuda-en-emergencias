@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import type {
   CreatePlaceRequest,
   PlaceCreateResponse,
@@ -217,7 +217,7 @@ export class PlacesService {
           ? dto.needTags.map((t) => String(t)).slice(0, 8)
           : [],
         retrievedAt: new Date(),
-        expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+        expiresAt: null,
         manageTokenHash: token.hash,
         properties: { origin: 'USER_FORM', divipola: city.code },
       }),
@@ -316,15 +316,22 @@ export class PlacesService {
     return count;
   }
 
-  async expireStale(): Promise<number> {
-    const result = await this.repo.update(
-      {
-        status: 'ACTIVE',
-        expiresAt: LessThan(new Date()),
-      },
-      { status: 'EXPIRED' },
-    );
-    return result.affected ?? 0;
+  /**
+   * Los acopios comunitarios no caducan: se quedan en el mapa hasta que
+   * quien publicó los oculte o moderación los esconda.
+   */
+  async keepCommunityPlaces(): Promise<number> {
+    const rows: Array<{ id: string }> = await this.repo.query(`
+      UPDATE places
+      SET
+        expires_at = NULL,
+        status = CASE WHEN status = 'EXPIRED' THEN 'ACTIVE' ELSE status END
+      WHERE source_id = 'community'
+        AND status IN ('ACTIVE', 'EXPIRED')
+        AND (expires_at IS NOT NULL OR status = 'EXPIRED')
+      RETURNING id
+    `);
+    return Array.isArray(rows) ? rows.length : 0;
   }
 
   private toDto(p: PlaceEntity): PlaceDto {

@@ -13,6 +13,9 @@ import { OsmHelpConnector } from './osm-help.connector';
 import { EventsService } from '../events/events.service';
 import { SourcesService } from '../sources/sources.service';
 import { PlacesService } from '../places/places.service';
+import { NeedsService } from '../needs/needs.service';
+import { PetsService } from '../pets/pets.service';
+import { PeopleService } from '../people/people.service';
 import { RawRecordEntity } from '../events/raw-record.entity';
 import { NATIONAL_SYNC_CITIES } from '../geo/city-bboxes';
 import { findCityByCode } from '../geo/cities.seed';
@@ -53,6 +56,9 @@ export class ConnectorRunnerService {
     private readonly osmHelp: OsmHelpConnector,
     private readonly events: EventsService,
     private readonly places: PlacesService,
+    private readonly needs: NeedsService,
+    private readonly pets: PetsService,
+    private readonly people: PeopleService,
     private readonly sources: SourcesService,
     @InjectRepository(RawRecordEntity)
     private readonly rawRepo: Repository<RawRecordEntity>,
@@ -90,11 +96,17 @@ export class ConnectorRunnerService {
     }, 4000);
   }
 
-  /** Expira places comunitarios con expiresAt pasado (cada hora). */
+  /** Mantiene acopios comunitarios visibles; borra avisos/mascotas caducados (cada hora). */
   @Cron(process.env.PLACES_EXPIRE_CRON ?? '0 15 * * * *')
   async scheduledExpirePlaces(): Promise<void> {
-    const n = await this.places.expireStale();
-    if (n > 0) this.logger.log(`Expired ${n} stale places`);
+    const places = await this.places.keepCommunityPlaces();
+    const needs = await this.needs.purgeExpired();
+    const pets = await this.pets.purgeExpired();
+    const people = await this.people.purgeExpired();
+    if (places > 0) this.logger.log(`Restored ${places} community places to the map`);
+    if (needs > 0) this.logger.log(`Purged ${needs} expired needs`);
+    if (pets > 0) this.logger.log(`Purged ${pets} expired pet reports`);
+    if (people > 0) this.logger.log(`Purged ${people} expired person reports`);
   }
 
   getStatus(): ConnectorStatusSnapshot {

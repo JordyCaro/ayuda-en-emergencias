@@ -138,9 +138,13 @@ const PLACE_TYPES: Array<{ id: PlaceType; label: string; hint: string }> = [
           <button type="button" class="loc" (click)="useMyLocation()" [disabled]="locating()">
             {{ locating() ? 'Buscando…' : usedGps() ? 'Ubicación lista' : 'Usar mi ubicación' }}
           </button>
+          <p class="hint">
+            Este punto se queda en el mapa (sin verificar) hasta que lo ocultes con el enlace de
+            cierre. No caduca solo.
+          </p>
           <p class="err" *ngIf="error()">{{ error() }}</p>
           <p class="ok" *ngIf="okId()">
-            Punto publicado (sin verificar).
+            Punto publicado (sin verificar). Ya puede verse en el mapa de Dónde ayudar.
             <a routerLink="/ayudar">Ver en Dónde ayudar</a>
           </p>
           <div class="manage" *ngIf="manageLink()">

@@ -7,26 +7,22 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import type {
-  PetReportKind,
-  PetReportStatus,
-  PetSpecies,
+  PersonReportKind,
+  PersonReportStatus,
   Verification,
 } from '@aee/shared-types';
 
-@Entity({ name: 'pet_reports' })
+@Entity({ name: 'person_reports' })
 @Index(['kind'])
 @Index(['status'])
 @Index(['createdAt'])
 @Index(['cityCode'])
-export class PetReportEntity {
+export class PersonReportEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column({ type: 'varchar', length: 16 })
-  kind!: PetReportKind;
-
-  @Column({ type: 'varchar', length: 16 })
-  species!: PetSpecies;
+  kind!: PersonReportKind;
 
   @Column({ type: 'text' })
   description!: string;
@@ -47,7 +43,7 @@ export class PetReportEntity {
   verification!: Verification;
 
   @Column({ type: 'varchar', length: 16, default: 'OPEN' })
-  status!: PetReportStatus;
+  status!: PersonReportStatus;
 
   @Column({ type: 'varchar', length: 8, default: 'CO' })
   country!: string;

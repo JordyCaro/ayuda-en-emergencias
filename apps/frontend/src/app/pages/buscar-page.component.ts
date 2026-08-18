@@ -6,6 +6,14 @@ import type { NeedCategory, NeedDto, NeedIntent } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { CITY_CHIPS, FORUM_CATEGORIES, forumCatLabel } from '../help-categories';
 
+function cityOnly(place: string): string {
+  const parts = place
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return parts[parts.length - 1] || place;
+}
+
 /** Avisos de ejemplo para ver el muro (no son datos reales). */
 const DEMO: NeedDto[] = [
   {
@@ -306,7 +314,10 @@ const DEMO: NeedDto[] = [
                 "
               ></textarea>
             </label>
-            <p class="fine">Tres toques: categoría, ciudad, publicar. Urgencias graves: 123.</p>
+            <p class="fine">
+              Este aviso se verá <strong>7 días</strong> y luego se borra. Si sigue haciendo falta,
+              puedes publicarlo otra vez. Urgencias graves: 123.
+            </p>
             <button type="button" class="send" [disabled]="posting()" (click)="publish()">
               {{ posting() ? 'Publicando…' : 'Publicar en el muro' }}
             </button>
@@ -331,18 +342,26 @@ const DEMO: NeedDto[] = [
                   }}</span>
                   <div class="who">
                     <strong>{{ shortWho(n) }}</strong>
-                    <span class="tag" [class.offer]="n.intent === 'OFFER'">
-                      {{ n.intent === 'OFFER' ? 'Puede aportar' : 'Necesita ayuda' }}
+                    <span class="tag" [class.offer]="n.intent === 'OFFER'" [class.sos]="n.category === 'SOS'">
+                      {{ n.category === 'SOS' ? 'Urgente' : (n.intent === 'OFFER' ? 'Puede aportar' : 'Necesita ayuda') }}
                     </span>
                     <span class="ex">{{ forumCatLabel(n.category) }}</span>
                     <span class="ex" *ngIf="isDemo(n)">Ejemplo</span>
                   </div>
                 </div>
-                <p class="msg">{{ n.description }}</p>
+                <p class="msg">{{ displayNeedText(n) }}</p>
                 <p class="meta">
-                  {{ n.municipality || 'Sin ciudad' }}
+                  {{ placeLabel(n) }}
                   · {{ n.createdAt | date: 'd MMM y, HH:mm' }}
                 </p>
+                <a
+                  *ngIf="mapLink(n) as href"
+                  class="map"
+                  [href]="href"
+                  target="_blank"
+                  rel="noopener"
+                  >Ver en el mapa</a
+                >
                 <a
                   *ngIf="n.contactWhatsapp && !isDemo(n)"
                   class="wa"
@@ -705,6 +724,10 @@ const DEMO: NeedDto[] = [
         background: #d8f0ec;
         color: var(--teal-deep);
       }
+      .tag.sos {
+        background: var(--coral);
+        color: #fff;
+      }
       .ex {
         background: var(--sky-band);
         color: var(--ink-soft);
@@ -725,6 +748,18 @@ const DEMO: NeedDto[] = [
         font-size: 0.84rem;
         font-weight: 600;
         color: var(--muted);
+      }
+      .map {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        border-radius: 14px;
+        background: #eef3ff;
+        color: #1e3a8a;
+        text-decoration: none;
+        font-weight: 800;
+        border: 1px solid #c9d7f5;
       }
       .wa {
         display: flex;
@@ -808,9 +843,17 @@ export class BuscarPageComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((q) => {
       const intent = q.get('intent');
+      const cat = q.get('category');
       if (intent === 'OFFER' || intent === 'NEED') {
-        this.setIntent(intent);
+        this.intent = intent;
+        this.showForm.set(false);
+        this.ok.set(null);
+        this.formError.set(null);
       }
+      if (cat && this.cats.some((c) => c.id === cat)) {
+        this.category = cat as NeedCategory;
+      }
+      if (this.intent) this.reload();
     });
   }
 
@@ -900,7 +943,8 @@ export class BuscarPageComponent implements OnInit {
       this.intent === 'NEED'
         ? `Necesito: ${forumCatLabel(cat)}.`
         : `Puedo aportar: ${forumCatLabel(cat)}.`;
-    const description = this.description.trim() || fallback;
+    const typed = this.description.trim();
+    const description = typed.length >= 8 ? typed : fallback;
     this.posting.set(true);
     this.api
       .createNeed({
@@ -913,7 +957,7 @@ export class BuscarPageComponent implements OnInit {
       .subscribe({
         next: (r) => {
           this.posting.set(false);
-          this.ok.set('Publicado. Caduca en ~72 horas.');
+          this.ok.set('Publicado. Se verá 7 días; luego se borra. Puedes volver a publicarlo.');
           this.manageLink.set(this.api.manageUrl('need', r.id, r.manageToken));
           this.description = '';
           this.whatsapp = '';
@@ -945,8 +989,42 @@ export class BuscarPageComponent implements OnInit {
   }
 
   shortWho(n: NeedDto): string {
+    if (n.category === 'SOS') {
+      return n.municipality ? `Urgente · ${cityOnly(n.municipality)}` : 'Alguien pide que lo encuentren';
+    }
     if (n.intent === 'OFFER') return n.municipality ? `Aporte · ${n.municipality}` : 'Alguien aporta';
     return n.municipality ? `Pedido · ${n.municipality}` : 'Alguien necesita';
+  }
+
+  displayNeedText(n: NeedDto): string {
+    const cleaned = n.description
+      .replace(/https?:\/\/\S+/gi, '')
+      .replace(/Mi ubicación aproximada:\s*/gi, '')
+      .replace(/Este aviso no llama al 123\.?/gi, '')
+      .replace(/Si estás cerca, por favor avisa a emergencias o acércate con cuidado\.?/gi, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s+\./g, '.')
+      .trim();
+    if (n.category === 'SOS' && cleaned.length < 8) {
+      return 'Estoy en peligro y necesito ayuda ahora.';
+    }
+    return cleaned;
+  }
+
+  placeLabel(n: NeedDto): string {
+    if (n.municipality) return n.municipality;
+    if (n.category === 'SOS') return 'Ubicación en el mapa';
+    return 'Sin ciudad';
+  }
+
+  mapLink(n: NeedDto): string | null {
+    if (n.category !== 'SOS') return null;
+    const coords = n.geometry?.coordinates;
+    if (!Array.isArray(coords) || coords.length < 2) return null;
+    const lng = coords[0];
+    const lat = coords[1];
+    if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+    return `https://maps.google.com/?q=${lat},${lng}`;
   }
 
   waLink(n: NeedDto): string {
@@ -957,3 +1035,4 @@ export class BuscarPageComponent implements OnInit {
     return `https://wa.me/${phone}?text=${text}`;
   }
 }
+

@@ -59,8 +59,8 @@ export class ModerationController {
   }
 
   private assertKind(kind: string): asserts kind is ModerationTargetKind {
-    if (kind !== 'place' && kind !== 'need' && kind !== 'pet') {
-      throw new BadRequestException('kind must be place|need|pet');
+    if (kind !== 'place' && kind !== 'need' && kind !== 'pet' && kind !== 'person') {
+      throw new BadRequestException('kind must be place|need|pet|person');
     }
   }
 }

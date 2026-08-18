@@ -7,3 +7,4 @@
 | [0003](0003-mvp-slice-001.md) | Alcance del primer MVP | Aceptada |
 | [0004](0004-mapas-y-geo.md) | Mapas y datos geo | Aceptada |
 | [0005](0005-fuentes-y-confianza.md) | Fuentes, trust, legal | Aceptada |
+| [0006](0006-avisos-comunitarios-personas.md) | Avisos comunitarios de personas + RND | Aceptada |

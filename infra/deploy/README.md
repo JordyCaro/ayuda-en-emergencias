@@ -29,7 +29,7 @@ Sin cuenta:
 | Mascota perdida/encontrada | `/perdidos` | `POST /api/v1/pets` |
 | Cerrar lo propio (enlace secreto) | `/cerrar` | `POST /api/v1/manage/close` |
 | Ver directorio / cerca de mí | `/ayudar` | `GET /api/v1/places` |
-| Personas desaparecidas | `/perdidos` → RND/SIRDEC | *sin base propia* |
+| Personas (oficial + aviso comunitario) | `/perdidos` → Personas | `GET/POST /api/v1/people` |
 
 Todo lo comunitario nace `UNVERIFIED` y puede expirar.
 
@@ -53,6 +53,7 @@ Límites actuales (por IP, ventana ~1 min):
 | `POST /needs` | **10**/min |
 | `POST /places` | **8**/min |
 | `POST /pets` | **8**/min |
+| `POST /people` | **8**/min |
 
 Implicación: **miles de registros totales en días/semanas** es plausible.  
 **Miles de altas concurrentes en el mismo minuto** no: el rate-limit y un solo proceso lo frenan (a propósito, anti-spam).
@@ -97,11 +98,17 @@ Combinación típica:
 4. HTTPS lo dan Pages/Render/etc.  
 5. Health: `GET /api/v1/health/ready`.
 
-### Limitaciones de lo gratis
+### Limitaciones de lo gratis (lo que tenemos ahora)
 
-- Sleep / cold start (primera petición lenta).  
-- Cuotas de horas-RAM y de DB.  
-- No es ideal para un pico nacional; sirve para **piloto público** y validar uso.
+| Pieza | Plan | Aguanta en la práctica | Se satura cuando |
+|-------|------|------------------------|------------------|
+| **Front (Cloudflare Workers)** | Gratis: ~100 000 peticiones/día del Worker | Miles de visitas al día de HTML/JS estático suelen ir bien | Pico nacional enorme o bots |
+| **API (Render Free)** | 512 MB RAM, 0,1 CPU; **se duerme a los 15 min**; ~750 h/mes | Decenas de personas a la vez; primera visita lenta (~30–60 s) | Cientos concurrentes, o se acaban las horas del mes |
+| **DB (Supabase Free)** | ~500 MB disco, se pausa si nadie la usa ~1 semana | Cientos/miles de avisos de 7 días: trivial | El directorio SISPRO/OSM (lugares oficiales), no los avisos ciudadanos |
+
+**Respuesta corta:** para un piloto (un municipio, un evento) **sí aguanta**. Una emergencia nacional viral **no**: el cuello es Render (sueño + 1 proceso) y el tamaño de Places oficiales, no los avisos de 7 días.
+
+Limpieza automática: necesidades, aportes, SOS, mascotas y avisos de personas **7 días** y luego **borrado**. Los **lugares** (comunitarios y oficiales) **no se borran**; el acopio que publica alguien se queda en el mapa hasta que lo oculte.
 
 ### Alternativa un solo VPS
 

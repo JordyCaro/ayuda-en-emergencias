@@ -1,14 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json, urlencoded } from 'express';
 import { mkdirSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
   const corsOrigin = process.env.API_CORS_ORIGIN ?? 'http://localhost:4200';
   app.enableCors({ origin: corsOrigin.split(',').map((o) => o.trim()) });
+  app.use(json({ limit: '400kb' }));
+  app.use(urlencoded({ extended: true, limit: '400kb' }));
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({

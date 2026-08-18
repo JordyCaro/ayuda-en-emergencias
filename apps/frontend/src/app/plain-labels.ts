@@ -7,6 +7,11 @@ export type CatMeta = {
 };
 
 export const NEED_CATS: Record<NeedCategory, CatMeta> = {
+  SOS: {
+    title: 'Estoy en peligro',
+    hint: 'Necesito que alguien me encuentre ahora',
+    short: 'SOS',
+  },
   HELP: { title: 'Ayuda general', hint: 'No estoy seguro qué pedir', short: 'Ayuda' },
   WATER: { title: 'Agua', hint: 'Para beber o limpiar', short: 'Agua' },
   FOOD: { title: 'Comida', hint: 'Alimentos para hoy', short: 'Comida' },

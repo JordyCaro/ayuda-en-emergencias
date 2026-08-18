@@ -23,15 +23,59 @@ import { statusLabel } from '../plain-labels';
           <a class="btn primary" routerLink="/buscar">¿Qué necesitas?</a>
           <a class="btn secondary" routerLink="/ayudar">Quiero ayudar</a>
         </div>
-        <div class="sos-row">
-          <a class="sos" href="tel:123">SOS · Llamar al 123</a>
-          <button type="button" class="share-loc" (click)="shareLocation()">
-            Compartir mi ubicación por WhatsApp
-          </button>
+        <button type="button" class="sos" (click)="openSos()" [disabled]="sosBusy()">
+          Estoy aquí y necesito ayuda
+        </button>
+        <p class="sos-note">
+          Un toque deja un aviso urgente en
+          <a routerLink="/buscar" [queryParams]="{ intent: 'NEED', category: 'SOS' }">¿Qué necesitas?</a>
+          (pestaña Necesito ayuda, etiqueta Urgente) para que vecinos te vean. No enviamos patrullas.
+        </p>
+
+        <div class="sos-sheet" *ngIf="sosOpen()" role="dialog" aria-labelledby="sos-title">
+          <p id="sos-title" class="sos-title">Estás pidiendo que te encuentren</p>
+          <p class="sos-body" *ngIf="!sosDone()">
+            Vamos a dejar un aviso urgente con el punto donde estás. Quien abra
+            <strong>¿Qué necesitas?</strong> → <strong>Necesito ayuda</strong> puede verte y acercarse.
+            Se verá <strong>7 días</strong> y luego se borra; si sigue haciendo falta, publícalo otra vez.
+          </p>
+          <p class="geo-err" *ngIf="geoError()">{{ geoError() }}</p>
+          <p class="sos-ok" *ngIf="sosDone()">
+            Ya estás en el muro. La gente te ve en <strong>¿Qué necesitas?</strong>, pestaña
+            <strong>Necesito ayuda</strong>, etiqueta <strong>Urgente</strong>. Se verá 7 días;
+            luego se borra. Puedes volver a publicarlo.
+          </p>
+          <p class="sos-body" *ngIf="sosDone() && sosCopied()">
+            Si más tarde estás a salvo, el enlace para cerrar el aviso se copió al portapapeles.
+          </p>
+          <div class="sos-actions">
+            <button
+              type="button"
+              class="btn primary"
+              *ngIf="!sosDone()"
+              [disabled]="sosBusy()"
+              (click)="publishSos()"
+            >
+              {{ sosBusy() ? 'Marcando tu lugar…' : 'Publicar dónde estoy' }}
+            </button>
+            <a
+              class="btn secondary"
+              *ngIf="sosDone()"
+              routerLink="/buscar"
+              [queryParams]="{ intent: 'NEED', category: 'SOS' }"
+            >
+              Ver tu aviso
+            </a>
+            <button type="button" class="sos-cancel" (click)="closeSos()">Cerrar</button>
+          </div>
         </div>
-        <p class="sos-note">El 123 es la línea de urgencias. Nosotros no despachamos rescate.</p>
-        <p class="geo-err" *ngIf="geoError()">{{ geoError() }}</p>
-        <button type="button" class="install" *ngIf="installReady()" (click)="installApp()">
+
+        <button
+          type="button"
+          class="install"
+          *ngIf="installReady() && isPhone()"
+          (click)="installApp()"
+        >
           Añadir a la pantalla de inicio
         </button>
       </div>
@@ -244,47 +288,82 @@ import { statusLabel } from '../plain-labels';
         border: 1.5px solid rgba(255, 255, 255, 0.45);
         color: #fff;
       }
-      .sos-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.55rem;
-        margin-top: 1.15rem;
-        align-items: center;
-      }
       .sos {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         min-height: var(--tap);
-        padding: 0 1.15rem;
+        margin-top: 1.1rem;
+        padding: 0 1.25rem;
+        border: 0;
         border-radius: 999px;
         background: #fff;
         color: var(--coral-deep);
         font-weight: 800;
-        font-size: 0.95rem;
-        text-decoration: none;
-      }
-      .share-loc {
-        border: 1.5px solid rgba(255, 255, 255, 0.45);
-        background: transparent;
-        color: #fff;
-        border-radius: 999px;
-        min-height: var(--tap);
-        padding: 0 1rem;
-        font-weight: 700;
-        font-size: 0.88rem;
+        font-size: 1rem;
         cursor: pointer;
       }
+      .sos:disabled {
+        opacity: 0.7;
+        cursor: wait;
+      }
+      .sos-note a {
+        color: #fff;
+        font-weight: 800;
+        text-decoration: underline;
+        text-underline-offset: 0.15em;
+      }
       .sos-note,
-      .geo-err {
+      .geo-err,
+      .sos-ok {
         margin: 0.55rem 0 0;
         font-weight: 600;
-        font-size: 0.82rem;
-        color: rgba(247, 243, 236, 0.7);
+        font-size: 0.86rem;
+        color: rgba(247, 243, 236, 0.78);
         max-width: 36rem;
+        line-height: 1.45;
       }
       .geo-err {
         color: #ffb4ad;
+      }
+      .sos-ok {
+        color: #b8efe4;
+      }
+      .sos-sheet {
+        margin-top: 1rem;
+        max-width: 28rem;
+        padding: 1.05rem 1.1rem 1rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .sos-title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+      .sos-body {
+        margin: 0.45rem 0 0;
+        font-size: 0.92rem;
+        font-weight: 500;
+        line-height: 1.45;
+        color: rgba(247, 243, 236, 0.88);
+      }
+      .sos-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.9rem;
+        align-items: center;
+      }
+      .sos-cancel {
+        border: 0;
+        background: transparent;
+        color: rgba(247, 243, 236, 0.8);
+        font-weight: 700;
+        cursor: pointer;
+        min-height: 2.4rem;
       }
       .install {
         margin-top: 0.75rem;
@@ -296,6 +375,11 @@ import { statusLabel } from '../plain-labels';
         color: #fff;
         font-weight: 800;
         cursor: pointer;
+      }
+      @media (min-width: 880px) {
+        .install {
+          display: none !important;
+        }
       }
       .pulse {
         background: var(--ink);
@@ -562,11 +646,16 @@ export class HomePageComponent implements OnInit {
   readonly statusLabel = statusLabel;
   readonly geoError = signal<string | null>(null);
   readonly installReady = signal(false);
+  readonly sosOpen = signal(false);
+  readonly sosBusy = signal(false);
+  readonly sosDone = signal(false);
+  readonly sosCopied = signal(false);
   private deferredInstall: { prompt: () => Promise<void> } | null = null;
 
   ngOnInit(): void {
     window.addEventListener('beforeinstallprompt', (e: Event) => {
       e.preventDefault();
+      if (!this.isPhone()) return;
       this.deferredInstall = e as unknown as { prompt: () => Promise<void> };
       this.installReady.set(true);
     });
@@ -607,23 +696,67 @@ export class HomePageComponent implements OnInit {
     });
   }
 
-  shareLocation(): void {
+  isPhone(): boolean {
+    return window.matchMedia('(max-width: 879px)').matches;
+  }
+
+  openSos(): void {
+    this.sosOpen.set(true);
+    this.geoError.set(null);
+    this.sosDone.set(false);
+    this.sosCopied.set(false);
+  }
+
+  closeSos(): void {
+    this.sosOpen.set(false);
+    this.sosBusy.set(false);
+  }
+
+  publishSos(): void {
     this.geoError.set(null);
     if (!navigator.geolocation) {
-      this.geoError.set('Este navegador no comparte ubicación.');
+      this.geoError.set('Este teléfono no nos deja leer la ubicación.');
       return;
     }
+    this.sosBusy.set(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const lat = pos.coords.latitude.toFixed(5);
-        const lng = pos.coords.longitude.toFixed(5);
-        const text = `Estoy aquí: https://maps.google.com/?q=${lat},${lng}\n(Ayuda en Emergencias — esto no llama al 123.)`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        this.api
+          .createNeed({
+            intent: 'NEED',
+            category: 'SOS',
+            description: 'Estoy en peligro y necesito ayuda ahora.',
+            geometry: { type: 'Point', coordinates: [lng, lat] },
+          })
+          .subscribe({
+            next: (r) => {
+              this.sosBusy.set(false);
+              this.sosDone.set(true);
+              const close = r.manageToken
+                ? this.api.manageUrl('need', r.id, r.manageToken)
+                : '';
+              if (close) {
+                try {
+                  void navigator.clipboard?.writeText(`${window.location.origin}${close}`);
+                  this.sosCopied.set(true);
+                } catch {
+                  /* ignore */
+                }
+              }
+            },
+            error: () => {
+              this.sosBusy.set(false);
+              this.geoError.set('No pudimos publicar el aviso. Intenta de nuevo.');
+            },
+          });
       },
       () => {
-        this.geoError.set('No pudimos leer la ubicación. Revisa el permiso del navegador.');
+        this.sosBusy.set(false);
+        this.geoError.set('Sin permiso de ubicación no podemos marcar el punto.');
       },
-      { enableHighAccuracy: false, timeout: 12000, maximumAge: 60_000 },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
     );
   }
 

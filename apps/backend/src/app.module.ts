@@ -12,6 +12,7 @@ import { ConnectorsModule } from './connectors/connectors.module';
 import { PlacesModule } from './places/places.module';
 import { GeoModule } from './geo/geo.module';
 import { PetsModule } from './pets/pets.module';
+import { PeopleModule } from './people/people.module';
 import { ModerationModule } from './moderation/moderation.module';
 import { ManageModule } from './manage/manage.module';
 
@@ -32,6 +33,7 @@ import { ManageModule } from './manage/manage.module';
     ConnectorsModule,
     GeoModule,
     PetsModule,
+    PeopleModule,
     ModerationModule,
     ManageModule,
   ],

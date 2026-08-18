@@ -7,6 +7,8 @@ import type {
   PetReportDto,
   PetReportKind,
   PetSpecies,
+  PersonReportDto,
+  PersonReportKind,
 } from '@aee/shared-types';
 import { ApiService } from '../api.service';
 import { CITY_CHIPS } from '../help-categories';
@@ -22,13 +24,13 @@ import { CITY_CHIPS } from '../help-categories';
         <h1>Perdidos y encontrados</h1>
         <p class="lead">
           Cobertura nacional. Mascotas: publica una señal en tu municipio. Personas: canales
-          oficiales (RND/SIRDEC) — sin registro paralelo nuestro.
+          oficiales (RND/SIRDEC) y avisos de la comunidad (sin verificar).
         </p>
       </div>
     </section>
 
     <section class="page-body">
-      <div class="page-wrap wide">
+      <div class="page-wrap wide" [class.people-wide]="tab === 'people'">
         <div class="tabs" role="tablist">
           <button
             type="button"
@@ -49,44 +51,211 @@ import { CITY_CHIPS } from '../help-categories';
         </div>
 
         <ng-container *ngIf="tab === 'people'">
-          <p class="intro">
-            Para buscar o reportar personas en cualquier zona del país, usa los canales oficiales.
-            Así evitamos datos sensibles sin control y no reemplazamos a Medicina Legal.
-          </p>
-          <ul class="people">
-            <li>
-              <strong>Consulta de desaparecidos (SIRDEC)</strong>
-              <p>Consulta pública nacional.</p>
-              <a
-                href="https://siclico.medicinalegal.gov.co/consultasPublicas/Desaparecidos.xhtml"
-                target="_blank"
-                rel="noopener"
-                >Ir a la consulta</a
-              >
-            </li>
-            <li>
-              <strong>Portal RND</strong>
-              <p>Información del Registro Nacional de Desaparecidos.</p>
-              <a
-                href="https://www.medicinalegal.gov.co/rnd-registro-de-desaparecidos"
-                target="_blank"
-                rel="noopener"
-                >Abrir portal</a
-              >
-            </li>
-            <li>
-              <strong>Líneas de atención</strong>
-              <p>123 (urgencia) · 141 (ICBF / niñez) · 155 (violencia de género).</p>
-              <div class="row-links">
-                <a href="tel:123">123</a>
-                <a href="tel:141">141</a>
-                <a href="tel:155">155</a>
+          <div class="people-layout">
+            <aside class="rail" aria-label="Canales oficiales">
+              <article class="rail-card urgent">
+                <strong>¿Alguien en peligro ahora?</strong>
+                <p>Llama al 123. Si puede pedir ayuda, usa <a routerLink="/">Estoy aquí y necesito ayuda</a>.</p>
+                <a class="rail-cta" href="tel:123">Llamar 123</a>
+              </article>
+              <article class="rail-card">
+                <strong>Consulta SIRDEC</strong>
+                <p>Búsqueda pública nacional de desaparecidos.</p>
+                <a
+                  href="https://siclico.medicinalegal.gov.co/consultasPublicas/Desaparecidos.xhtml"
+                  target="_blank"
+                  rel="noopener"
+                  >Ir a la consulta</a
+                >
+              </article>
+            </aside>
+
+            <div class="people-main">
+              <p class="intro">
+                Señales de todo el país (sin verificar). Filtra por ciudad si quieres, o deja
+                <strong>Todo el país</strong>. No reemplaza al RND: 123, SIRDEC y el portal
+                siguen en las fichas oficiales.
+              </p>
+
+              <div class="filters panel">
+                <div class="chips">
+                  <button type="button" class="chip" [class.on]="!peopleKind" (click)="setPeopleKind(null)">
+                    Todas
+                  </button>
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.on]="peopleKind === 'LOOKING'"
+                    (click)="setPeopleKind('LOOKING')"
+                  >
+                    Las busco
+                  </button>
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.on]="peopleKind === 'SEEN'"
+                    (click)="setPeopleKind('SEEN')"
+                  >
+                    Se vieron
+                  </button>
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.on]="peopleKind === 'FOUND'"
+                    (click)="setPeopleKind('FOUND')"
+                  >
+                    Las encontré
+                  </button>
+                </div>
+                <p class="label">Zona</p>
+                <div class="chips">
+                  <button
+                    type="button"
+                    class="chip soft"
+                    *ngFor="let c of cityChips"
+                    [class.on]="peopleFilterCity === c.code"
+                    (click)="setPeopleFilterCity(c.code)"
+                  >
+                    {{ c.label }}
+                  </button>
+                </div>
+                <button type="button" class="cta" (click)="showPeopleForm.set(!showPeopleForm())">
+                  {{ showPeopleForm() ? 'Cerrar formulario' : 'Publicar aviso' }}
+                </button>
               </div>
-            </li>
-          </ul>
-          <p class="hint-foot">
-            Más canales del país en <a routerLink="/origenes">Orígenes</a>.
-          </p>
+
+              <form class="panel form" *ngIf="showPeopleForm()" (ngSubmit)="publishPerson()">
+                <p class="label">¿Qué pasó?</p>
+                <div class="chips">
+                  <button type="button" class="chip" [class.on]="pFormKind === 'LOOKING'" (click)="pFormKind = 'LOOKING'">
+                    La busco
+                  </button>
+                  <button type="button" class="chip" [class.on]="pFormKind === 'SEEN'" (click)="pFormKind = 'SEEN'">
+                    Se vio / desorientada
+                  </button>
+                  <button type="button" class="chip" [class.on]="pFormKind === 'FOUND'" (click)="pFormKind = 'FOUND'">
+                    La encontré
+                  </button>
+                </div>
+                <label>
+                  Municipio
+                  <input
+                    [(ngModel)]="pCityQuery"
+                    name="pCityQuery"
+                    (ngModelChange)="onPeopleCityQuery($event)"
+                    placeholder="Escribe: Pasto, Cali, Quibdó…"
+                    autocomplete="off"
+                  />
+                </label>
+                <ul class="city-hits" *ngIf="pCityHits().length && !pFormCity">
+                  <li *ngFor="let c of pCityHits()">
+                    <button type="button" (click)="pickPeopleCity(c)">
+                      {{ c.name }} — {{ c.department }}
+                    </button>
+                  </li>
+                </ul>
+                <p class="picked" *ngIf="pFormCityLabel()">Municipio: {{ pFormCityLabel() }}</p>
+                <label>
+                  Descripción
+                  <textarea
+                    [(ngModel)]="pFormDesc"
+                    name="pDesc"
+                    rows="4"
+                    maxlength="2000"
+                    placeholder="Cómo vestía, barrio o vía, cuándo se vio… Sin cédula ni datos de menores."
+                  ></textarea>
+                </label>
+                <label>
+                  WhatsApp (opcional)
+                  <input [(ngModel)]="pFormWa" name="pWa" maxlength="20" placeholder="3001234567" />
+                </label>
+                <label>
+                  Foto (opcional)
+                  <input type="file" accept="image/*" name="pPhoto" (change)="onPeoplePhoto($event)" />
+                </label>
+                <p class="picked" *ngIf="pPhotoPreview()">Foto lista para publicar.</p>
+                <p class="ttl">
+                  El aviso se verá <strong>7 días</strong> y luego se borra. También reporta en RND/123.
+                </p>
+                <p class="err" *ngIf="pFormError()">{{ pFormError() }}</p>
+                <p class="ok" *ngIf="pOk()">{{ pOk() }}</p>
+                <div class="manage" *ngIf="pManageLink()">
+                  <p>
+                    <strong>Guarda este enlace</strong> para cerrar el aviso:
+                  </p>
+                  <a [href]="pManageLink()">{{ pManageLink() }}</a>
+                  <button type="button" class="copy" (click)="copyPeopleManage()">Copiar enlace</button>
+                </div>
+                <button type="submit" class="cta" [disabled]="pPosting()">
+                  {{ pPosting() ? 'Publicando…' : 'Publicar aviso' }}
+                </button>
+              </form>
+
+              <p class="err" *ngIf="pListError()">{{ pListError() }}</p>
+              <p class="count" *ngIf="!pLoading()">
+                {{ people().length }} aviso{{ people().length === 1 ? '' : 's' }}
+              </p>
+              <ul class="feed" *ngIf="people().length; else peopleEmpty">
+                <li *ngFor="let p of people()">
+                  <article>
+                    <img
+                      *ngIf="p.hasPhoto"
+                      class="pet-photo"
+                      [src]="api.personPhotoUrl(p.id)"
+                      alt="Foto del aviso"
+                    />
+                    <div class="top">
+                      <span class="tag" [class.found]="p.kind === 'FOUND'">{{ personKindLabel(p.kind) }}</span>
+                    </div>
+                    <p class="desc">{{ p.description }}</p>
+                    <div class="foot">
+                      <span>{{ p.municipality || 'Colombia' }}</span>
+                      <span>{{ p.createdAt | date: 'd MMM, HH:mm' }}</span>
+                    </div>
+                    <a
+                      *ngIf="p.contactWhatsapp"
+                      class="wa"
+                      [href]="personWaUrl(p)"
+                      target="_blank"
+                      rel="noopener"
+                      >WhatsApp</a
+                    >
+                  </article>
+                </li>
+              </ul>
+              <ng-template #peopleEmpty>
+                <div class="empty" *ngIf="!pLoading()">
+                  <strong>Aún no hay avisos con esos filtros.</strong>
+                  <p>Puedes publicar desde cualquier municipio del país.</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <p class="official-kicker">Canales oficiales</p>
+
+            <aside class="rail" aria-label="Registro oficial">
+              <article class="rail-card">
+                <strong>Portal RND</strong>
+                <p>Registro Nacional de Desaparecidos (Medicina Legal).</p>
+                <a
+                  href="https://www.medicinalegal.gov.co/rnd-registro-de-desaparecidos"
+                  target="_blank"
+                  rel="noopener"
+                  >Abrir portal</a
+                >
+              </article>
+              <article class="rail-card">
+                <strong>Líneas</strong>
+                <p>123 urgencia · 141 niñez · 155 género.</p>
+                <div class="row-links">
+                  <a href="tel:123">123</a>
+                  <a href="tel:141">141</a>
+                  <a href="tel:155">155</a>
+                </div>
+                <a routerLink="/origenes">Más canales</a>
+              </article>
+            </aside>
+          </div>
         </ng-container>
 
         <ng-container *ngIf="tab === 'pets'">
@@ -204,6 +373,15 @@ import { CITY_CHIPS } from '../help-categories';
                 placeholder="3001234567"
               />
             </label>
+            <label>
+              Foto (opcional)
+              <input type="file" accept="image/*" name="photo" (change)="onPhoto($event)" />
+            </label>
+            <p class="picked" *ngIf="photoPreview()">Foto lista para publicar.</p>
+            <p class="ttl">
+              La señal se verá <strong>7 días</strong> y luego se borra. Si sigue perdida o
+              encontrada, publícala de nuevo.
+            </p>
             <p class="err" *ngIf="formError()">{{ formError() }}</p>
             <p class="ok" *ngIf="ok()">{{ ok() }}</p>
             <div class="manage" *ngIf="manageLink()">
@@ -225,6 +403,12 @@ import { CITY_CHIPS } from '../help-categories';
           <ul class="feed" *ngIf="pets().length; else empty">
             <li *ngFor="let p of pets()">
               <article>
+                <img
+                  *ngIf="p.hasPhoto"
+                  class="pet-photo"
+                  [src]="api.petPhotoUrl(p.id)"
+                  alt="Foto de la mascota"
+                />
                 <div class="top">
                   <span class="tag" [class.found]="p.kind === 'FOUND'">{{
                     p.kind === 'LOST' ? 'Perdida' : 'Encontrada'
@@ -262,10 +446,117 @@ import { CITY_CHIPS } from '../help-categories';
       .page-wrap.wide {
         width: min(900px, calc(100% - 1.5rem));
       }
+      .page-wrap.wide.people-wide {
+        width: min(1180px, calc(100% - 1.25rem));
+      }
+      .people-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+        align-items: start;
+      }
+      .people-main {
+        grid-column: 1 / -1;
+        order: 1;
+        min-width: 0;
+      }
+      .official-kicker {
+        grid-column: 1 / -1;
+        order: 2;
+        margin: 0.4rem 0 0;
+        font-weight: 800;
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .rail {
+        display: grid;
+        gap: 0.65rem;
+        order: 3;
+      }
+      .rail-card {
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 0.7rem 0.75rem;
+      }
+      .rail-card strong {
+        font-family: var(--font-display);
+        font-size: 0.9rem;
+        display: block;
+        line-height: 1.25;
+      }
+      .rail-card p {
+        display: none;
+        margin: 0.3rem 0 0;
+        color: var(--muted);
+        font-weight: 500;
+        font-size: 0.82rem;
+        line-height: 1.4;
+      }
+      .rail-card a {
+        display: inline-block;
+        margin-top: 0.4rem;
+        font-weight: 800;
+        color: var(--teal);
+        text-decoration: none;
+        font-size: 0.82rem;
+      }
+      .rail-card p a {
+        display: inline;
+        margin-top: 0;
+      }
+      .rail-cta {
+        background: var(--coral);
+        color: #fff !important;
+        border-radius: 999px;
+        padding: 0.35rem 0.7rem;
+      }
+      .rail-card.urgent {
+        border-color: rgba(201, 68, 59, 0.25);
+        background: linear-gradient(180deg, #fff 0%, #fff6f5 100%);
+      }
+      @media (min-width: 1024px) {
+        .people-layout {
+          grid-template-columns: 230px minmax(0, 1fr) 230px;
+          gap: 1rem;
+        }
+        .official-kicker {
+          display: none;
+        }
+        .people-main {
+          grid-column: auto;
+          order: 0;
+        }
+        .rail {
+          order: 0;
+          position: sticky;
+          top: calc(var(--nav-h) + 0.75rem);
+        }
+        .rail-card {
+          padding: 0.95rem 1rem;
+        }
+        .rail-card strong {
+          font-size: 1.02rem;
+        }
+        .rail-card p {
+          display: block;
+        }
+        .rail-card a {
+          font-size: 0.86rem;
+          margin-top: 0.5rem;
+        }
+      }
       .tabs {
         display: flex;
         gap: 0.35rem;
         margin-bottom: 1rem;
+      }
+      .page-wrap.wide.people-wide .tabs {
+        width: min(560px, 100%);
+        margin-left: auto;
+        margin-right: auto;
       }
       .tab {
         flex: 1;
@@ -287,48 +578,14 @@ import { CITY_CHIPS } from '../help-categories';
         color: var(--muted);
         line-height: 1.45;
       }
-      .people {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 0.75rem;
-      }
-      .people li {
-        background: var(--white);
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 1.1rem;
-      }
-      .people strong {
-        font-family: var(--font-display);
-        font-size: 1.15rem;
-      }
-      .people p {
-        margin: 0.35rem 0 0;
-        color: var(--muted);
-        font-weight: 500;
-      }
-      .people a,
-      .hint-foot a {
-        display: inline-block;
-        margin-top: 0.55rem;
-        font-weight: 800;
-        color: var(--teal);
-        text-decoration: none;
-      }
       .row-links {
         display: flex;
-        gap: 0.75rem;
-        margin-top: 0.5rem;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        margin-top: 0.35rem;
       }
       .row-links a {
         margin-top: 0;
-      }
-      .hint-foot {
-        margin: 1.2rem 0 0;
-        font-weight: 600;
-        color: var(--muted);
       }
       .panel {
         background: var(--white);
@@ -435,6 +692,14 @@ import { CITY_CHIPS } from '../help-categories';
         border-radius: 16px;
         padding: 1rem;
       }
+      .pet-photo {
+        width: 100%;
+        max-height: 220px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 0.7rem;
+        background: #eee;
+      }
       .top {
         display: flex;
         gap: 0.5rem;
@@ -494,6 +759,13 @@ import { CITY_CHIPS } from '../help-categories';
         border-radius: 16px;
         padding: 1.2rem;
       }
+      .ttl {
+        margin: 0 0 0.75rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--muted);
+        line-height: 1.4;
+      }
       .err {
         color: var(--coral-deep);
         font-weight: 800;
@@ -530,7 +802,7 @@ import { CITY_CHIPS } from '../help-categories';
   ],
 })
 export class PerdidosPageComponent implements OnInit {
-  private readonly api = inject(ApiService);
+  readonly api = inject(ApiService);
 
   tab: 'pets' | 'people' = 'pets';
   kind: PetReportKind | null = null;
@@ -553,6 +825,28 @@ export class PerdidosPageComponent implements OnInit {
   cityQuery = '';
   formDesc = '';
   formWa = '';
+  photoBase64: string | null = null;
+  readonly photoPreview = signal(false);
+
+  peopleKind: PersonReportKind | null = null;
+  peopleFilterCity = '';
+  readonly people = signal<PersonReportDto[]>([]);
+  readonly pLoading = signal(false);
+  readonly pPosting = signal(false);
+  readonly showPeopleForm = signal(false);
+  readonly pListError = signal<string | null>(null);
+  readonly pFormError = signal<string | null>(null);
+  readonly pOk = signal<string | null>(null);
+  readonly pManageLink = signal<string | null>(null);
+  readonly pFormCityLabel = signal('');
+  readonly pCityHits = signal<CityDto[]>([]);
+  readonly pPhotoPreview = signal(false);
+  pFormKind: PersonReportKind = 'LOOKING';
+  pFormCity = '';
+  pCityQuery = '';
+  pFormDesc = '';
+  pFormWa = '';
+  pPhotoBase64: string | null = null;
 
   readonly speciesOpts: Array<{ id: PetSpecies; label: string }> = [
     { id: 'DOG', label: 'Perro' },
@@ -566,6 +860,7 @@ export class PerdidosPageComponent implements OnInit {
 
   setTab(t: 'pets' | 'people'): void {
     this.tab = t;
+    if (t === 'people') this.reloadPeople();
   }
 
   setKind(k: PetReportKind | null): void {
@@ -651,17 +946,20 @@ export class PerdidosPageComponent implements OnInit {
         description: this.formDesc.trim(),
         cityCode: this.formCity,
         contactWhatsapp: this.formWa.trim() || undefined,
+        photoBase64: this.photoBase64 || undefined,
       })
       .subscribe({
         next: (r) => {
           this.posting.set(false);
-          this.ok.set('Publicado. Guarda el enlace de cierre.');
+          this.ok.set('Publicado. Se verá 7 días; luego se borra. Puedes volver a publicarlo.');
           this.manageLink.set(this.api.manageUrl('pet', r.id, r.manageToken));
           this.formDesc = '';
           this.formWa = '';
           this.formCity = '';
           this.formCityLabel.set('');
           this.cityQuery = '';
+          this.photoBase64 = null;
+          this.photoPreview.set(false);
           this.reload();
         },
         error: (err) => {
@@ -681,4 +979,171 @@ export class PerdidosPageComponent implements OnInit {
     if (!link) return;
     void navigator.clipboard?.writeText(`${window.location.origin}${link}`);
   }
+
+  async onPhoto(ev: Event): Promise<void> {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    this.photoBase64 = null;
+    this.photoPreview.set(false);
+    if (!file) return;
+    try {
+      this.photoBase64 = await compressPetJpeg(file);
+      this.photoPreview.set(true);
+    } catch {
+      this.formError.set('No pudimos leer esa foto. Prueba otra imagen.');
+      input.value = '';
+    }
+  }
+
+  setPeopleKind(k: PersonReportKind | null): void {
+    this.peopleKind = k;
+    this.reloadPeople();
+  }
+
+  setPeopleFilterCity(code: string): void {
+    this.peopleFilterCity = code;
+    this.reloadPeople();
+  }
+
+  onPeopleCityQuery(q: string): void {
+    this.pFormCity = '';
+    this.pFormCityLabel.set('');
+    const term = q.trim();
+    if (term.length < 2) {
+      this.pCityHits.set([]);
+      return;
+    }
+    this.api.cities(term).subscribe({
+      next: (r) => this.pCityHits.set(r.data.slice(0, 12)),
+      error: () => this.pCityHits.set([]),
+    });
+  }
+
+  pickPeopleCity(c: CityDto): void {
+    this.pFormCity = c.code;
+    this.pFormCityLabel.set(`${c.name} — ${c.department}`);
+    this.pCityQuery = c.name;
+    this.pCityHits.set([]);
+  }
+
+  personKindLabel(k: PersonReportKind): string {
+    if (k === 'LOOKING') return 'La busco';
+    if (k === 'SEEN') return 'Se vio';
+    return 'La encontré';
+  }
+
+  personWaUrl(p: PersonReportDto): string {
+    const phone = p.contactWhatsapp ?? '';
+    const text = encodeURIComponent(
+      `Hola, vi tu aviso en Ayuda en Emergencias: ${p.description.slice(0, 140)}`,
+    );
+    return `https://wa.me/${phone}?text=${text}`;
+  }
+
+  reloadPeople(): void {
+    this.pLoading.set(true);
+    this.pListError.set(null);
+    this.api
+      .people({
+        kind: this.peopleKind ?? undefined,
+        cityCode: this.peopleFilterCity || undefined,
+      })
+      .subscribe({
+        next: (r) => {
+          this.people.set(r.data);
+          this.pLoading.set(false);
+        },
+        error: () => {
+          this.pLoading.set(false);
+          this.pListError.set('No pudimos cargar los avisos. ¿API en :3000?');
+        },
+      });
+  }
+
+  publishPerson(): void {
+    this.pFormError.set(null);
+    this.pOk.set(null);
+    this.pManageLink.set(null);
+    if (!this.pFormCity) {
+      this.pFormError.set('Busca y elige un municipio de la lista.');
+      return;
+    }
+    if (this.pFormDesc.trim().length < 8) {
+      this.pFormError.set('Describe un poco más (mín. 8 caracteres).');
+      return;
+    }
+    this.pPosting.set(true);
+    this.api
+      .createPerson({
+        kind: this.pFormKind,
+        description: this.pFormDesc.trim(),
+        cityCode: this.pFormCity,
+        contactWhatsapp: this.pFormWa.trim() || undefined,
+        photoBase64: this.pPhotoBase64 || undefined,
+      })
+      .subscribe({
+        next: (r) => {
+          this.pPosting.set(false);
+          this.pOk.set('Publicado. Se verá 7 días; luego se borra. Reporta también en RND/123.');
+          this.pManageLink.set(this.api.manageUrl('person', r.id, r.manageToken));
+          this.pFormDesc = '';
+          this.pFormWa = '';
+          this.pFormCity = '';
+          this.pFormCityLabel.set('');
+          this.pCityQuery = '';
+          this.pPhotoBase64 = null;
+          this.pPhotoPreview.set(false);
+          this.reloadPeople();
+        },
+        error: (err) => {
+          this.pPosting.set(false);
+          const msg =
+            err?.error?.message ??
+            (Array.isArray(err?.error?.message) ? err.error.message.join(', ') : null);
+          this.pFormError.set(
+            typeof msg === 'string' ? msg : 'No se pudo publicar. Revisa los datos.',
+          );
+        },
+      });
+  }
+
+  copyPeopleManage(): void {
+    const link = this.pManageLink();
+    if (!link) return;
+    void navigator.clipboard?.writeText(`${window.location.origin}${link}`);
+  }
+
+  async onPeoplePhoto(ev: Event): Promise<void> {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    this.pPhotoBase64 = null;
+    this.pPhotoPreview.set(false);
+    if (!file) return;
+    try {
+      this.pPhotoBase64 = await compressPetJpeg(file);
+      this.pPhotoPreview.set(true);
+    } catch {
+      this.pFormError.set('No pudimos leer esa foto. Prueba otra imagen.');
+      input.value = '';
+    }
+  }
+}
+
+async function compressPetJpeg(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  const max = 720;
+  const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('canvas');
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  let q = 0.72;
+  let data = canvas.toDataURL('image/jpeg', q);
+  while (data.length > 240_000 && q > 0.38) {
+    q -= 0.08;
+    data = canvas.toDataURL('image/jpeg', q);
+  }
+  return data;
 }

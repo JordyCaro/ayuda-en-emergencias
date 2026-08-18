@@ -5,6 +5,7 @@ import type {
   CityDto,
   CreateNeedRequest,
   CreatePetReportRequest,
+  CreatePersonReportRequest,
   CreatePlaceRequest,
   EventDto,
   ManageCloseRequest,
@@ -14,6 +15,8 @@ import type {
   NeedDto,
   PetReportCreateResponse,
   PetReportDto,
+  PersonReportCreateResponse,
+  PersonReportDto,
   PlaceCreateResponse,
   PlaceDto,
   SourceDto,
@@ -123,6 +126,29 @@ export class ApiService {
 
   createPet(body: CreatePetReportRequest): Observable<PetReportCreateResponse> {
     return this.http.post<PetReportCreateResponse>(`${this.base}/pets`, body);
+  }
+
+  petPhotoUrl(id: string): string {
+    return `${this.base}/pets/${id}/photo`;
+  }
+
+  people(params?: {
+    kind?: 'LOOKING' | 'SEEN' | 'FOUND';
+    cityCode?: string;
+  }): Observable<{ data: PersonReportDto[] }> {
+    const q = new URLSearchParams();
+    if (params?.kind) q.set('kind', params.kind);
+    if (params?.cityCode) q.set('cityCode', params.cityCode);
+    const qs = q.toString();
+    return this.http.get<{ data: PersonReportDto[] }>(`${this.base}/people${qs ? `?${qs}` : ''}`);
+  }
+
+  createPerson(body: CreatePersonReportRequest): Observable<PersonReportCreateResponse> {
+    return this.http.post<PersonReportCreateResponse>(`${this.base}/people`, body);
+  }
+
+  personPhotoUrl(id: string): string {
+    return `${this.base}/people/${id}/photo`;
   }
 
   managePreview(

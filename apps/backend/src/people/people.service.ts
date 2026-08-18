@@ -2,27 +2,26 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 import type {
-  CreatePetReportRequest,
-  PetReportCreateResponse,
-  PetReportDto,
-  PetReportKind,
-  PetSpecies,
+  CreatePersonReportRequest,
+  PersonReportCreateResponse,
+  PersonReportDto,
+  PersonReportKind,
 } from '@aee/shared-types';
-import { PetReportEntity } from './pet-report.entity';
+import { PersonReportEntity } from './person-report.entity';
 import { cityCenter } from '../geo/city-centers';
 import { findCityByCode } from '../geo/cities.seed';
 import { hashManageToken, issueManageToken } from '../common/manage-token';
-import { PET_TTL_MS } from '../common/ttl';
+import { PERSON_TTL_MS } from '../common/ttl';
 import { parseJpegPhoto } from '../common/jpeg-photo';
 
 @Injectable()
-export class PetsService {
+export class PeopleService {
   constructor(
-    @InjectRepository(PetReportEntity)
-    private readonly repo: Repository<PetReportEntity>,
+    @InjectRepository(PersonReportEntity)
+    private readonly repo: Repository<PersonReportEntity>,
   ) {}
 
-  async create(dto: CreatePetReportRequest): Promise<PetReportCreateResponse> {
+  async create(dto: CreatePersonReportRequest): Promise<PersonReportCreateResponse> {
     let lng: number;
     let lat: number;
     let cityCode = dto.cityCode?.trim() || null;
@@ -65,7 +64,6 @@ export class PetsService {
     const row = await this.repo.save(
       this.repo.create({
         kind: dto.kind,
-        species: dto.species,
         description,
         geometry: { type: 'Point', coordinates: [lng, lat] },
         lng,
@@ -78,7 +76,7 @@ export class PetsService {
         municipality,
         contactWhatsapp: normalizeWhatsapp(dto.contactWhatsapp),
         manageTokenHash: token.hash,
-        expiresAt: new Date(Date.now() + PET_TTL_MS),
+        expiresAt: new Date(Date.now() + PERSON_TTL_MS),
         photoJpeg: photo,
         hasPhoto: Boolean(photo),
       }),
@@ -86,11 +84,7 @@ export class PetsService {
     return { ...this.toDto(row), manageToken: token.plain };
   }
 
-  async list(opts?: {
-    kind?: PetReportKind;
-    species?: PetSpecies;
-    cityCode?: string;
-  }): Promise<PetReportDto[]> {
+  async list(opts?: { kind?: PersonReportKind; cityCode?: string }): Promise<PersonReportDto[]> {
     const qb = this.repo
       .createQueryBuilder('p')
       .where('p.status = :status', { status: 'OPEN' })
@@ -99,16 +93,15 @@ export class PetsService {
       .take(200);
 
     if (opts?.kind) qb.andWhere('p.kind = :kind', { kind: opts.kind });
-    if (opts?.species) qb.andWhere('p.species = :species', { species: opts.species });
     if (opts?.cityCode) qb.andWhere('p.city_code = :cityCode', { cityCode: opts.cityCode });
 
     const rows = await qb.getMany();
     return rows.map((r) => this.toDto(r));
   }
 
-  async getById(id: string): Promise<PetReportDto> {
+  async getById(id: string): Promise<PersonReportDto> {
     const row = await this.repo.findOne({ where: { id } });
-    if (!row) throw new NotFoundException(`Pet report ${id} not found`);
+    if (!row) throw new NotFoundException(`Person report ${id} not found`);
     return this.toDto(row);
   }
 
@@ -118,7 +111,7 @@ export class PetsService {
       throw new NotFoundException('Aviso no encontrado o enlace inválido');
     }
     return {
-      kind: 'pet' as const,
+      kind: 'person' as const,
       id: row.id,
       title: row.description.slice(0, 160),
       status: row.status,
@@ -126,7 +119,7 @@ export class PetsService {
     };
   }
 
-  async closeWithToken(id: string, manageToken: string): Promise<PetReportDto> {
+  async closeWithToken(id: string, manageToken: string): Promise<PersonReportDto> {
     const row = await this.repo.findOne({ where: { id } });
     if (!row || !row.manageTokenHash || row.manageTokenHash !== hashManageToken(manageToken)) {
       throw new NotFoundException('Aviso no encontrado o enlace inválido');
@@ -143,11 +136,10 @@ export class PetsService {
     return result.affected ?? 0;
   }
 
-  private toDto(row: PetReportEntity): PetReportDto {
+  private toDto(row: PersonReportEntity): PersonReportDto {
     return {
       id: row.id,
       kind: row.kind,
-      species: row.species,
       description: row.description,
       geometry: row.geometry,
       verification: row.verification,

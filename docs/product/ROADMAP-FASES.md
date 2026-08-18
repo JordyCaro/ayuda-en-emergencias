@@ -17,7 +17,7 @@ Fuente de **comportamiento a construir**: siempre una `spec` aprobada en `/specs
 2. **Conectar, no intermediarios** — no pedimos, recaudamos ni custodiamos donaciones (dinero o especie).  
 3. **Avisos = señales** — no son tickets que la plataforma prometa cumplir.  
 4. **Procedencia visible** en todo dato.  
-5. **Personas desaparecidas** → solo deep-link oficial (RND/SIRDEC); **nunca** base propia.  
+5. **Personas desaparecidas** → RND/SIRDEC y líneas oficiales siempre visibles; avisos comunitarios `UNVERIFIED` (7 días, sin cédulas) no reemplazan el canal oficial.  
 6. **Offline / PWA avanzada** = **última fase y casi opcional**.
 
 ---
@@ -57,7 +57,7 @@ El slice **001** colapsó master 1+3+4 en un MVP usable. El resto del master se 
 | **5** | Descubrimiento llevar ayuda (enlace) | Acopio/especie vía terceros; cero pasarela | `004` | **Hecha** |
 | **6** | Densificación territorial | OSM multi-ciudad; cerca de mí | `005` | **Hecha** |
 | **7** | Orígenes / deep-links oficiales | Página unificada canales + estado de integración | `006` | **Hecha** |
-| **8** | Perdidos / encontrados | Mascotas UNVERIFIED; personas → RND | `007` | **Hecha** |
+| **8** | Perdidos / encontrados | Mascotas UNVERIFIED; personas → RND + avisos comunitarios | `007` | **Hecha** |
 | **9** | Cierre comunitario (sin moderador) | Enlace secreto `/cerrar`; sin panel admin | `008` | **Hecha** |
 | **10** | Plataforma de producción | Migraciones, Docker prod, health, connectors status, OpenAPI, checklist deploy | `009` | **Hecha** (hosting = operador) |
 | **11** | Multi-país / expansión | País #2 con discovery propio | opcional | Opcional |
@@ -134,8 +134,8 @@ Spec: `specs/006-deep-links-oficiales/` (**APROBADA**; UI fusionada post-entrega
 
 ### Fase 8 — Perdidos / encontrados ✅
 
-- **Mascotas:** `POST/GET /api/v1/pets` — perdida/encontrada (`UNVERIFIED`), ciudad, WhatsApp opcional, ~14d.  
-- **Personas:** pestaña en `/perdidos` → RND/SIRDEC + 123/141/155 (sin CRUD nuestro).  
+- **Mascotas:** `POST/GET /api/v1/pets` — perdida/encontrada (`UNVERIFIED`), ciudad, WhatsApp opcional, foto, 7d.  
+- **Personas:** pestaña en `/perdidos` → RND/SIRDEC + 123/141/155 **y** avisos comunitarios `UNVERIFIED` (7d, sin cédulas).  
 - No marketplace de servicios.  
 - Spec: `specs/007-perdidos-encontrados/` (**APROBADA**).
 

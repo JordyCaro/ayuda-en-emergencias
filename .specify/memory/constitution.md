@@ -56,7 +56,7 @@ No cobramos por acceder a información de emergencia.
 ### VIII. Privacidad mínima necesaria
 
 No almacenar documentos de identidad, teléfonos públicos ni direcciones privadas salvo necesidad legal real.  
-Casos de personas desaparecidas: derivar a recursos oficiales; no presentarnos como autoridad.
+Casos de personas desaparecidas: **siempre** mostrar RND/SIRDEC y líneas oficiales primero. Pueden existir avisos comunitarios `UNVERIFIED` (busco / se vio / encontré), con caducidad corta, **sin cédulas** y sin presentarnos como autoridad ni como registro oficial.
 
 ### IX. Ética
 

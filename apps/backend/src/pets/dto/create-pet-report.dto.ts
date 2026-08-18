@@ -51,4 +51,10 @@ export class CreatePetReportDto {
   @IsString()
   @MaxLength(20)
   contactWhatsapp?: string;
+
+  /** JPEG data URL o base64. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(280000)
+  photoBase64?: string;
 }

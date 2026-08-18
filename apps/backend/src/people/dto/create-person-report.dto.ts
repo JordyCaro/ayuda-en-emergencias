@@ -8,25 +8,11 @@ import {
   IsString,
   Matches,
   MaxLength,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { NeedCategory, NeedIntent } from '@aee/shared-types';
-
-const NEED_CATEGORIES = [
-  'SOS',
-  'HELP',
-  'WATER',
-  'FOOD',
-  'SHELTER',
-  'MEDICAL',
-  'TRANSPORT',
-  'COMMUNICATION',
-  'VOLUNTEER',
-  'CLOTHING',
-  'BLOOD',
-  'OTHER',
-] as const;
+import type { PersonReportKind } from '@aee/shared-types';
 
 class GeoPointDto {
   @IsIn(['Point'])
@@ -39,14 +25,12 @@ class GeoPointDto {
   coordinates!: [number, number];
 }
 
-export class CreateNeedDto {
-  @IsIn(NEED_CATEGORIES)
-  category!: NeedCategory;
-
-  @IsIn(['NEED', 'OFFER'])
-  intent!: NeedIntent;
+export class CreatePersonReportDto {
+  @IsIn(['LOOKING', 'SEEN', 'FOUND'])
+  kind!: PersonReportKind;
 
   @IsString()
+  @MinLength(8)
   @MaxLength(2000)
   description!: string;
 
@@ -60,9 +44,13 @@ export class CreateNeedDto {
   @Matches(/^\d{5}$/, { message: 'cityCode must be 5 digits' })
   cityCode?: string;
 
-  /** Celular CO: 10 dígitos (3xx…) o con 57. */
   @IsOptional()
   @IsString()
   @MaxLength(20)
   contactWhatsapp?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(280000)
+  photoBase64?: string;
 }

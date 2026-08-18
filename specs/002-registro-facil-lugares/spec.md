@@ -15,7 +15,7 @@
 2. Una **organización o entidad** puede registrarse con un flujo simple (nombre, tipo, punto, enlace / “qué necesitan”).  
 3. Existe un listado tipo **“Organizaciones / puntos que piden apoyo”** con **filtro por ciudad** (DIVIPOLA) y orden por actualización reciente.  
 4. Los puntos aparecen en el mapa **cerca del usuario**, con badge no verificado / oficial y **fecha de actualización**.  
-5. Puntos de emergencia pueden **expirar** automáticamente.  
+5. Los acopios comunitarios **permanecen visibles** hasta que quien publicó los oculte o moderación los esconda.  
 6. Nosotros **no** recaudamos donaciones: solo enlazamos al canal de la org/punto.
 
 ## 2. Alcance
@@ -28,8 +28,8 @@
 - `POST /api/v1/places` + `GET` con geo, `cityCode`, `sourceId`.  
 - `GET /api/v1/geo/cities` catálogo DIVIPOLA (subset curado + búsqueda).  
 - UI listado / filtro en Comunidad (capa **Puntos**).  
-- `expiresAt` default 72h; cron de expiración (ya en Fase 2).  
-- Copy: no promesa de cumplimiento; no pasarela de dinero.
+- Copy: no promesa de cumplimiento; no pasarela de dinero.  
+- Lugares comunitarios **sin** caducidad automática (siguen en el mapa).
 
 ### OUT (002)
 
@@ -59,11 +59,11 @@
 **When** filtro por código DIVIPOLA  
 **Then** solo veo puntos de esa ciudad
 
-### D — Expiración
+### D — Permanencia en el mapa
 
-**Given** un acopio con expiresAt pasado  
-**When** consulto listados  
-**Then** no aparece como ACTIVE
+**Given** un acopio comunitario publicado  
+**When** consulto listados y el mapa días después  
+**Then** sigue ACTIVE (salvo cierre del autor o moderación)
 
 ## 4. Constraints
 
@@ -76,7 +76,7 @@
 - [ ] Flujo &lt;30s en móvil  
 - [ ] Place en GET places con geo / cityCode  
 - [ ] Badge UNVERIFIED por defecto (community)  
-- [ ] expiresAt respetado  
+- [ ] Acopio comunitario permanece en mapa (sin TTL)  
 - [ ] OpenAPI actualizado  
 - [ ] No se muestra como OFFICIAL sin ser connector oficial  
 
