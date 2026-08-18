@@ -897,7 +897,7 @@ export class AyudarPageComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: () => {
         this.loading.set(false);
-        this.error.set('No pudimos cargar el directorio. ¿Está el API en :3000?');
+        this.error.set('Error al cargar los datos. Intenta de nuevo en un momento.');
       },
     });
   }

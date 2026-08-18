@@ -192,7 +192,7 @@ import { CITY_CHIPS } from '../help-categories';
               </form>
 
               <p class="err" *ngIf="pListError()">{{ pListError() }}</p>
-              <p class="count" *ngIf="!pLoading()">
+              <p class="count" *ngIf="!pLoading() && !pListError()">
                 {{ people().length }} aviso{{ people().length === 1 ? '' : 's' }}
               </p>
               <ul class="feed" *ngIf="people().length; else peopleEmpty">
@@ -224,7 +224,7 @@ import { CITY_CHIPS } from '../help-categories';
                 </li>
               </ul>
               <ng-template #peopleEmpty>
-                <div class="empty" *ngIf="!pLoading()">
+                <div class="empty" *ngIf="!pLoading() && !pListError()">
                   <strong>Aún no hay avisos con esos filtros.</strong>
                   <p>Puedes publicar desde cualquier municipio del país.</p>
                 </div>
@@ -397,7 +397,7 @@ import { CITY_CHIPS } from '../help-categories';
           </form>
 
           <p class="err" *ngIf="listError()">{{ listError() }}</p>
-          <p class="count" *ngIf="!loading()">
+          <p class="count" *ngIf="!loading() && !listError()">
             {{ pets().length }} aviso{{ pets().length === 1 ? '' : 's' }}
           </p>
           <ul class="feed" *ngIf="pets().length; else empty">
@@ -432,7 +432,7 @@ import { CITY_CHIPS } from '../help-categories';
             </li>
           </ul>
           <ng-template #empty>
-            <div class="empty" *ngIf="!loading()">
+            <div class="empty" *ngIf="!loading() && !listError()">
               <strong>Aún no hay avisos con esos filtros.</strong>
               <p>Puedes publicar desde cualquier municipio del país.</p>
             </div>
@@ -921,7 +921,7 @@ export class PerdidosPageComponent implements OnInit {
         },
         error: () => {
           this.loading.set(false);
-          this.listError.set('No pudimos cargar los avisos. ¿API en :3000?');
+          this.listError.set('Error al cargar los datos. Intenta de nuevo en un momento.');
         },
       });
   }
@@ -1055,7 +1055,7 @@ export class PerdidosPageComponent implements OnInit {
         },
         error: () => {
           this.pLoading.set(false);
-          this.pListError.set('No pudimos cargar los avisos. ¿API en :3000?');
+          this.pListError.set('Error al cargar los datos. Intenta de nuevo en un momento.');
         },
       });
   }
