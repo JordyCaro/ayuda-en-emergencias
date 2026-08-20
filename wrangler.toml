@@ -4,6 +4,15 @@ name = "ayuda-en-emergencias"
 compatibility_date = "2026-08-18"
 workers_dev = true
 
+# Dominio propio (Cloudflare crea DNS + HTTPS al desplegar).
+[[routes]]
+pattern = "ayudaenemergencias.com"
+custom_domain = true
+
+[[routes]]
+pattern = "www.ayudaenemergencias.com"
+custom_domain = true
+
 [assets]
 directory = "apps/frontend/dist/frontend/browser"
 not_found_handling = "single-page-application"

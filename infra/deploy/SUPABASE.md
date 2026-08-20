@@ -96,7 +96,7 @@ Eso prueba: **tu laptop → API Nest → Postgres de Supabase**. Todavía no hay
 | `NODE_ENV` | `production` |
 | `DATABASE_URL` | la URI **Direct** de Supabase (añade `?sslmode=require` al final si no está) |
 | `API_PORT` | `10000` (Render suele inyectar `PORT`; si falla, ver nota abajo) |
-| `API_CORS_ORIGIN` | `https://TU-FRONT.netlify.app` *(la pones cuando exista el front)* |
+| `API_CORS_ORIGIN` | `https://ayudaenemergencias.com,https://www.ayudaenemergencias.com` |
 | `OPS_TOKEN` | un string largo aleatorio |
 | `MODERATION_TOKEN` | otro string largo aleatorio |
 | `TYPEORM_SYNCHRONIZE` | `true` **solo el primer deploy** (crea tablas) |
@@ -123,11 +123,17 @@ Cloudflare (2026) mete el front en **Create a Worker** (GitHub). No busques otra
 
 Advanced: `NODE_VERSION` = `22`. URL típica: `https://ayuda-en-emergencias.jhordan-caro.workers.dev`.
 
-En Render, `API_CORS_ORIGIN` = esa URL (https, sin slash final).
+En Render, `API_CORS_ORIGIN` = origen del front (https, sin slash final). Con dominio propio:
+
+```text
+https://ayudaenemergencias.com,https://www.ayudaenemergencias.com
+```
+
+(Varios orígenes separados por coma.)
 
 1. [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → GitHub → repo `ayuda-en-emergencias`.
 
-Dominio propio: en el Worker → **Settings** → **Domains & Routes** (o Custom domains). El HTTPS lo pone Cloudflare. El dominio se **compra aparte**; engancharlo es gratis.
+Dominio propio: en el Worker → **Settings** → **Domains & Routes** → **Add custom domain** → `ayudaenemergencias.com` y `www.ayudaenemergencias.com`. También queda declarado en `wrangler.toml` (se aplica en cada `wrangler deploy`). HTTPS lo pone Cloudflare. Si compraste el dominio en Cloudflare, no hace falta tocar DNS a mano.
 
 ---
 
