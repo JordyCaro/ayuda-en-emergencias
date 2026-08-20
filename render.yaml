@@ -1,0 +1,14 @@
+# Blueprint Render — API Nest del monorepo (sin secretos).
+# Si ya creaste el servicio a mano, estos comandos deben coincidir con el dashboard.
+services:
+  - type: web
+    name: ayuda-en-emergencias
+    runtime: node
+    plan: free
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile &&
+      pnpm --filter @aee/shared-types build &&
+      pnpm --filter @aee/backend build
+    startCommand: pnpm --filter @aee/backend start:prod
+    healthCheckPath: /api/v1/health/ready
